@@ -1,0 +1,245 @@
+@import '~assets/fonts/bo_icons/style.css';
+@import '~assets/style/user/_fonts.css';
+
+html {
+  color: var(--color-default);
+  font-size: 10px;
+  letter-spacing: 0.25px;
+}
+
+.color-primary {
+  color: var(--color-u-primary);
+}
+.color-secondary {
+  color: var(--color-u-secondary);
+}
+.color-white {
+  color: var(--color-white);
+}
+.color-grey1 {
+  color: var(--color-u-grey-1);
+}
+.color-grey2 {
+  color: var(--color-u-grey-2);
+}
+.color-grey3 {
+  color: var(--color-u-grey-3);
+}
+.color-grey4 {
+  color: var(--color-u-grey-4);
+}
+.color-black {
+  color: var(--color-black);
+}
+.color-error {
+  color: var(--color-u-error);
+}
+
+// margin set
+.mr-8 {
+  margin-right: 0.8rem;
+}
+
+.mr-16 {
+  margin-right: 1.6rem;
+}
+
+.mr-24 {
+  margin-right: 2.4rem;
+}
+
+.mr-28 {
+  margin-right: 2.8rem;
+}
+
+.ml-8 {
+  margin-left: 0.8rem;
+}
+
+.ml-16 {
+  margin-left: 1.6rem;
+}
+
+.ml-24 {
+  margin-left: 2.4rem;
+}
+
+.ml-28 {
+  margin-left: 2.8rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-12 {
+  margin-bottom: 1.2rem;
+}
+
+.mb-14 {
+  margin-bottom: 1.4rem;
+}
+
+.mb-16 {
+  margin-bottom: 1.6rem;
+}
+
+.mb-17 {
+  margin-bottom: 1.7rem;
+}
+
+.mb-20 {
+  margin-bottom: 2rem;
+}
+
+.mb-24 {
+  margin-bottom: 2.4rem;
+}
+
+.mb-26 {
+  margin-bottom: 2.6rem;
+}
+
+.mb-28 {
+  margin-bottom: 2.8rem;
+}
+
+.mb-32 {
+  margin-bottom: 3.2rem;
+}
+
+.mb-36 {
+  margin-bottom: 3.6rem;
+}
+
+.mb-43 {
+  margin-bottom: 4.3rem;
+}
+
+.mb-80 {
+  margin-bottom: 8rem;
+}
+
+/* GLOBAL TEXT SET */
+html,
+body {
+  font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue,
+    helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+  -webkit-overflow-scrolling: touch;
+}
+// default = txt-body3
+body {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 160%;
+}
+
+::-webkit-scrollbar {
+  height: 80%;
+  margin-right: 12px;
+  width: 2px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-black);
+}
+::-webkit-scrollbar-track {
+  background-color: var(--color-u-grey-2);
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+summary {
+  display: block;
+  cursor: pointer;
+}
+
+.bullet {
+  li {
+    font-size: 1.4rem;
+    position: relative;
+    padding-left: 0.9rem;
+    word-break: keep-all;
+
+    &::before {
+      content: '';
+      height: 3px;
+      width: 3px;
+      position: absolute;
+      background-image: url('~assets/img/bullet.svg');
+      top: 0.9rem;
+      left: 0;
+    }
+  }
+
+  &.sm {
+    li {
+      font-size: 1.2rem;
+
+      &::before {
+        top: 0.8rem;
+      }
+    }
+  }
+}
+
+.only-pc {
+  display: none !important;
+}
+
+.only-pc-flex {
+  display: none !important;
+}
+
+@media screen and (min-width: 769px) {
+  .only-mobile {
+    display: none !important;
+  }
+
+  .only-pc {
+    display: block !important;
+  }
+
+  .only-pc-flex {
+    display: flex !important;
+  }
+
+  // pc-container: pc에서만 사용되는 컨테이너
+  .container,
+  .pc-container {
+    max-width: 1392px;
+    padding: 0 1.4rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .bullet {
+    li {
+      font-size: 1.6rem;
+      padding-left: 1.5rem;
+      margin-bottom: 0.4rem;
+      line-height: 160%;
+
+      &::before {
+        top: 1rem;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    &.sm {
+      li {
+        font-size: 1.2rem;
+
+        &::before {
+          top: 0.8rem;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+#summernote ~ .note-editor,
+.note-editor-viewer {
+  word-break: break-all;
+
+  .note-editable,
+  .note-dropdown-menu {
+    a {
+      color: #337ab7;
+      text-decoration: none;
+    }
+
+    a:active,
+    a:hover {
+      outline: 0;
+    }
+
+    a:focus,
+    a:hover {
+      color: #23527c;
+      text-decoration: underline;
+    }
+
+    p,
+    li {
+      font-size: 14px;
+      color: #68747f;
+    }
+
+    b,
+    strong {
+      font-weight: bold;
+    }
+
+    blockquote {
+      border-left: 5px solid #f86466;
+      padding: 10px 20px;
+      margin: 0 0 20px;
+    }
+
+    pre {
+      display: block;
+      padding: 9.5px;
+      margin: 0 0 10px;
+      font-size: 13px;
+      line-height: 1.42857143;
+      color: #333;
+      word-break: break-all;
+      word-wrap: break-word;
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .h1,
+    .h2,
+    .h3,
+    .h4,
+    .h5,
+    .h6,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.1;
+      color: inherit;
+    }
+
+    h1 {
+      font-size: 36px;
+    }
+
+    h2 {
+      font-size: 26px;
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    h4 {
+      font-size: 18px;
+    }
+
+    h5 {
+      font-size: 14px;
+    }
+
+    h6 {
+      font-size: 12px;
+    }
+
+    ul,
+    ol {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    ol {
+      display: block;
+      list-style-type: decimal;
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      margin-inline-start: 0;
+      margin-inline-end: 0;
+      padding-left: 40px;
+
+      li {
+        color: #333;
+        word-wrap: break-word;
+        box-sizing: border-box;
+      }
+    }
+
+    ::marker {
+      unicode-bidi: isolate;
+      font-variant-numeric: tabular-nums;
+      text-transform: none;
+      text-indent: 0 !important;
+      text-align: start !important;
+      text-align-last: start !important;
+    }
+  }
+
+  .note-editable *:not(font) {
+    color: #000 !important;
+  }
+}

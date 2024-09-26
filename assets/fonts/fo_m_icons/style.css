@@ -1,0 +1,77 @@
+@font-face {
+  font-family: 'fo_m';
+  src: url('fonts/fo_m.ttf?d4vdag') format('truetype'), url('fonts/fo_m.woff?d4vdag') format('woff'),
+    url('fonts/fo_m.svg?d4vdag#fo_m') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+i.m {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'fo_m', serif !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.umic-location:before {
+  content: "\e911";
+}
+.umic-arrow_backward:before {
+  content: '\e900';
+}
+.umic-arrow_bottom:before {
+  content: '\e901';
+}
+.umic-arrow_calendar_next_end:before {
+  content: '\e902';
+}
+.umic-arrow_calendar_pre_end:before {
+  content: '\e903';
+}
+.umic-arrow_forward:before {
+  content: '\e904';
+}
+.umic-arrow_top:before {
+  content: '\e905';
+}
+.umic-calendar:before {
+  content: '\e906';
+}
+.umic-detail:before {
+  content: '\e907';
+}
+.umic-docent:before {
+  content: '\e908';
+}
+.umic-header_search:before {
+  content: '\e909';
+}
+.umic-home:before {
+  content: '\e90a';
+}
+.umic-minus:before {
+  content: '\e90b';
+}
+.umic-my:before {
+  content: '\e90c';
+}
+.umic-plus:before {
+  content: '\e90d';
+}
+.umic-header_menu_close:before {
+  content: '\e90e';
+}
+.umic-header_menu_open:before {
+  content: '\e90f';
+}
+.umic-ticketing:before {
+  content: '\e910';
+}

@@ -1,0 +1,240 @@
+@charset "utf-8";
+
+/*
+  File Definition: Grid Style
+  Version: 1.0.0
+  Writer: JJY
+ */
+
+/*
+ * BASIC (>639px) ---------------------------------------------------
+ * fixture---------------------xs
+
+ * TABLET, MOBILE (>640px) ------------------------------------------
+ * fixture---------------------sm
+
+ * TABLET, MOBILE (>768px) ------------------------------------------
+ * fixture---------------------md
+
+ * TABLET (>1024px) -------------------------------------------------
+ * fixture---------------------lg
+
+ * TABLET, IPADS (>1280px) ------------------------------------------
+ * fixture---------------------xl
+
+ * LAPTOPS, DESKTOP (>1536px) ---------------------------------------
+ * fixture---------------------xxl
+*/
+
+//breakpoint 설정
+$sm-breakpoint: 640px;
+$md-breakpoint: 768px;
+$lg-breakpoint: 1024px;
+$xl-breakpoint: 1280px;
+$xxl-breakpoint: 1536px;
+
+//columns 설정, 12 Column System
+$columns: 12;
+
+//gap 설정, 값: 100 = 10rem
+$gap: 100;
+
+.grid {
+  display: grid;
+
+  &.col-none {
+    grid-template-columns: none;
+  }
+  &.row-none {
+    grid-template-rows: none;
+  }
+  &.flow-col {
+    grid-auto-flow: column;
+  }
+  &.flow-row {
+    grid-auto-flow: row;
+  }
+  &.flow-col-dense {
+    grid-auto-flow: column dense;
+  }
+  &.flow-row-dense {
+    grid-auto-flow: row dense;
+  }
+}
+
+.col-span-full {
+  grid-column: 1 / -1;
+}
+
+.row-span-full {
+  grid-row: 1 / -1;
+}
+
+@for $index from 1 through $columns {
+  .col-xs-#{$index} {
+    grid-template-columns: repeat($index, minmax(0, 1fr));
+  }
+  .row-xs-#{$index} {
+    grid-template-rows: repeat($index, minmax(0, 1fr));
+  }
+  .col-xs-span-#{$index} {
+    grid-column: span $index/span $index;
+  }
+  .row-xs-span-#{$index} {
+    grid-row: span $index/span $index;
+  }
+}
+
+@for $index from 1 through $gap {
+  .gap-xs-#{$index} {
+    grid-gap: $index * 0.1 + rem;
+  }
+  .gap-xs-row-#{$index} {
+    grid-row-gap: $index * 0.1 + rem;
+  }
+  .gap-xs-col-#{$index} {
+    grid-column-gap: $index * 0.1 + rem;
+  }
+}
+
+@media screen and (min-width: $sm-breakpoint) {
+  @for $index from 1 through $columns {
+    .col-sm-#{$index} {
+      grid-template-columns: repeat($index, minmax(0, 1fr));
+    }
+    .row-sm-#{$index} {
+      grid-template-rows: repeat($index, minmax(0, 1fr));
+    }
+    .col-sm-span-#{$index} {
+      grid-column: span $index/span $index;
+    }
+    .row-sm-span-#{$index} {
+      grid-row: span $index/span $index;
+    }
+  }
+
+  @for $index from 1 through $gap {
+    .gap-sm-#{$index} {
+      grid-gap: $index * 0.1 + rem;
+    }
+    .gap-sm-row-#{$index} {
+      grid-row-gap: $index * 0.1 + rem;
+    }
+    .gap-sm-col-#{$index} {
+      grid-column-gap: $index * 0.1 + rem;
+    }
+  }
+}
+
+@media screen and(min-width: $md-breakpoint) {
+  @for $index from 1 through $columns {
+    .col-md-#{$index} {
+      grid-template-columns: repeat($index, minmax(0, 1fr));
+    }
+    .row-md-#{$index} {
+      grid-template-rows: repeat($index, minmax(0, 1fr));
+    }
+    .col-md-span-#{$index} {
+      grid-column: span $index/span $index;
+    }
+    .row-md-span-#{$index} {
+      grid-row: span $index/span $index;
+    }
+  }
+
+  @for $index from 1 through $gap {
+    .gap-md-#{$index} {
+      grid-gap: $index * 0.1 + rem;
+    }
+    .gap-md-row-#{$index} {
+      grid-row-gap: $index * 0.1 + rem;
+    }
+    .gap-md-col-#{$index} {
+      grid-column-gap: $index * 0.1 + rem;
+    }
+  }
+}
+@media screen and(min-width: $lg-breakpoint) {
+  @for $index from 1 through $columns {
+    .col-lg-#{$index} {
+      grid-template-columns: repeat($index, minmax(0, 1fr));
+    }
+    .row-lg-#{$index} {
+      grid-template-rows: repeat($index, minmax(0, 1fr));
+    }
+    .col-lg-span-#{$index} {
+      grid-column: span $index/span $index;
+    }
+    .row-lg-span-#{$index} {
+      grid-row: span $index/span $index;
+    }
+  }
+
+  @for $index from 1 through $gap {
+    .gap-lg-#{$index} {
+      grid-gap: $index * 0.1 + rem;
+    }
+    .gap-lg-row-#{$index} {
+      grid-row-gap: $index * 0.1 + rem;
+    }
+    .gap-lg-col-#{$index} {
+      grid-column-gap: $index * 0.1 + rem;
+    }
+  }
+}
+@media screen and(min-width: $xl-breakpoint) {
+  @for $index from 1 through $columns {
+    .col-xl-#{$index} {
+      grid-template-columns: repeat($index, minmax(0, 1fr));
+    }
+    .row-xl-#{$index} {
+      grid-template-rows: repeat($index, minmax(0, 1fr));
+    }
+    .col-xl-span-#{$index} {
+      grid-column: span $index/span $index;
+    }
+    .row-xl-span-#{$index} {
+      grid-row: span $index/span $index;
+    }
+  }
+
+  @for $index from 1 through $gap {
+    .gap-xl-#{$index} {
+      grid-gap: $index * 0.1 + rem;
+    }
+    .gap-xl-row-#{$index} {
+      grid-row-gap: $index * 0.1 + rem;
+    }
+    .gap-xl-col-#{$index} {
+      grid-column-gap: $index * 0.1 + rem;
+    }
+  }
+}
+@media screen and(min-width: $xxl-breakpoint) {
+  @for $index from 1 through $columns {
+    .col-xxl-#{$index} {
+      grid-template-columns: repeat($index, minmax(0, 1fr));
+    }
+    .row-xxl-#{$index} {
+      grid-template-rows: repeat($index, minmax(0, 1fr));
+    }
+    .col-xxl-span-#{$index} {
+      grid-column: span $index/span $index;
+    }
+    .row-xxl-span-#{$index} {
+      grid-row: span $index/span $index;
+    }
+  }
+
+  @for $index from 1 through $gap {
+    .gap-xxl-#{$index} {
+      grid-gap: $index * 0.1 + rem;
+    }
+    .gap-xxl-row-#{$index} {
+      grid-row-gap: $index * 0.1 + rem;
+    }
+    .gap-xxl-col-#{$index} {
+      grid-column-gap: $index * 0.1 + rem;
+    }
+  }
+}

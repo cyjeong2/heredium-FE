@@ -1,0 +1,117 @@
+@font-face {
+  font-family: 'fo';
+  src: url('fonts/fo.ttf?knuylm') format('truetype'), url('fonts/fo.woff?knuylm') format('woff'),
+    url('fonts/fo.svg?knuylm#fo') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+i.pc {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'fo', serif !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.uic-account:before {
+  content: '\e900';
+}
+.uic-arrow_backward:before {
+  content: '\e901';
+}
+.uic-arrow_bottom:before {
+  content: '\e902';
+}
+.uic-arrow_calendar_next_end:before {
+  content: '\e903';
+}
+.uic-arrow_calendar_pre_end:before {
+  content: '\e904';
+}
+.uic-arrow_forward:before {
+  content: '\e905';
+}
+.uic-arrow_next:before {
+  content: '\e906';
+}
+.uic-arrow_pre:before {
+  content: '\e907';
+}
+.uic-arrow_top:before {
+  content: '\e908';
+}
+.uic-attach:before {
+  content: '\e909';
+}
+.uic-calendar:before {
+  content: '\e90a';
+}
+.uic-close:before {
+  content: '\e90b';
+}
+.uic-detail:before {
+  content: '\e90c';
+}
+.uic-download:before {
+  content: '\e90d';
+}
+.uic-facebook:before {
+  content: '\e90e';
+}
+.uic-fixed:before {
+  content: '\e90f';
+}
+.uic-guide:before {
+  content: '\e910';
+}
+.uic-home:before {
+  content: '\e911';
+}
+.uic-info:before {
+  content: '\e912';
+}
+.uic-kakaotalk:before {
+  content: '\e913';
+}
+.uic-link:before {
+  content: '\e918';
+}
+.uic-login:before {
+  content: '\e919';
+}
+.uic-logout:before {
+  content: '\e91a';
+}
+.uic-minus:before {
+  content: '\e91b';
+}
+.uic-notice:before {
+  content: '\e91c';
+}
+.uic-open_hours:before {
+  content: '\e91d';
+}
+.uic-plus:before {
+  content: '\e91e';
+}
+.uic-search:before {
+  content: '\e91f';
+}
+.uic-share:before {
+  content: '\e920';
+}
+.uic-ticket:before {
+  content: '\e921';
+}
+.uic-twitter:before {
+  content: '\e922';
+}

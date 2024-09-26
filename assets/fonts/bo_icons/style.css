@@ -1,0 +1,97 @@
+@font-face {
+  font-family: 'simsimicons';
+  src: url('fonts/simsimicons.ttf?bsntq2') format('truetype'), url('fonts/simsimicons.woff?bsntq2') format('woff'),
+    url('fonts/simsimicons.svg?bsntq2#simsimicons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+i {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'simsimicons', serif !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  font-size: 24px;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ic-minus:before {
+  content: '\e917';
+}
+.ic-plus:before {
+  content: '\e916';
+}
+.ic-dragndrop:before {
+  content: '\e914';
+}
+.ic-download:before {
+  content: '\e915';
+}
+.ic-search:before {
+  content: '\e913';
+}
+.ic-check:before {
+  content: '\e912';
+}
+.ic-arrow-end:before {
+  content: '\e900';
+}
+.ic-arrow-first:before {
+  content: '\e901';
+}
+.ic-arrow-left:before {
+  content: '\e902';
+}
+.ic-arrow-next:before {
+  content: '\e903';
+}
+.ic-arrow-pre:before {
+  content: '\e904';
+}
+.ic-arrow-right:before {
+  content: '\e905';
+}
+.ic-calendar-arrow_r:before {
+  content: '\e906';
+}
+.ic-calendar-arrow-l:before {
+  content: '\e907';
+}
+.ic-close:before {
+  content: '\e908';
+}
+.ic-edit:before {
+  content: '\e909';
+}
+.ic-expand-more:before {
+  content: '\e90a';
+}
+.ic-logout:before {
+  content: '\e90b';
+}
+.ic-more:before {
+  content: '\e90c';
+}
+.ic-settings:before {
+  content: '\e90d';
+}
+.ic-sound-off:before {
+  content: '\e90e';
+}
+.ic-sound-on:before {
+  content: '\e90f';
+}
+.ic-today:before {
+  content: '\e910';
+}
+.ic-trash:before {
+  content: '\e911';
+}

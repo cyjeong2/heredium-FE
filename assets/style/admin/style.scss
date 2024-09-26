@@ -1,0 +1,452 @@
+@import '~assets/style/admin/_fonts.css';
+
+html {
+  background-color: rgba(238, 238, 238, 1);
+}
+
+html,
+body {
+  font-family: 'Inter', 'Noto Sans KR', sans-serif;
+}
+
+body {
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+
+h1,
+.h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 6rem;
+}
+
+h2,
+.h2 {
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 3.6rem;
+}
+
+h3,
+.h3 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 2.7rem;
+}
+
+h4,
+.h4 {
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 2.4rem;
+}
+
+// bt: body-text | 1b: Body Type-1 bold medium regular
+.bt-1b {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 2.1rem;
+}
+
+.bt-1m {
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 2.1rem;
+}
+
+.bt-1r {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2.1rem;
+}
+
+.bt-2m {
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.8rem;
+}
+
+.bt-2r {
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.8rem;
+}
+
+// nt: number-text | 1: Number Type 1
+.nt-1 {
+  font-size: 2.4rem;
+  font-weight: 500;
+  line-height: 3.6rem;
+  color: var(--color-black);
+}
+
+.nt-2 {
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 2.4rem;
+  color: var(--color-black);
+}
+
+.nt-3 {
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 2.1rem;
+  color: var(--color-black);
+}
+
+.nt-4 {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2.1rem;
+  color: var(--color-black);
+}
+
+.nt-5 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.8rem;
+  color: var(--color-black);
+}
+
+.nt-6 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.65rem;
+  color: var(--color-black);
+}
+
+// mt: text modal(modal-text) | 1b: type1 - bold medium regular
+.tm-1b {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 2.4rem;
+}
+
+.tm-1m {
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 2.4rem;
+}
+
+.tm-2m {
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 2.1rem;
+}
+
+.tm-2r {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2.1rem;
+}
+
+// Admin Table
+.admin-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 2.75rem;
+  box-shadow: 0 0 0 1px var(--color-grey-2);
+}
+
+.admin-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-radius: 0.3rem;
+  border-style: hidden;
+  overflow: hidden;
+
+  thead {
+    background-color: #fafafa;
+    height: 4.4rem;
+
+    &.data-none {
+      th {
+        width: 100% !important;
+      }
+    }
+  }
+
+  th,
+  td {
+    border: 1px solid var(--color-grey-2);
+  }
+
+  th {
+    color: #777;
+    font-weight: 500;
+    padding: 0 1.2rem;
+
+    &.text-center {
+      text-align: center;
+    }
+
+    &.text-right {
+      text-align: end;
+    }
+
+    &.text-left {
+      text-align: left;
+    }
+  }
+
+  tbody {
+    tr {
+      background-color: var(--color-white);
+      cursor: pointer;
+
+      &:nth-child(2n) {
+        background-color: rgba(244, 244, 244, 0.3);
+      }
+
+      &:hover {
+        background-color: #ebf7ff;
+      }
+    }
+
+    td {
+      > div {
+        color: var(--color-black);
+        display: block;
+        min-height: 6rem;
+        padding: 2rem 1.2rem;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.4rem;
+
+        &.text-left {
+          text-align: left;
+        }
+
+        &.text-right {
+          text-align: end;
+        }
+
+        &.img {
+          padding: 1rem;
+
+          img {
+            width: 100%;
+            height: 9.6rem;
+            border-radius: 0.3rem;
+            object-fit: cover;
+            object-position: center;
+            background-color: #d9d9d9;
+          }
+        }
+      }
+    }
+  }
+}
+
+// common info table
+.info-table {
+  $th-width: 14.8rem;
+  width: 100%;
+  border: 1px solid var(--color-grey-2);
+  border-left: 0;
+  border-radius: 0.3rem;
+  margin-bottom: 1.6rem;
+
+  .row {
+    display: flex;
+    border-bottom: 1px solid var(--color-grey-2);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    > label {
+      color: var(--color-grey-4);
+      display: flex;
+      align-items: center;
+      min-height: 6rem;
+      width: $th-width;
+      border-right: 1px solid var(--color-grey-2);
+      border-left: 1px solid var(--color-grey-2);
+      padding: 0 1.9rem;
+      font-size: 1.4rem;
+      font-weight: 500;
+      background-color: #fafafa;
+
+      b {
+        color: var(--color-blue);
+      }
+    }
+
+    > div {
+      display: flex;
+      flex: 1 0 0;
+      width: 100%;
+      min-height: 4.4rem;
+      align-items: center;
+      padding: 0.8rem 1.9rem;
+      font-size: 1.4rem;
+      font-weight: 500;
+      background-color: var(--color-white);
+
+      &.has-btn {
+        align-items: flex-start;
+
+        input {
+          margin-bottom: 0.4rem;
+        }
+
+        p {
+          color: var(--color-grey-3);
+          font-size: 1.2rem;
+          line-height: 150%;
+        }
+      }
+
+      &.has-feedback {
+        flex-direction: column;
+        align-items: flex-start;
+
+        p {
+          margin-top: 0.8rem;
+          color: var(--color-red);
+          font-size: 1.4rem;
+          text-align: left;
+
+          &.is-success {
+            color: var(--color-green);
+          }
+        }
+      }
+    }
+  }
+}
+
+// summernote editor
+.note-editor:not(.contents-wrap .note-editor):not(.content .note-editor) {
+  border: 1px solid var(--color-grey-2) !important;
+}
+
+.is_error .note-editor {
+  border: 1px solid var(--color-red) !important;
+}
+
+// validation
+.validation {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2.1rem;
+  color: var(--color-red);
+}
+
+.is-error {
+  border: 0.1rem solid var(--color-red) !important;
+}
+
+// margin set
+.mr-8 {
+  margin-right: 0.8rem;
+}
+
+.mr-16 {
+  margin-right: 1.6rem;
+}
+
+.mr-24 {
+  margin-right: 2.4rem;
+}
+
+.mr-28 {
+  margin-right: 2.8rem;
+}
+
+.ml-8 {
+  margin-left: 0.8rem;
+}
+
+.ml-16 {
+  margin-left: 1.6rem;
+}
+
+.ml-24 {
+  margin-left: 2.4rem;
+}
+
+.ml-28 {
+  margin-left: 2.8rem;
+}
+
+.mb-12 {
+  margin-bottom: 1.2rem;
+}
+
+.mb-14 {
+  margin-bottom: 1.4rem;
+}
+
+.mb-16 {
+  margin-bottom: 1.6rem;
+}
+
+.mb-17 {
+  margin-bottom: 1.7rem;
+}
+
+.mb-20 {
+  margin-bottom: 2rem;
+}
+
+.mb-24 {
+  margin-bottom: 2.4rem;
+}
+
+.mb-26 {
+  margin-bottom: 2.6rem;
+}
+
+.mb-28 {
+  margin-bottom: 2.8rem;
+}
+
+.mb-32 {
+  margin-bottom: 3.2rem;
+}
+
+.mb-36 {
+  margin-bottom: 3.6rem;
+}
+
+.mb-43 {
+  margin-bottom: 4.3rem;
+}
+
+.mb-80 {
+  margin-bottom: 8rem;
+}
+
+// summernote icon size fix
+.note-toolbar i {
+  font-size: 14px !important;
+}
+
+@media screen and (max-width: 1680px) {
+  html {
+    font-size: 8px;
+  }
+  .admin-table {
+    th {
+      padding: 0 1rem;
+    }
+
+    tbody td > div {
+      padding: 2rem 1rem;
+    }
+  }
+  .info-table {
+    .row {
+      > label {
+        padding: 0 1rem;
+      }
+
+      > div {
+        padding: 0.8rem 1rem;
+      }
+    }
+  }
+}

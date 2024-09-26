@@ -1,0 +1,335 @@
+@charset "utf-8";
+
+*:not(font, i, b) {
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+:after,
+:before {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+:root {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  cursor: default;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  --color-default: #000;
+  --color-blue: #18a0fb;
+  --color-black: #111;
+  --color-white: #fff;
+  --color-red: #f62323;
+  --color-green: #21cc47;
+  --color-grey-1: #f4f4f4;
+  --color-grey-2: #bebebe;
+  --color-grey-3: #ababab;
+  --color-grey-4: #777;
+  --color-u-primary: #a5b195;
+  --color-u-secondary: #743b2e;
+  --color-u-grey-1: #ebebeb;
+  --color-u-grey-2: #bebebe;
+  --color-u-grey-3: #989898;
+  --color-u-grey-4: #404040;
+  --color-u-error: #ff4d00;
+}
+
+html {
+  color: var(--color-default);
+  font-size: 10px;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+ul li,
+ol li {
+  list-style: none;
+}
+
+ol,
+ul,
+li {
+  margin: 0;
+  padding: 0;
+}
+
+input {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+  color: inherit;
+  font-style: normal;
+  font-size: 100%;
+  font-family: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  word-break: inherit;
+  word-wrap: inherit;
+  box-sizing: inherit;
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  -o-box-sizing: inherit;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+
+input::-ms-clear,
+input::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+input::-webkit-search-decoration,
+input::-webkit-search-cancel-button,
+input::-webkit-search-results-button,
+input::-webkit-search-results-decoration {
+  display: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-transition: background-color 5000s;
+  transition: background-color 5000s;
+  -webkit-text-fill-color: var(--color-grey-4) !important;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.input_registration_sec input:-webkit-autofill,
+.input_registration_sec input:-webkit-autofill:hover,
+.input_registration_sec input:-webkit-autofill:focus,
+.input_registration_sec input:-webkit-autofill:active {
+  -webkit-transition: background-color 5000s;
+  transition: background-color 5000s;
+  -webkit-text-fill-color: #333 !important;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+.is-blind {
+  display: block;
+  position: absolute;
+  top: 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  font-size: 0 !important;
+}
+
+// vue transition 기본 페이드 효과
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+// editor(summernote) 스타일 조정
+.note-editor {
+  .note-modal-footer {
+    height: 52px !important;
+  }
+
+  .note-editable {
+    ul li,
+    ol li {
+      list-style: inherit !important;
+    }
+
+    ol,
+    ul,
+    li {
+      margin: inherit !important;
+    }
+
+    ol,
+    ul {
+      padding-left: 20px !important;
+    }
+
+    h1,
+    h1 span {
+      font-size: 52px !important;
+      line-height: 100%;
+    }
+
+    h2,
+    h2 span {
+      font-size: 42px !important;
+      line-height: 100%;
+    }
+
+    h3,
+    h3 span {
+      font-size: 36px !important;
+      line-height: 100%;
+    }
+
+    h4,
+    h4 span {
+      font-size: 32px !important;
+      line-height: 100%;
+    }
+
+    h5,
+    h5 span {
+      font-size: 28px !important;
+      line-height: 100%;
+    }
+
+    h6,
+    h6 span {
+      font-size: 20px !important;
+      line-height: 100%;
+    }
+
+    blockquote {
+      border-left: 5px solid #f86466;
+      padding: 10px 20px;
+      margin: 0 0 20px;
+    }
+
+    pre {
+      display: block;
+      padding: 9.5px;
+      margin: 0 0 10px;
+      font-size: 13px;
+      line-height: 1.42857143;
+      color: #333;
+      word-break: break-all;
+      word-wrap: break-word;
+      background-color: #f5f5f5;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table td,
+    table th {
+      border: 1px solid #ececec;
+      padding: 5px 3px;
+    }
+
+    a {
+      background-color: inherit;
+      text-decoration: inherit;
+      font-family: inherit;
+      font-weight: inherit;
+      color: #337ab7;
+    }
+
+    a:hover,
+    a:focus {
+      color: #23527c;
+      text-decoration: underline;
+      outline: 0;
+    }
+
+    figure {
+      margin: 0;
+    }
+  }
+
+  .note-dropdown-item {
+    h1,
+    h1 span {
+      font-size: 52px !important;
+    }
+
+    h2,
+    h2 span {
+      font-size: 42px !important;
+    }
+
+    h3,
+    h3 span {
+      font-size: 36px !important;
+    }
+
+    h4,
+    h4 span {
+      font-size: 32px !important;
+    }
+
+    h5,
+    h5 span {
+      font-size: 28px !important;
+    }
+
+    h6,
+    h6 span {
+      font-size: 20px !important;
+    }
+  }
+
+  &.fullscreen .note-editable {
+    background-color: #fff;
+  }
+}
