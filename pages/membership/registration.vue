@@ -117,6 +117,9 @@ export default {
       justify-content: start;
       gap: 0.8rem;
       color: var(--color-u-grey-4);
+      P {
+        flex: 1;
+      }
     }
 
     .membership-radio-list {

@@ -73,6 +73,8 @@ export default {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
 
     .label-box {
       display: flex;
