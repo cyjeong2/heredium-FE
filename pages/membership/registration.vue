@@ -54,7 +54,7 @@ import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import MembershipOption from '~/components/user/page/MembershipOption.vue';
 
 export default {
-  name: 'MembershipRegistration',
+  name: 'MembershipRegistrationPage',
   components: { MembershipOption, URefundPolicy, UButton, UNoticePolicy },
   props: {},
   data() {
