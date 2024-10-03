@@ -21,7 +21,7 @@
       </div>
       <div v-if="selectedType === 'membership'" class="list-wrap">
         <!-- <div v-if="!contents || !contents[0]" class="no-data">리스트가 없습니다.</div> -->
-        <a class="list-item" @click="checkAndGoDetail(item.id)">
+        <a class="list-item" href="/membership/posts">
           <img src="~assets/img/intro/heredium_membership.png" alt="" />
           <article>
             <h3>HEREDIUM MEMBERSHIP</h3>
