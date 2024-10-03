@@ -3,9 +3,9 @@
     <div class="container">
       <section class="title">
         <UButton @click="setOpenModal">Click to show modal error</UButton>
-        <UDialogModalError :is-show="modal1" :message-error="msgError" :is-registered="false">
+        <UDialogModalError :is-show="openModal" :message-error="msgError" :is-registered="false">
           <template #modal-btn2>
-            <UButton class="feedback-btn" @click="modal1 = false">확인</UButton>
+            <UButton class="feedback-btn" @click="openModal = false">확인</UButton>
           </template>
         </UDialogModalError>
       </section>
@@ -23,13 +23,13 @@ export default {
   components: { UButton, UDialogModalError },
   data() {
     return {
-      modal1: false,
-      msgError: 'Message Error Here'
+      openModal: false,
+      msgError: ''
     }
   },
   methods: {
     setOpenModal() {
-      this.modal1 = !this.modal1
+      this.openModal = !this.openModal
     }
   }
 };
@@ -39,5 +39,4 @@ export default {
 .container {
   height: 500px;
 }
-
 </style>
