@@ -216,6 +216,13 @@ summary {
     margin-right: auto;
   }
 
+  .center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
   .bullet {
     li {
       font-size: 1.6rem;
