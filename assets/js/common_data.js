@@ -13,3 +13,29 @@ export const RESERVATION_TERMS = Object.freeze({
     ]
   }
 });
+
+export const dataMembershipMock= {
+  id: 1,
+  uuid: '550e8400-e29b-41d4-a716-446655440000',
+  name: '브라운',
+  startDate: "2024-09-01 00:00:00",
+  endDate: "2025-02-28 23:59:59",
+  benefits: [
+    {
+      coupon_name: '전시',
+      type: TICKET_KIND_TYPE.EXHIBITION,
+      quantity: 0,
+    },
+    {
+      coupon_name: '프로그램',
+      type: TICKET_KIND_TYPE.PROGRAM,
+      quantity: 2,
+    },
+    {
+      coupon_name: '커피',
+      type: TICKET_KIND_TYPE.COFFEE,
+      quantity: 1,
+    }
+  ]
+}
+
