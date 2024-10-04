@@ -15,8 +15,24 @@
         <button type="button" :class="{ active: selectedType === 'programs' }" @click="changeType('programs')">
           프로그램
         </button>
+        <button type="button" :class="{ active: selectedType === 'membership' }" @click="changeType('membership')">
+          멤버십
+        </button>
       </div>
-      <div class="list-wrap">
+      <div v-if="selectedType === 'membership'" class="list-wrap">
+        <!-- <div v-if="!contents || !contents[0]" class="no-data">리스트가 없습니다.</div> -->
+        <a class="list-item" href="/membership/posts">
+          <img src="~assets/img/intro/heredium_membership.png" alt="" />
+          <article>
+            <h3>HEREDIUM MEMBERSHIP</h3>
+            <p>
+              헤레디움을 사랑하는 예술 애호가 여러분을 위한 멤버십 제도를 소개합니다. 엄선된 혜택과 프로그램을 통해
+              과거의 역사적 흔적과 현대 예술의 조화를 느껴보시길 바랍니다.
+            </p>
+          </article>
+        </a>
+      </div>
+      <div v-else class="list-wrap">
         <div v-if="!contents || !contents[0]" class="no-data">리스트가 없습니다.</div>
         <a v-for="item in contents" :key="item.id" class="list-item" @click="checkAndGoDetail(item.id)">
           <h3>{{ item.title }}</h3>
@@ -278,8 +294,11 @@ export default {
       }
     }
 
-    > button:first-child {
+    > button {
       margin-right: 2.4rem;
+    }
+    > button:last-child {
+      margin-right: 0;
     }
   }
 
@@ -363,6 +382,22 @@ export default {
         width: 100%;
         object-fit: contain;
         border-radius: 8px !important;
+      }
+    }
+    article {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 20px;
+      text-align: center;
+
+      h3 {
+        font-size: 2rem;
+        line-height: 2.8rem;
+      }
+      p {
+        font-size: 1.6rem;
+        line-height: 2.4rem;
       }
     }
   }

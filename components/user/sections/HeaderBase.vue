@@ -96,7 +96,7 @@
           </div>
         </div>
         <div class="depth-nav">
-          <NuxtLink to="/membership/introduce" @click.native="menuOff">Membership</NuxtLink>
+          <NuxtLink to="/membership/posts" @click.native="menuOff">Membership</NuxtLink>
         </div>
         <div class="depth-nav">
           <NuxtLink v-slot="{ isActive, href, navigate }" to="/coffee" custom @click.native="menuOff">
@@ -200,7 +200,7 @@
             </div>
           </li>
           <li>
-            <NuxtLink to="/membership/introduce" @click.native="pcMenuTop">Membership</NuxtLink>
+            <NuxtLink to="/membership/posts" @click.native="pcMenuTop">Membership</NuxtLink>
           </li>
           <li>
             <NuxtLink to="/coffee" @click.native="pcMenuTop">
