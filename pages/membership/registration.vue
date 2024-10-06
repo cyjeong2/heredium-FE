@@ -51,7 +51,7 @@ import { toKoreaCurrency } from '~/assets/js/converter';
 import UButton from '~/components/user/common/UButton.vue';
 import UNoticePolicy from '~/components/user/common/UNoticePolicy.vue';
 import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
-import MembershipOption from '~/components/user/page/MembershipOption.vue';
+import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
 
 export default {
   name: 'MembershipRegistrationPage',

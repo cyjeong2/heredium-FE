@@ -194,6 +194,13 @@ summary {
   display: none !important;
 }
 
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
 @media screen and (min-width: 769px) {
   .only-mobile {
     display: none !important;
@@ -214,13 +221,6 @@ summary {
     padding: 0 1.4rem;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
   }
   
   .bullet {

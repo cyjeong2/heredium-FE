@@ -1,3 +1,5 @@
+import { TICKET_KIND_TYPE } from "./types";
+
 export const RESERVATION_TERMS = Object.freeze({
   notice: {
     title: '관람 유의사항 안내',
