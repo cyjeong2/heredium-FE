@@ -50,15 +50,8 @@ export default {
 .container {
   height: 500px;
 
-  .center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-
-    img {
-      margin-bottom: 2rem;
-    }
+  img {
+    margin-bottom: 2rem;
   }
 }
 
