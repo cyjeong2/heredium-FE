@@ -8,7 +8,7 @@
         <div class="center qr-box">
           <p class="name-membership">등급 : {{ dataMerbership.name }}</p>
           <p>유효기간: {{ getFormattedDate(dataMerbership.startDate, dataMerbership.endDate) }}</p>
-          <QrcodeVue :value="createQrValue" :size="172" level="H" />
+          <QrcodeVue :value="createQrValue" :size="250" level="H" />
         </div>
         <div class="benefit">
           <p class="title">이용가능 혜택</p>
@@ -31,7 +31,6 @@ import { getDateCommonDateOutput } from '~/assets/js/commons';
 export default {
   name: 'ModalMembershipInfor',
   components: { UModal, QrcodeVue },
-
   props: {
     dataMerbership: {
       type: Object,
