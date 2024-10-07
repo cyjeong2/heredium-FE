@@ -102,6 +102,11 @@ export default {
 
   .banner {
     width: 100dvw;
+    display: flex;
+    justify-content: center;
+    img {
+      object-fit: contain;
+    }
   }
 
   .membership-form-container {
@@ -168,22 +173,56 @@ export default {
 
 @media screen and (min-width: 769px) {
   .contents {
-    margin: 4.8rem 0 8.8rem;
+    margin: 1.2rem 0 8.8rem;
+    padding: 104px 38px 12px 38px;
+    display: flex;
+    gap: 24px;
+    flex-direction: row-reverse;
+    position: relative;
 
     h1 {
       font-weight: 700;
       font-size: 4.2rem;
       line-height: 150%;
+      position: absolute;
+      top: 0px;
+      left: 0;
+      width: calc(100dvw - 74px);
+      margin: 0 38px 20px 38px;
     }
 
     h2 {
       font-style: normal;
       font-weight: 500;
-      font-size: 3.6rem;
+      font-size: 2.4rem;
       line-height: 150%;
-      text-align: right;
       letter-spacing: -1px;
     }
+
+    .banner {
+      width: 100%;
+      flex: 1;
+      justify-content: end;
+      align-items: start;
+      img {
+        width: 100%;
+        max-width: 720px;
+      }
+    }
+    .membership-form-container {
+      width: 30%;
+      max-width: 600px;
+      padding: 0;
+      form {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  .contents {
+    margin: 4rem 0 8.8rem;
   }
 }
 </style>
