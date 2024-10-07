@@ -5,7 +5,7 @@
         <img src="~assets/img/icon/icon_no_membership.svg" />
       </div>
       <div class="content">
-        <div v-if="!dataMerbership" class="center">
+        <div class="center">
           <p>멤버십 회원이 아닙니다.</p>
           <p>헤레디움 멤버십 가입을 통해 다양한 혜택을 누려보세요!</p>
         </div>
@@ -24,7 +24,7 @@ export default {
   components: { UButton },
   methods: {
     goToMembershipRegister() {
-      this.$router.push(`/membership/registration`);
+      this.$router.push(`/membership/posts`);
     }
   }
 };
