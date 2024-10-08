@@ -41,3 +41,84 @@ export const dataMembershipMock= {
   ]
 }
 
+export const dataTableMembershipMockAdmin  = {
+  content: [
+    {
+      id: 1,
+      thumbnail: {
+        resizeImage: {
+          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+        }
+      },
+      title: '클래식 음악과',
+      creator: 'Nga',
+      isEnabled: true,
+      createdDate: "2024-08-31 20:23:33",
+      lastModifiedDate: "2024-09-27 14:21:09",
+    },
+    {
+      id: 1,
+      thumbnail: {
+        resizeImage: {
+          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+        }
+      },
+      title: '클래식 음악과',
+      creator: 'Nga',
+      isEnabled: true,
+      createdDate: "2024-08-31 20:23:33",
+      lastModifiedDate: "2024-09-27 14:21:09",
+    },
+    {
+      id: 2,
+      thumbnail: {
+        resizeImage: {
+          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+        }
+      },
+      title: '클래식 음악과',
+      creator: 'Nga',
+      isEnabled: true,
+      createdDate: "2024-08-31 20:23:33",
+      lastModifiedDate: "2024-09-27 14:21:09",
+    },
+    {
+      id: 3,
+      thumbnail: {
+        resizeImage: {
+          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+        }
+      },
+      title: '클래식 음악과',
+      creator: 'Nga',
+      isEnabled: true,
+      createdDate: "2024-08-31 20:23:33",
+      lastModifiedDate: "2024-09-27 14:21:09",
+    }
+  ],
+  pageable: {
+      sort: {
+          empty: true,
+          unsorted: true,
+          sorted: false
+      },
+      offset: 0,
+      pageNumber: 0,
+      pageSize: 20,
+      paged: true,
+      unpaged: false
+  },
+  last: false,
+  totalPages: 1,
+  totalElements: 4,
+  size: 20,
+  number: 0,
+  sort: {
+      empty: true,
+      unsorted: true,
+      sorted: false
+  },
+  first: true,
+  numberOfElements: 20,
+  empty: false
+}
