@@ -1,10 +1,10 @@
 <template>
-  <section class="contents">
+  <section v-if="isDataReady && !!postDetail" class="contents">
     <section class="banner">
-      <img src="~assets/img/intro/heredium_membership.png" alt="" />
+      <img :src="postDetail.image_url" alt="Heredium membership image" />
     </section>
     <div class="membership-form-container">
-      <h1>헤레디움 멤버십 오픈</h1>
+      <h1>{{ postDetail.name }}</h1>
       <form>
         <h2>멤버십 종류 선택</h2>
         <div class="membership-form-content">
@@ -14,14 +14,17 @@
           </div>
 
           <div class="membership-radio-list">
-            <MembershipOption :model-value="membershipType" :value="'orange'" :change="updateSelection">
+            <MembershipOption
+              v-for="membership in postDetail.memberships"
+              :key="membership.membership_id"
+              :model-value="membershipIdSelected"
+              :value="membership.membership_id"
+              :change="updateSelection"
+            >
               <template #label>오렌지</template>
-              <template #price>{{ toKoreaCurrency(30000) }}</template>
-            </MembershipOption>
-
-            <MembershipOption :model-value="membershipType" :value="'brown'" :change="updateSelection">
-              <template #label>브라운</template>
-              <template #price>{{ toKoreaCurrency(50000) }}</template>
+              <template v-if="typeof membership.price === 'number'" #price>{{
+                toKoreaCurrency(membership.price)
+              }}</template>
             </MembershipOption>
           </div>
 
@@ -30,7 +33,7 @@
           <div class="total-amount">
             <p>합계</p>
             <h5>
-              {{ toKoreaCurrency(50000) }}
+              {{ toKoreaCurrency(totalPrice) }}
             </h5>
           </div>
 
@@ -40,8 +43,22 @@
           </div>
         </div>
 
-        <UButton class="btn-submit" w-size="100" h-size="normal"> 결제하기 </UButton>
+        <UButton
+          class="btn-submit"
+          w-size="100"
+          h-size="normal"
+          :disabled="!membershipIdSelected"
+          @click="handleSubmit()"
+        >
+          결제하기
+        </UButton>
       </form>
+      <UWarningDialog
+        v-if="dialogWarning.open"
+        :warning-message="dialogWarning.warningMessage"
+        :on-close="closeDialog"
+      />
+      <UExistedMembershipDialog v-if="hasMembership" :on-confirm="goToMyMembership" />
     </div>
   </section>
 </template>
@@ -51,17 +68,40 @@ import { toKoreaCurrency } from '~/assets/js/converter';
 import UButton from '~/components/user/common/UButton.vue';
 import UNoticePolicy from '~/components/user/common/UNoticePolicy.vue';
 import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
+import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
+import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
 
 export default {
   name: 'MembershipRegistrationPage',
-  components: { MembershipOption, URefundPolicy, UButton, UNoticePolicy },
+  components: { MembershipOption, URefundPolicy, UButton, UNoticePolicy, UWarningDialog, UExistedMembershipDialog },
   props: {},
+  async asyncData({ query, $axios }) {
+    try {
+      const postId = query.id;
+      if (!postId) {
+        return { postDetail: null, isDataReady: true };
+      }
+      const postDetail = await $axios.$get(`/user/posts/${postId}`);
+      return { postDetail, isDataReady: true };
+    } catch (error) {
+      console.error(error);
+      return { postDetail: null, isDataReady: true };
+    }
+  },
   data() {
     return {
-      membershipType: 'brown',
-      isAgreeNoticePolicy: false,
-      isAgreeRefundPolicy: false
+      isDataReady: false,
+      postDetail: null,
+      membershipIdSelected: '',
+      totalPrice: 0,
+      isAgreeNoticePolicy: true,
+      isAgreeRefundPolicy: true,
+      dialogWarning: {
+        open: false,
+        warningMessage: null
+      },
+      hasMembership: false
     };
   },
   watch: {
@@ -69,7 +109,73 @@ export default {
       console.log(newValue);
     }
   },
-  methods: { toKoreaCurrency, updateSelection() {} }
+  mounted() {
+    this.checkUserLogin();
+  },
+  methods: {
+    toKoreaCurrency,
+    checkUserLogin() {
+      const isLogged = !!this.$store.getters['service/auth/getAccessToken'];
+      if (!isLogged) {
+        this.$router.replace(`/auth/login?redirectPage=${this.$route.fullPath}`);
+      }
+    },
+    updateSelection(id) {
+      this.membershipIdSelected = id;
+      const membershipOption = this.postDetail.memberships.find((item) => item.membership_id === id);
+      this.totalPrice = membershipOption.price || 0;
+    },
+    closeDialog() {
+      this.dialogWarning = {
+        open: false,
+        warningMessage: ''
+      };
+    },
+    validateBeforeRegister() {
+      if (!this.isAgreeNoticePolicy) {
+        this.dialogWarning = {
+          open: true,
+          warningMessage: '관람 유의사항에 동의해주세요.'
+        };
+        return false;
+      }
+      if (!this.isAgreeRefundPolicy) {
+        this.dialogWarning = {
+          open: true,
+          warningMessage: '환불 규정에 동의해주세요.'
+        };
+        return false;
+      }
+      return true;
+    },
+    handleSubmit() {
+      const isValid = this.validateBeforeRegister();
+      if (!isValid) {
+        return null;
+      }
+      if (!this.membershipIdSelected) {
+        return null;
+      }
+
+      this.$axios
+        .post('/user/membership/register', {
+          membership_id: this.membershipIdSelected
+        })
+        .then(() => {
+          this.goToMyMembership();
+        })
+        .catch((err) => {
+          const errorMessage = err.response.data?.MESSAGE || '';
+          if (errorMessage === 'MEMBERSHIP_REGISTRATION_ALREADY_EXISTS') {
+            this.hasMembership = true;
+            return null;
+          }
+        });
+    },
+    goToMyMembership() {
+      this.$router.push('/mypage/purchase/membership');
+    }
+  }
 };
 </script>
 
@@ -106,6 +212,7 @@ export default {
     justify-content: center;
     img {
       object-fit: contain;
+      min-height: 50px;
     }
   }
 
