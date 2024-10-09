@@ -1,5 +1,5 @@
 <template>
-  <div class="coupon-card" @click="handleOpenModal">
+  <div class="coupon-card">
     <div class="img-wrap">
       <img :src="detailCoupon.img" />
     </div>
@@ -10,6 +10,15 @@
         <span>{{ getFormattedDate(detailCoupon.startDate, detailCoupon.endDate) }}</span>
       </p>
       <div class="coupon-remaining">
+        <div class="button">
+          <UButton
+            class="reservation-btn"
+            :disabled="isExpired || detailCoupon.quantity === 0"
+            @click="handleOpenModal"
+          >
+            QR코드
+          </UButton>
+        </div>
         <div v-if="detailCoupon.isActive" class="status active">
           <span>사용완</span>
         </div>
@@ -27,12 +36,13 @@
 </template>
 
 <script>
+import UButton from '../../common/UButton.vue';
 import ModalCouponInfor from '../../modal/coupon/ModalCouponInfor.vue';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
 
 export default {
   name: 'CouponCard',
-  components: { ModalCouponInfor },
+  components: { ModalCouponInfor, UButton },
   props: {
     detailCoupon: {
       type: Object,
@@ -42,7 +52,8 @@ export default {
   },
   data() {
     return {
-      openModalQr: false
+      openModalQr: false,
+      isExpired: false
     };
   },
   computed: {
@@ -50,6 +61,9 @@ export default {
       const { id, uuid } = this.detailCoupon;
       return uuid ? JSON.stringify({ id, uuid }) : '';
     }
+  },
+  created() {
+    this.checkExpiration();
   },
   methods: {
     getFormattedDate(startDate, endDate) {
@@ -60,6 +74,11 @@ export default {
     },
     handleCloseModal() {
       this.openModalQr = false;
+    },
+    checkExpiration() {
+      const endDateTime = new Date(this.detailCoupon.endDate);
+      const today = new Date();
+      this.isExpired = endDateTime < today;
     }
   }
 };
@@ -72,6 +91,7 @@ export default {
     align-items: center;
     margin-bottom: 1.2rem;
     column-gap: 1.2rem;
+
     &:hover {
       cursor: pointer;
     }
@@ -86,10 +106,12 @@ export default {
         object-fit: cover;
       }
     }
+
     .name {
       font-weight: 700;
       color: var(--color-default);
     }
+
     .date {
       font-size: 1.2rem;
       display: flex;
@@ -108,12 +130,30 @@ export default {
 
   &-remaining {
     display: flex;
+    align-items: center;
     column-gap: 8px;
+
+    .button {
+      display: flex;
+      align-items: center;
+    }
+
+    .reservation-btn {
+      min-width: 83px !important;
+      height: 22px;
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
     .status {
       border-radius: 6px;
       padding: 2px 8px;
       width: fit-content;
       font-size: 1.2rem;
+      height: 22px;
+      display: flex;
+      align-items: center;
+
       &::before {
         content: '';
         width: 8px;
@@ -123,18 +163,22 @@ export default {
         margin-right: 6px;
       }
     }
+
     .active {
       background-color: #f0fdf4;
       color: #15803d;
       border: 1px solid #bbf7d0;
+
       &::before {
         background-color: #22c55e;
       }
     }
+
     .deactive {
       background-color: #fef2f2;
       color: #b91c1c;
       border: 1px solid #fecaca;
+
       &::before {
         background-color: #ef4444;
       }

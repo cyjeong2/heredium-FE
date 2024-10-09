@@ -28,22 +28,18 @@
       <div class="center">
         <QrcodeVue :value="createQrValue" :size="250" level="H" />
       </div>
-      <div class="button">
-        <u-button button-type="primary" @click="handleClose">OK</u-button>
-      </div>
     </template>
   </UModal>
 </template>
 
 <script>
 import QrcodeVue from 'qrcode.vue';
-import UButton from '../../common/UButton.vue';
 import UModal from '~/components/user/modal/UModal.vue';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
 
 export default {
   name: 'ModalCouponInfor',
-  components: { UModal, QrcodeVue, UButton },
+  components: { UModal, QrcodeVue },
   props: {
     detailCoupon: {
       type: Object,
