@@ -3,7 +3,7 @@
     <div v-if="isShow" class="modal-wrap">
       <div class="modal-inner">
         <div class="modal">
-          <div class="head">
+          <div v-if="!hideHead" class="head">
             <h1 class="tm-1b"><slot name="title"></slot></h1>
             <button v-if="!hideEdgeCloseBtn" type="button" class="close-btn" @click="$emit('close')">
               <i class="ic-close" />
@@ -35,6 +35,11 @@ export default {
       default: false
     },
     hideEdgeCloseBtn: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    hideHead: {
       type: Boolean,
       required: false,
       default: false

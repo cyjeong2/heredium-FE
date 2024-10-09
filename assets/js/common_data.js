@@ -122,3 +122,43 @@ export const dataTableMembershipMockAdmin  = {
   numberOfElements: 20,
   empty: false
 }
+
+export const dataCouponMock= [
+  {
+    id: 1,
+    name: '쿠폰명[(미코노스 블루, 1잔)]',
+    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
+    startDate: "2024-09-01 00:00:00",
+    endDate: "2025-02-28 23:59:59",
+    quantity: 2,
+    isActive: true
+  },
+  {
+    id: 2,
+    name: '쿠폰명[(미코노스 블루, 1잔)]',
+    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
+    startDate: "2024-09-01 00:00:00",
+    endDate: "2025-02-28 23:59:59",
+    quantity: 0,
+    isActive: false
+  },
+  {
+    id: 3,
+    name: '쿠폰명[(미코노스 블루, 1잔)]',
+    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
+    startDate: "2024-09-01 00:00:00",
+    endDate: "2024-09-28 23:59:59",
+    quantity: 2,
+    isActive: true
+  },
+  {
+    id: 4,
+    name: '쿠폰명[(미코노스 블루, 1잔)]',
+    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
+    startDate: "2024-09-01 00:00:00",
+    endDate: "2025-02-28 23:59:59",
+    quantity: 0,
+    isActive: false
+  }
+]
+
