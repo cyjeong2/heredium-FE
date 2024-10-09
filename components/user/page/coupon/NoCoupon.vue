@@ -1,6 +1,6 @@
 <template>
   <KeepAlive>
-    <div class="center">
+    <div class="center no-coupon">
       <div>
         <img src="~assets/img/icon/icon_error.svg" />
       </div>
@@ -20,11 +20,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.content {
-  width: 250px;
-  text-align: center;
-  margin-top: 2rem;
-  margin-bottom: 3.2rem;
+.no-coupon {
+  padding: 8.5rem 0;
   color: var(--color-u-placeholder);
+
+  .content {
+    margin-top: 2rem;
+  }
 }
 </style>

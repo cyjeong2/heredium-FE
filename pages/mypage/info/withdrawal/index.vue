@@ -1,22 +1,6 @@
 <template>
   <main class="container">
-    <div>
-      <h1>Mypage</h1>
-      <section class="tab-sec">
-        <div class="only-mobile">
-          <div class="tabs page">
-            <NuxtLink class="tab" to="/mypage/purchase/all">구매내역</NuxtLink>
-            <NuxtLink class="tab" to="/mypage/info">내 정보 수정</NuxtLink>
-          </div>
-        </div>
-        <div class="only-pc pc-tabs">
-          <h2>구매내역</h2>
-          <NuxtLink to="/mypage/purchase/all" class="tab">전시·프로그램</NuxtLink>
-          <NuxtLink to="/mypage/purchase/coffee" class="tab">커피</NuxtLink>
-          <NuxtLink to="/mypage/info" class="big-tab">내 정보 수정</NuxtLink>
-        </div>
-      </section>
-    </div>
+    <SideBarMyPage />
     <section>
       <div class="withdrawal-head">
         <h2>회원 탈퇴</h2>
@@ -93,14 +77,16 @@
 </template>
 
 <script>
+import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UCheckbox from '~/components/user/common/UCheckbox';
 import UButton from '~/components/user/common/UButton';
 import UDialogModal from '~/components/user/modal/UDialogModal';
 import UInput from '~/components/user/common/UInput';
 import UModal from '~/components/user/modal/UModal.vue';
+
 export default {
   name: 'WithdrawalPage',
-  components: { UModal, UInput, UDialogModal, UButton, UCheckbox },
+  components: { UModal, UInput, UDialogModal, UButton, UCheckbox, SideBarMyPage },
   asyncData({ store, redirect }) {
     const isLogged = !!store.getters['service/auth/getAccessToken'];
     if (!isLogged) {
