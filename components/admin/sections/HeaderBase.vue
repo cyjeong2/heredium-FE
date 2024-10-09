@@ -35,6 +35,9 @@
             <NuxtLink to="/admin/common/program">
               <span class="bt-1r">프로그램</span>
             </NuxtLink>
+            <NuxtLink to="/admin/common/membership">
+              <span class="bt-1r">멤버십</span>
+            </NuxtLink>
             <NuxtLink to="/admin/common/holiday">
               <span class="bt-1r">휴무일 설정</span>
             </NuxtLink>
