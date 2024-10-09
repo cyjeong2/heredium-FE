@@ -19,15 +19,15 @@
           멤버십
         </button>
       </div>
-      <div v-if="selectedType === 'membership'" class="list-wrap">
+      <div v-if="selectedType === 'membership'" class="list-wrap membership">
         <!-- <div v-if="!contents || !contents[0]" class="no-data">리스트가 없습니다.</div> -->
         <a class="list-item" href="/membership/posts">
           <img src="~assets/img/intro/heredium_membership.png" alt="" />
           <article>
             <h3>HEREDIUM MEMBERSHIP</h3>
             <p>
-              헤레디움을 사랑하는 예술 애호가 여러분을 위한 멤버십 제도를 소개합니다. 엄선된 혜택과 프로그램을 통해
-              과거의 역사적 흔적과 현대 예술의 조화를 느껴보시길 바랍니다.
+              헤레디움을 사랑하는 예술 애호가 여러분을 위한 멤버십 제도를 소개합니다. <br />
+              엄선된 혜택과 프로그램을 통해 과거의 역사적 흔적과 현대 예술의 조화를 느껴보시길 바랍니다.
             </p>
           </article>
         </a>
@@ -398,6 +398,12 @@ export default {
       p {
         font-size: 1.6rem;
         line-height: 2.4rem;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+      br {
+        display: none;
       }
     }
   }
@@ -491,6 +497,43 @@ export default {
         > img {
           width: auto;
           max-height: 88.9rem;
+        }
+      }
+    }
+
+    .membership .list-item {
+      display: flex;
+      flex-direction: row-reverse;
+
+      img {
+        max-width: 50%;
+      }
+
+      article {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        flex: 1;
+        padding: 0 3rem;
+        background-color: #f7f8f5;
+        margin: 0;
+      }
+      h3 {
+        font-size: 2.8rem;
+        line-height: 3.8rem;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1180px) {
+  .contents {
+    .membership .list-item {
+      article {
+        br {
+          display: block;
         }
       }
     }
