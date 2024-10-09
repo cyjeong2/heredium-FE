@@ -162,29 +162,3 @@ export const dataCouponMock= [
   }
 ]
 
-export const dataPostMock = [
-  {
-    id: 1,
-    img: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
-    title: '클래식 음악과',
-    content: '<p>1922년 일제강점기, 대전역 근처 쌀시장이 형성된 동구 인동 지역에 지어진 구 동양척식회사 대전 지점은 대영제국의 동인도회사를 본뜬 대표적인 수탈 기관이었습니다. 당시 9개 지역 지점으로 운영되던 동양척식주식회사는 현재 부산, 목포, 대전 지점 세 건물만이 남아 있습니다.</p>'
-  },
-  {
-    id: 2,
-    img: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
-    title: '클래식 음악과',
-    content: '<p>1922년 일제강점기, 대전역 근처 쌀시장이 형성된 동구 인동 지역에 지어진 구 동양척식회사 대전 지점은 대영제국의 동인도회사를 본뜬 대표적인 수탈 기관이었습니다. 당시 9개 지역 지점으로 운영되던 동양척식주식회사는 현재 부산, 목포, 대전 지점 세 건물만이 남아 있습니다.</p>'
-  },
-  {
-    id: 3,
-    img: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
-    title: '클래식 음악과',
-    content: '<p>1922년 일제강점기, 대전역 근처 쌀시장이 형성된 동구 인동 지역에 지어진 구 동양척식회사 대전 지점은 대영제국의 동인도회사를 본뜬 대표적인 수탈 기관이었습니다. 당시 9개 지역 지점으로 운영되던 동양척식주식회사는 현재 부산, 목포, 대전 지점 세 건물만이 남아 있습니다.</p>'
-  },
-  {
-    id: 4,
-    img: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
-    title: '클래식 음악과',
-    content: '<p>1922년 일제강점기, 대전역 근처 쌀시장이 형성된 동구 인동 지역에 지어진 구 동양척식회사 대전 지점은 대영제국의 동인도회사를 본뜬 대표적인 수탈 기관이었습니다. 당시 9개 지역 지점으로 운영되던 동양척식주식회사는 현재 부산, 목포, 대전 지점 세 건물만이 남아 있습니다.</p>'
-  },
-]
