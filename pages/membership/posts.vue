@@ -4,25 +4,26 @@
       <section class="title">
         <h1>헤레디움 멤버십</h1>
       </section>
-      <div class="center">
-        <div v-for="(item, index) in dataMock" :key="index">
-          <post-card :detail-post="item" />
-        </div>
+      <div v-for="(item, index) in dataPosts" :key="index">
+        <post-card :detail-post="item" />
       </div>
     </div>
   </KeepAlive>
 </template>
 
 <script>
-import { dataPostMock } from '~/assets/js/common_data';
 import PostCard from '~/components/user/page/membership/PostCard.vue';
 
 export default {
   name: 'PostList',
   components: { PostCard },
+  async asyncData({ $axios }) {
+    const dataPosts = await $axios.$get('/user/posts/enabled-list');
+    return { dataPosts };
+  },
   data() {
     return {
-      dataMock: dataPostMock
+      dataPosts: null
     };
   }
 };
@@ -45,6 +46,7 @@ export default {
       margin-bottom: 8.8rem;
       h1 {
         font-size: 4.2rem;
+        line-height: initial;
       }
     }
   }
