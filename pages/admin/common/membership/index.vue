@@ -9,14 +9,14 @@
         <SDatepicker v-model="queryOptions.endDate" :min="queryOptions.startDate" />
         <SDivLine is-big />
 
-        <div class="label">Creator</div>
-        <SSearchBar v-model="queryOptions.creator" :placeholder="''" :w-size="'normal'" @search="onSearch()" />
+        <div class="label">창조자</div>
+        <SSearchBar v-model="queryOptions.created_name" :placeholder="''" :w-size="'normal'" @search="onSearch()" />
         <SDivLine is-big />
 
         <SDropdown v-model="queryOptions.isEnabled" :option-list="enabledOptionList">노출:</SDropdown>
       </div>
       <div>
-        <SSearchBar v-model="queryOptions.text" @search="onSearch()" />
+        <SSearchBar v-model="queryOptions.name" @search="onSearch()" />
 
         <SButton button-type="primary" @click="onSearch()">검색</SButton>
         <SButton @click="onSearch(true)">초기화</SButton>
@@ -33,39 +33,35 @@
         <table class="admin-table">
           <thead :class="{ 'data-none': !data || !data[0] }">
             <tr>
-              <th>NO</th>
+              <th>ID</th>
               <th>썸네일</th>
               <th>제목</th>
               <th>최초등록일시</th>
-              <th>Creator</th>
+              <th>창조자</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
               <td colspan="13"><div>리스트가 없습니다.</div></td>
             </tr>
-            <tr
-              v-for="(item, index) in data"
-              :key="item.id"
-              @click="$router.push(`/admin/common/membership/${item.id}`)"
-            >
+            <tr v-for="item in data" :key="item.id" @click="$router.push(`/admin/common/membership/${item.id}`)">
               <td size="23">
-                <div>{{ tableData.startCount - index }}</div>
+                <div>{{ item.id }}</div>
               </td>
               <td>
                 <div class="img">
-                  <img :src="item.thumbnail?.resizeImage?.small" alt="post-thumbnail" />
-                  <!-- <img :src="getImage(item.thumbnail?.resizeImage?.small)" alt="" /> -->
+                  <!-- <img :src="item.thumbnail?.resizeImage?.small" alt="post-thumbnail" /> -->
+                  <img :src="getImage(item.thumbnail?.resizeImage?.small)" alt="post-thumbnail" />
                 </div>
               </td>
               <td>
-                <div class="text-left">{{ item.title }}</div>
+                <div class="text-left">{{ item.name }}</div>
               </td>
               <td>
-                <div>{{ $dayjs(item.createdDate).format('YYYY-MM-DD HH:mm') }}</div>
+                <div>{{ item.created_date && $dayjs(item.created_date).format('YYYY-MM-DD HH:mm') }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item.creator }}</div>
+                <div class="text-left">{{ item.created_name }}</div>
               </td>
             </tr>
           </tbody>
@@ -84,9 +80,6 @@ import SSearchBar from '~/components/admin/commons/SSearchBar';
 import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SDivLine from '~/components/admin/commons/SDivLine';
 import SLink from '~/components/admin/commons/SLink';
-// import { EXHIBITION_STATE_TYPE } from '~/assets/js/types';
-import { dataTableMembershipMockAdmin } from '~/assets/js/common_data';
-
 export default {
   name: 'ExhibitionPage',
   components: { SLink, SDivLine, SDatepicker, STitle, SPageable, SDropdown, SButton, SSearchBar },
@@ -109,77 +102,63 @@ export default {
       ],
       queryOptions: {
         searchDateType: this.$route.query.searchDateType || 'CREATED_DATE',
-        startDate: this.$route.query.startDate || '',
-        endDate: this.$route.query.endDate || '',
+        startDate: this.$route.query.startDate || this.$dayjs().startOf('month').format('YYYY-MM-DD'),
+        endDate: this.$route.query.endDate || this.$dayjs().format('YYYY-MM-DD'),
         isEnabled:
           this.$route.query.isEnabled === 'true' ? true : this.$route.query.isEnabled === 'false' ? false : null,
-        text: this.$route.query.text || '',
-        creator: this.$route.query.creator || '',
+        name: this.$route.query.name || '',
+        created_name: this.$route.query.created_name || '',
         size: Number(this.$route.query.size) || 20
       },
-      // tableData: null
-      tableData: dataTableMembershipMockAdmin
+      tableData: null
     };
   },
-  fetch() {
-    // await this.$router
-    //   .replace({
-    //     path: this.$route.path,
-    //     query: this.queryOptions
-    //   })
-    //   .catch(() => {});
-
-    // this.tableData = await this.$axios.$get('/admin/exhibitions', {
-    //   params: {
-    //     ...this.queryOptions,
-    //     startDate: this.queryOptions.startDate ? `${this.queryOptions.startDate} 00:00:00` : '',
-    //     endDate: this.queryOptions.endDate ? `${this.queryOptions.endDate} 23:59:59` : ''
-    //   }
-    // });
-    this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+  mounted() {
+    this.getPosts();
   },
-  // computed: {
-  //   stateList() {
-  //     return Object.entries(EXHIBITION_STATE_TYPE).map(([key, value]) => ({
-  //       label: value,
-  //       value: key
-  //     }));
-  //   },
-  //   hallOptionList() {
-  //     const hallList = this.$store.state.HALL_LIST.map((hall) => ({ value: hall, label: `${hall} 전시홀` }));
-  //     hallList.unshift({ value: null, label: '전체' });
-  //     return hallList;
-  //   }
-  // },
   methods: {
     getImage(imageUrl) {
       return imageUrl ? this.$store.state.BASE_URL + imageUrl : require('~/assets/img/thumbnail_default.jpg');
     },
     setCurrentPage(currentPage) {
-      if (!this.$fetchState.pending) {
-        this.queryOptions.page = currentPage;
-        this.$fetch();
-      }
+      this.queryOptions.page = currentPage;
+      this.getPosts();
     },
     onSelectSizeChange() {
-      if (!this.$fetchState.pending) {
-        this.queryOptions.page = 0;
-        this.$fetch();
-      }
+      this.queryOptions.page = 0;
+      this.getPosts();
     },
     onSearch(isReset) {
-      if (!this.$fetchState.pending) {
-        if (isReset) {
-          this.queryOptions.searchDateType = 'CREATED_DATE';
-          this.queryOptions.startDate = '';
-          this.queryOptions.endDate = '';
-          this.queryOptions.isEnabled = null;
-          this.queryOptions.text = '';
-          this.queryOptions.creator = '';
-        }
-        this.queryOptions.page = 0;
-        this.$fetch();
+      if (isReset) {
+        this.queryOptions.searchDateType = 'CREATED_DATE';
+        this.queryOptions.startDate = this.$dayjs().startOf('month').format('YYYY-MM-DD');
+        this.queryOptions.endDate = this.$dayjs().format('YYYY-MM-DD');
+        this.queryOptions.isEnabled = null;
+        this.queryOptions.name = '';
+        this.queryOptions.created_name = '';
       }
+      this.queryOptions.page = 0;
+      this.getPosts();
+    },
+    async getPosts() {
+      await this.$router
+        .replace({
+          path: this.$route.path,
+          query: this.queryOptions
+        })
+        .catch(() => {});
+
+      this.tableData = await this.$axios.$get('/admin/posts', {
+        params: {
+          ...this.queryOptions,
+          startDate: this.queryOptions.startDate ? `${this.queryOptions.startDate} 00:00:00` : '',
+          endDate: this.queryOptions.endDate ? `${this.queryOptions.endDate} 23:59:59` : ''
+        }
+      });
+      const page = this.queryOptions.page || 0;
+      const size = this.queryOptions.size || 20;
+      this.tableData.startCount = this.tableData.totalElements - page * size;
+      this.tableData.number = page;
     }
   }
 };
