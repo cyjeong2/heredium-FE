@@ -2,12 +2,13 @@
   <KeepAlive>
     <div class="container">
       <section class="title">
-        <UDialogModal :is-show="isShow">
+        <UDialogModal :is-show="true">
           <template #content>
-            <div class="center">
-              <img v-if="isRegistered" src="~assets/img/icon/icon_error_registered.svg" />
-              <img v-else src="~assets/img/icon/icon_error.svg" />
-              <p>{{ messageError }}</p>
+            <div class="content-box center">
+              <img v-if="imageSrc" :src="imageSrc" alt="" />
+              <slot name="image-slot"></slot>
+              <p v-if="messageError" class="content-dialog">{{ messageError }}</p>
+              <p class="content-dialog"><slot name="content"></slot></p>
             </div>
           </template>
           <template #modal-btn2>
@@ -20,29 +21,23 @@
 </template>
 
 <script>
-
 import UDialogModal from './UDialogModal.vue';
 
 export default {
   name: 'UDialogModalError',
   components: { UDialogModal },
   props: {
-    isShow: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
     messageError: {
       type: String,
-      required: true,
+      required: false,
       default: ''
     },
-    isRegistered: {
-      type: Boolean,
+    imageSrc: {
+      type: String,
       required: false,
-      default: false
+      default: undefined
     }
-  },
+  }
 };
 </script>
 
@@ -53,7 +48,15 @@ export default {
   img {
     margin-bottom: 2rem;
   }
+  .content-box {
+    gap: 12px;
+  }
+  .content-dialog {
+    width: 100%;
+    text-align: center;
+  }
 }
 
-@media screen and (min-width: 769px) {}
+@media screen and (min-width: 769px) {
+}
 </style>
