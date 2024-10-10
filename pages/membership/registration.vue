@@ -95,8 +95,8 @@ export default {
       postDetail: null,
       membershipIdSelected: '',
       totalPrice: 0,
-      isAgreeNoticePolicy: true,
-      isAgreeRefundPolicy: true,
+      isAgreeNoticePolicy: false,
+      isAgreeRefundPolicy: false,
       dialogWarning: {
         open: false,
         warningMessage: null
