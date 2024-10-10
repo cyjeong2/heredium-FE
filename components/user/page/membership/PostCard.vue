@@ -1,13 +1,13 @@
 <template>
   <div class="post-card">
     <div>
-      <p>{{ detailPost.title }}</p>
-      <div v-html="detailPost.content"></div>
+      <p>{{ detailPost.name }}</p>
+      <div v-html="detailPost.content_detail"></div>
     </div>
     <div>
-      <NuxtLink :to="urlMembershipRegistration" class="img-wrap">
-        <img :src="detailPost.img" alt="heredium_membership" class="only-mobile" />
-        <img :src="detailPost.img" alt="heredium_membership" class="only-pc" />
+      <NuxtLink :to="detailPost.navigation_link" class="img-wrap">
+        <img :src="detailPost.thumbnail_urls.small" alt="heredium_membership" class="only-mobile" />
+        <img :src="detailPost.thumbnail_urls.medium" alt="heredium_membership" class="only-pc" />
       </NuxtLink>
     </div>
   </div>
@@ -22,9 +22,6 @@ export default {
       required: false,
       default: () => {}
     }
-  },
-  data() {
-    return { urlMembershipRegistration: `/membership/registration?id=${this.detailPost.id}` };
   }
 };
 </script>
