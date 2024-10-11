@@ -1,17 +1,19 @@
 <template>
-  <div class="center">
-    <div>
-      <img src="~assets/img/icon/icon_no_membership.svg" />
-    </div>
-    <div class="content">
-      <div class="center">
-        <p>멤버십 회원이 아닙니다.</p>
-        <p>헤레디움 멤버십 가입을 통해 다양한 혜택을 누려보세요!</p>
+  <KeepAlive>
+    <div class="center">
+      <div>
+        <img src="~assets/img/icon/icon_no_membership.svg" />
       </div>
-    </div>
+      <div class="content">
+        <div class="center">
+          <p>멤버십 회원이 아닙니다.</p>
+          <p>헤레디움 멤버십 가입을 통해 다양한 혜택을 누려보세요!</p>
+        </div>
+      </div>
 
-    <UButton class="button" @click="goToMembershipRegister">멤버십 가입하러 가기 </UButton>
-  </div>
+      <UButton class="button" @click="goToMembershipRegister">멤버십 가입하러 가기 </UButton>
+    </div>
+  </KeepAlive>
 </template>
 
 <script>
@@ -32,13 +34,12 @@ export default {
 .content {
   width: 250px;
   text-align: center;
+  margin-top: 2rem;
   color: var(--color-u-placeholder);
   margin-bottom: 3.2rem;
-  margin-top: 2rem;
 }
 
 .button {
   width: 100% !important;
-  height: 4.8rem;
 }
 </style>
