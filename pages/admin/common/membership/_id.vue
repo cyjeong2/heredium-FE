@@ -1,14 +1,12 @@
 <template>
-  <PostForm v-if="initFormData && mode" :post-detail="initFormData" :mode="mode"> </PostForm>
+  <PostForm v-if="initFormData" :post-detail="initFormData" :mode="mode"> </PostForm>
 </template>
 
 <script>
-import cloneDeep from 'lodash/cloneDeep';
-import { POST_DETAIL } from '~/assets/js/types';
 import PostForm from '~/components/admin/page/membership/PostForm.vue';
 
 export default {
-  name: 'EditPost',
+  name: 'ViewPost',
   components: {
     PostForm
   },
@@ -16,18 +14,13 @@ export default {
 
   data() {
     return {
-      mode: null,
+      mode: 'edit',
       initFormData: null
     };
   },
   computed: {},
   mounted() {
     const id = this.$route?.params?.id;
-    if (!id) {
-      this.mode = 'create';
-      this.initFormData = cloneDeep(POST_DETAIL);
-      return null;
-    }
     this.mode = 'edit';
     this.getPostDetail(id);
   },
@@ -38,9 +31,7 @@ export default {
         this.initFormData = {
           id: data.id,
           name: data.name,
-          memberships: {
-            memberships: data.memberships
-          },
+          memberships: data.memberships,
           detail_image: {
             image_url: data.image_url,
             original_file_name: 'gfhvjb.png'
@@ -48,7 +39,7 @@ export default {
           is_enabled: data.is_enabled,
           navigation_link: data.navigation_link,
           content_detail: data.content_detail,
-          thumbnail_url: data.thumbnail_urls
+          thumbnail_urls: data.thumbnail_urls
         };
       } catch (error) {}
     }
