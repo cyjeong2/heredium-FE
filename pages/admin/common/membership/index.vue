@@ -50,8 +50,7 @@
               </td>
               <td>
                 <div class="img">
-                  <!-- <img :src="item.thumbnail?.resizeImage?.small" alt="post-thumbnail" /> -->
-                  <img :src="getImage(item.thumbnail?.resizeImage?.small)" alt="post-thumbnail" />
+                  <img :src="getImage(item.thumbnail_urls?.small)" alt="post-thumbnail" />
                 </div>
               </td>
               <td>
@@ -244,6 +243,9 @@ export default {
     &:last-of-type {
       width: 5%;
     }
+  }
+  .img > img {
+    object-fit: contain !important;
   }
 }
 </style>
