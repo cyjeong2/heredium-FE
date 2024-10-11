@@ -7,7 +7,7 @@
       <div class="representative-img mr-28">
         <SImageUploadRepresentative
           :class="{ 'is-error': feedback?.thumbnailUrl }"
-          :image-src="detailData.thumbnail_url?.small"
+          :image-src="detailData.thumbnail_urls?.small"
           :disabled="isEdit"
           type="PROJECT_THUMBNAIL"
           @image-uploaded="updateThumbnail"
@@ -75,7 +75,7 @@
               <div class="grid-table-header">가격</div>
               <div class="grid-table-header">행동</div>
               <!-- BODY -->
-              <template v-for="(membership, membershipIndex) in detailData.memberships.memberships">
+              <template v-for="(membership, membershipIndex) in detailData.memberships">
                 <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body">
                   <SCheckbox v-model="membership.checked" />
                 </div>
@@ -254,10 +254,10 @@ export default {
       this.$router.replace({ path: this.$route.path, query: this.$route.query });
     },
     updateThumbnail(e) {
-      this.detailData.thumbnail_url = e.resizeImage;
+      this.detailData.thumbnail_urls = e.resizeImage;
     },
     removeThumbnail() {
-      this.detailData.thumbnail_url = { ...POST_DETAIL.thumbnail_url };
+      this.detailData.thumbnail_urls = { ...POST_DETAIL.thumbnail_url };
     },
     async updateDetailImage(e) {
       try {
@@ -294,10 +294,10 @@ export default {
       const newMembership = cloneDeep(MEMBERSHIP_DEFAULT);
       newMembership.name = e.name;
       newMembership.price = e.price;
-      if (Array.isArray(this.detailData?.memberships?.memberships)) {
-        this.detailData.memberships.memberships.push(newMembership);
+      if (Array.isArray(this.detailData?.memberships)) {
+        this.detailData.memberships.push(newMembership);
       }
-      const indexNewMembership = this.detailData.memberships.memberships.length - 1;
+      const indexNewMembership = this.detailData.memberships.length - 1;
       this.membershipIndexExpanded = indexNewMembership;
     },
 
@@ -309,10 +309,10 @@ export default {
       this.membershipIndexExpanded = membershipIndex;
     },
     handleAddCoupon(membershipIndex) {
-      this.detailData.memberships.memberships[membershipIndex].coupons.push(cloneDeep(COUPON_DEFAULT));
+      this.detailData.memberships[membershipIndex].coupons.push(cloneDeep(COUPON_DEFAULT));
     },
     handleUpdateCoupon(newCouponData, membershipIndex, couponIndex) {
-      this.detailData.memberships.memberships[membershipIndex].coupons[couponIndex] = cloneDeep(newCouponData);
+      this.detailData.memberships[membershipIndex].coupons[couponIndex] = cloneDeep(newCouponData);
     },
 
     validateCouponItem(couponItem) {
@@ -372,7 +372,7 @@ export default {
       if (!this.detailData.name) {
         feedbackError.name = true;
       }
-      const thumbnail = this.detailData.thumbnail_url;
+      const thumbnail = this.detailData.thumbnail_urls;
       if (!thumbnail || !thumbnail.large || !thumbnail.medium || !thumbnail.small) {
         feedbackError.thumbnailUrl = true;
       }
@@ -387,7 +387,7 @@ export default {
         feedbackError.navigationLink = true;
       }
 
-      const memberships = this.detailData?.memberships?.memberships || [];
+      const memberships = this.detailData?.memberships || [];
       if (!memberships.length) {
         feedbackError.emptyMemberships = true;
       }

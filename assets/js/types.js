@@ -283,9 +283,7 @@ export const ADMIN_DETAIL = {
 
 export const POST_DETAIL = {
   name: '',
-  memberships: {
-    memberships: []
-  },
+  memberships: [],
   detail_image: {
     image_url: '',
     original_file_name: ''
@@ -293,7 +291,7 @@ export const POST_DETAIL = {
   is_enabled: true,
   navigation_link: '',
   content_detail: '',
-  thumbnail_url: {
+  thumbnail_urls: {
     small: '',
     medium: '',
     large: ''
