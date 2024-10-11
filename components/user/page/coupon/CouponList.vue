@@ -1,14 +1,12 @@
 <template>
   <KeepAlive>
-    <div class="container">
-      <div class="center">
-        <div v-if="data.length === 0">
-          <no-coupon />
-        </div>
-        <div v-else>
-          <div v-for="(item, index) in data" :key="index">
-            <coupon-card :detail-coupon="item" />
-          </div>
+    <div class="center box">
+      <div v-if="data.length === 0">
+        <no-coupon />
+      </div>
+      <div v-else>
+        <div v-for="(item, index) in data" :key="index">
+          <coupon-card :is-history="isHistory" :detail-coupon="item" />
         </div>
       </div>
     </div>
@@ -27,13 +25,21 @@ export default {
       type: Array,
       required: false,
       default: () => []
+    },
+    isHistory: {
+      type: Boolean,
+      required: false,
+      default: false
     }
-  },
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-.container {
-  padding: 4rem 1.6rem 1.6rem;
+.box {
+  & > div {
+    height: 100%;
+    width: 100%;
+  }
 }
 </style>

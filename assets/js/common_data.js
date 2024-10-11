@@ -1,4 +1,4 @@
-import { TICKET_KIND_TYPE } from "./types";
+import { TICKET_KIND_TYPE } from './types';
 
 export const RESERVATION_TERMS = Object.freeze({
   notice: {
@@ -16,97 +16,76 @@ export const RESERVATION_TERMS = Object.freeze({
   }
 });
 
-export const dataMembershipMock= {
-  id: 1,
-  uuid: '550e8400-e29b-41d4-a716-446655440000',
-  name: '브라운',
-  startDate: "2024-09-01 00:00:00",
-  endDate: "2025-02-28 23:59:59",
-  benefits: [
-    {
-      coupon_name: '전시',
-      type: TICKET_KIND_TYPE.EXHIBITION,
-      quantity: 0,
-    },
-    {
-      coupon_name: '프로그램',
-      type: TICKET_KIND_TYPE.PROGRAM,
-      quantity: 2,
-    },
-    {
-      coupon_name: '커피',
-      type: TICKET_KIND_TYPE.COFFEE,
-      quantity: 1,
-    }
-  ]
-}
-
-export const dataTableMembershipMockAdmin  = {
+export const dataTableMembershipMockAdmin = {
   content: [
     {
       id: 1,
       thumbnail: {
         resizeImage: {
-          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+          small:
+            'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg'
         }
       },
       title: '클래식 음악과',
       creator: 'Nga',
       isEnabled: true,
-      createdDate: "2024-08-31 20:23:33",
-      lastModifiedDate: "2024-09-27 14:21:09",
+      createdDate: '2024-08-31 20:23:33',
+      lastModifiedDate: '2024-09-27 14:21:09'
     },
     {
       id: 1,
       thumbnail: {
         resizeImage: {
-          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+          small:
+            'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg'
         }
       },
       title: '클래식 음악과',
       creator: 'Nga',
       isEnabled: true,
-      createdDate: "2024-08-31 20:23:33",
-      lastModifiedDate: "2024-09-27 14:21:09",
+      createdDate: '2024-08-31 20:23:33',
+      lastModifiedDate: '2024-09-27 14:21:09'
     },
     {
       id: 2,
       thumbnail: {
         resizeImage: {
-          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+          small:
+            'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg'
         }
       },
       title: '클래식 음악과',
       creator: 'Nga',
       isEnabled: true,
-      createdDate: "2024-08-31 20:23:33",
-      lastModifiedDate: "2024-09-27 14:21:09",
+      createdDate: '2024-08-31 20:23:33',
+      lastModifiedDate: '2024-09-27 14:21:09'
     },
     {
       id: 3,
       thumbnail: {
         resizeImage: {
-          small: 'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg',
+          small:
+            'https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg'
         }
       },
       title: '클래식 음악과',
       creator: 'Nga',
       isEnabled: true,
-      createdDate: "2024-08-31 20:23:33",
-      lastModifiedDate: "2024-09-27 14:21:09",
+      createdDate: '2024-08-31 20:23:33',
+      lastModifiedDate: '2024-09-27 14:21:09'
     }
   ],
   pageable: {
-      sort: {
-          empty: true,
-          unsorted: true,
-          sorted: false
-      },
-      offset: 0,
-      pageNumber: 0,
-      pageSize: 20,
-      paged: true,
-      unpaged: false
+    sort: {
+      empty: true,
+      unsorted: true,
+      sorted: false
+    },
+    offset: 0,
+    pageNumber: 0,
+    pageSize: 20,
+    paged: true,
+    unpaged: false
   },
   last: false,
   totalPages: 1,
@@ -114,51 +93,11 @@ export const dataTableMembershipMockAdmin  = {
   size: 20,
   number: 0,
   sort: {
-      empty: true,
-      unsorted: true,
-      sorted: false
+    empty: true,
+    unsorted: true,
+    sorted: false
   },
   first: true,
   numberOfElements: 20,
   empty: false
-}
-
-export const dataCouponMock= [
-  {
-    id: 1,
-    name: '쿠폰명[(미코노스 블루, 1잔)]',
-    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
-    startDate: "2024-09-01 00:00:00",
-    endDate: "2025-02-28 23:59:59",
-    quantity: 2,
-    isActive: true
-  },
-  {
-    id: 2,
-    name: '쿠폰명[(미코노스 블루, 1잔)]',
-    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
-    startDate: "2024-09-01 00:00:00",
-    endDate: "2025-02-28 23:59:59",
-    quantity: 0,
-    isActive: false
-  },
-  {
-    id: 3,
-    name: '쿠폰명[(미코노스 블루, 1잔)]',
-    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
-    startDate: "2024-09-01 00:00:00",
-    endDate: "2024-09-28 23:59:59",
-    quantity: 2,
-    isActive: true
-  },
-  {
-    id: 4,
-    name: '쿠폰명[(미코노스 블루, 1잔)]',
-    img: `https://kr.object.fin-ncloudstorage.com/heredium-bucket/coffee/15/e1235d36-3316-4425-839e-8ffd496c7472.jpg`,
-    startDate: "2024-09-01 00:00:00",
-    endDate: "2025-02-28 23:59:59",
-    quantity: 0,
-    isActive: false
-  }
-]
-
+};
