@@ -6,8 +6,8 @@
     </div>
     <div>
       <NuxtLink :to="detailPost.navigation_link" class="img-wrap">
-        <img :src="detailPost.thumbnail_urls.small" alt="heredium_membership" class="only-mobile" />
-        <img :src="detailPost.thumbnail_urls.medium" alt="heredium_membership" class="only-pc" />
+        <img :src="detailPost?.thumbnail_urls?.small" alt="heredium_membership" class="only-mobile" />
+        <img :src="detailPost?.thumbnail_urls?.medium" alt="heredium_membership" class="only-pc" />
       </NuxtLink>
     </div>
   </div>
