@@ -6,17 +6,19 @@
           <p class="name">{{ detailCoupon.name }}</p>
           <p class="date">
             <img src="~assets/img/icon/icon_calender.svg" />
-            <span>{{ getFormattedDate(detailCoupon.startDate, detailCoupon.endDate) }}</span>
+            <span>{{
+              getFormattedDate(
+                detailCoupon.unused_coupons[0].delivered_date,
+                detailCoupon.unused_coupons[0].expiration_date
+              )
+            }}</span>
           </p>
           <div class="coupon-remaining">
-            <div v-if="detailCoupon.isActive" class="status active">
+            <div class="status active">
               <span>사용완</span>
             </div>
-            <div v-else class="status deactive">
-              <span>사용완료</span>
-            </div>
             <div>
-              <span>{{ detailCoupon.quantity }}</span
+              <span>{{ detailCoupon.unused_coupons.length }}</span
               >회남음
             </div>
           </div>
@@ -108,13 +110,18 @@ export default {
 
     &-remaining {
       display: flex;
+      align-items: center;
       column-gap: 8px;
       font-size: 1.2rem;
+
       .status {
         border-radius: 6px;
         padding: 2px 8px;
         width: fit-content;
         line-height: initial;
+        display: flex;
+        align-items: center;
+
         &::before {
           content: '';
           width: 8px;

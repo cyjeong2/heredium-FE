@@ -1,11 +1,11 @@
 <template>
-  <div class="coupon-card">
+  <div v-if="!isExpired" class="coupon-card">
     <div class="img-wrap">
       <img :src="detailCoupon.image_url" />
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
-      <p class="date">
+      <p v-if="!isHistory" class="date">
         <img src="~assets/img/icon/icon_calender.svg" />
         <span>{{
           getFormattedDate(
@@ -17,21 +17,23 @@
       <div class="coupon-remaining">
         <div class="button">
           <UButton
+            v-if="!isHistory"
             class="reservation-btn"
             :disabled="isExpired || detailCoupon.unused_coupons.length === 0"
             @click="handleOpenModal"
           >
             QR코드
           </UButton>
+          <UButton v-else class="reservation-btn" disabled> QR코드 </UButton>
         </div>
-        <div v-if="detailCoupon.unused_coupons.length > 0" class="status active">
+        <div v-if="!isHistory && detailCoupon.unused_coupons.length > 0" class="status active">
           <span>사용완</span>
         </div>
         <div v-else class="status deactive">
           <span>사용완료</span>
         </div>
         <div>
-          <span>{{ detailCoupon.unused_coupons.length }}</span
+          <span>{{ detail.length }}</span
           >회남음
         </div>
       </div>
@@ -53,12 +55,18 @@ export default {
       type: Object,
       required: false,
       default: () => {}
+    },
+    isHistory: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
     return {
       openModalQr: false,
-      isExpired: false
+      isExpired: false,
+      detail: {}
     };
   },
   computed: {
@@ -69,6 +77,12 @@ export default {
   },
   created() {
     this.checkExpiration();
+
+    if (this.isHistory) {
+      this.detail = this.detailCoupon.used_coupons;
+    } else {
+      this.detail = this.detailCoupon.unused_coupons;
+    }
   },
   methods: {
     getFormattedDate(startDate, endDate) {

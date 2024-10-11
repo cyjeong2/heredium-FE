@@ -6,15 +6,15 @@
       </template>
       <template #content>
         <div class="center qr-box">
-          <p class="name-membership">등급 : {{ dataMerbership.name }}</p>
-          <p>유효기간: {{ getFormattedDate(dataMerbership.startDate, dataMerbership.endDate) }}</p>
+          <p class="name-membership">등급 : {{ dataMerbership.membership_name }}</p>
+          <p>유효기간: {{ getFormattedDate(dataMerbership.registration_date, dataMerbership.expiration_date) }}</p>
           <QrcodeVue :value="createQrValue" :size="250" level="H" />
         </div>
         <div class="benefit">
           <p class="title">이용가능 혜택</p>
           <div class="benefit-box">
-            <div v-for="(item, index) in dataMerbership.benefits" :key="index" class="benefit-card">
-              <p class="benefit-card-name">{{ item.coupon_name }}</p>
+            <div v-for="(item, index) in dataMerbership.coupons" :key="index" class="benefit-card">
+              <p class="benefit-card-name">{{ item.type }}</p>
               <p class="benefit-card-quantity">{{ item.quantity }}</p>
             </div>
           </div>

@@ -55,19 +55,20 @@ h1 {
     display: flex;
     margin-bottom: 2rem;
 
-    .tab + .tab {
-      margin-left: 2.4rem;
-    }
-
     .tab {
       font-size: 1.8rem;
       font-weight: 500;
       line-height: 1.8rem;
       color: var(--color-grey-4);
+      padding: 12px;
+      text-align: center;
+      flex: 1;
+      border-bottom: 1px solid #e5e7eb;
 
       &.nuxt-link-active {
         color: var(--color-u-primary);
         font-weight: 700;
+        border-bottom: 2px solid var(--color-u-primary);
       }
     }
   }
