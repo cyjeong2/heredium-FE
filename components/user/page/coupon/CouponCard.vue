@@ -1,25 +1,20 @@
 <template>
   <div v-if="!isExpired" class="coupon-card">
     <div class="img-wrap">
-      <img :src="detailCoupon.image_url" />
+      <img :src="detailCoupon.img" />
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
       <p v-if="!isHistory" class="date">
         <img src="~assets/img/icon/icon_calender.svg" />
-        <span>{{
-          getFormattedDate(
-            detailCoupon.unused_coupons[0].delivered_date,
-            detailCoupon.unused_coupons[0].expiration_date
-          )
-        }}</span>
+        <span>{{ getFormattedDate(detailCoupon.startDate, detailCoupon.endDate) }}</span>
       </p>
       <div class="coupon-remaining">
         <div class="button">
           <UButton
             v-if="!isHistory"
             class="reservation-btn"
-            :disabled="isExpired || detailCoupon.unused_coupons.length === 0"
+            :disabled="isExpired || detailCoupon.quantity === 0"
             @click="handleOpenModal"
           >
             QR코드
@@ -95,7 +90,7 @@ export default {
       this.openModalQr = false;
     },
     checkExpiration() {
-      const endDateTime = new Date(this.detailCoupon.unused_coupons[0].expiration_date);
+      const endDateTime = new Date(this.detailCoupon.endDate);
       const today = new Date();
       this.isExpired = endDateTime < today;
     }

@@ -1,6 +1,22 @@
 <template>
   <main class="container">
-    <SideBarMyPage />
+    <div>
+      <h1>Mypage</h1>
+      <section class="tab-sec">
+        <div class="only-mobile">
+          <div class="tabs page">
+            <NuxtLink class="tab" to="/mypage/purchase/all">구매내역</NuxtLink>
+            <NuxtLink class="tab" to="/mypage/info">내 정보 수정</NuxtLink>
+          </div>
+        </div>
+        <div class="only-pc pc-tabs">
+          <h2>구매내역</h2>
+          <NuxtLink to="/mypage/purchase/all" class="tab">전시·프로그램</NuxtLink>
+          <NuxtLink to="/mypage/purchase/coffee" class="tab">커피</NuxtLink>
+          <NuxtLink to="/mypage/info" class="big-tab">내 정보 수정</NuxtLink>
+        </div>
+      </section>
+    </div>
     <section class="info-sec">
       <div class="my-info-head">
         <h2>내 정보 수정</h2>
@@ -131,7 +147,6 @@
 </template>
 
 <script>
-import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UInput from '~/components/user/common/UInput';
 import UButton from '~/components/user/common/UButton';
 import UDialogModal from '~/components/user/modal/UDialogModal';
@@ -141,7 +156,7 @@ import { createFormElement } from '~/assets/js/commons';
 
 export default {
   name: 'MyPage',
-  components: { UInput, UButton, UCheckbox, UDialogModal, SideBarMyPage },
+  components: { UInput, UButton, UCheckbox, UDialogModal },
   asyncData({ store, redirect }) {
     const isLogged = !!store.getters['service/auth/getAccessToken'];
 

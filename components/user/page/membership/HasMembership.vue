@@ -6,8 +6,8 @@
       </div>
       <div class="content">
         <div class="center">
-          <p class="name-membership">등급 : {{ dataMerbership.membership_name }}</p>
-          <p>유효기간: {{ getFormattedDate(dataMerbership.registration_date, dataMerbership.expiration_date) }}</p>
+          <p class="name-membership">등급 : {{ dataMerbership.name }}</p>
+          <p>유효기간: {{ getFormattedDate(dataMerbership.startDate, dataMerbership.endDate) }}</p>
         </div>
       </div>
       <UButton class="button" @click="handleOpenModal">멤버십 QR코드 </UButton>
