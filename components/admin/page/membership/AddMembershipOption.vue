@@ -3,7 +3,12 @@
     <div class="create-membership__content">
       <div class="field-group">
         <label> 멤버십 이름 </label>
-        <SInput v-model="membershipName" w-size="large" :class="{ 'is-error': isSubmitted && !membershipName }" />
+        <SInput
+          v-model="membershipName"
+          w-size="large"
+          :class="{ 'is-error': isSubmitted && !membershipName }"
+          :disabled="disabled"
+        />
       </div>
       <div class="field-group">
         <label> 가격 </label>
@@ -13,11 +18,12 @@
           w-size="large"
           text-align="right"
           :class="{ 'is-error': isSubmitted && !price }"
+          :disabled="disabled"
         />
       </div>
     </div>
     <div class="create-membership__action">
-      <SButton button-type="primary" @click="handleAddMembershipOption">
+      <SButton button-type="primary" :disabled="disabled" @click="handleAddMembershipOption">
         <i class="ic-plus mb-28"></i>
         추가하다
       </SButton>
@@ -35,6 +41,12 @@ const DEFAULT_MEMBERSHIP_PRICE = 0;
 export default {
   name: 'AddMembershipOption',
   components: { SInput, SButton },
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       membershipName: DEFAULT_MEMBERSHIP_NAME,

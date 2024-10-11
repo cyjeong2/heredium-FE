@@ -5,6 +5,7 @@
         :image-src="couponEditor.image_url"
         type="SMALL"
         :class="{ 'is-error': error?.imageUrl }"
+        :disabled="disabled"
         @image-uploaded="updateThumbnail"
         @image-removed="removeThumbnail"
       />
@@ -13,7 +14,12 @@
       <div class="field-group">
         <label>Coupon name</label>
         <div class="field-value">
-          <SInput v-model="couponEditor.name" :class="{ 'is-error': error?.name }" w-size="large" />
+          <SInput
+            v-model="couponEditor.name"
+            :disabled="disabled"
+            :class="{ 'is-error': error?.name }"
+            w-size="large"
+          />
         </div>
       </div>
       <div class="field-group">
@@ -21,6 +27,7 @@
         <div class="field-value">
           <SInput
             v-model="couponEditor.period_in_days"
+            :disabled="disabled"
             :class="{ 'is-error': error?.periodInDays }"
             is-comma-num
             w-size="large"
@@ -32,6 +39,7 @@
         <div class="field-value">
           <SDropdown
             v-model="couponEditor.coupon_type"
+            :disabled="disabled"
             :class="{ 'is-error': error?.couponType }"
             :option-list="couponTypeOptionList"
             w-size="large"
@@ -45,11 +53,11 @@
             v-model="couponEditor.number_of_uses"
             is-comma-num
             w-size="large"
-            :disabled="couponEditor.is_permanent"
+            :disabled="couponEditor.is_permanent || disabled"
             :class="{ 'is-error': error?.numberOfUses }"
           />
           <div>
-            <SCheckbox v-model="couponEditor.is_permanent" />
+            <SCheckbox v-model="couponEditor.is_permanent" :disabled="disabled" />
             <p>Permanent discount</p>
           </div>
         </div>
@@ -63,10 +71,11 @@
             is-comma-num
             maxlength="3"
             w-size="large"
+            :disabled="disabled"
           />
         </div>
       </div>
-      <div v-if="showAddButton" class="right">
+      <div v-if="showAddButton && !disabled" class="right">
         <SButton button-type="primary" w-size="medium" @click="$emit('add-coupon')"> Add </SButton>
       </div>
     </div>
@@ -107,6 +116,10 @@ export default {
     showAddButton: {
       type: Boolean,
       required: true,
+      default: false
+    },
+    disabled: {
+      type: Boolean,
       default: false
     }
   },
