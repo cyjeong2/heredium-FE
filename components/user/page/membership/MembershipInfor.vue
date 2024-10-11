@@ -1,13 +1,11 @@
 <template>
   <KeepAlive>
-    <div class="container">
-      <div class="center">
-        <div v-if="!dataMerbership">
-          <no-membership />
-        </div>
-        <div v-else>
-          <has-membership :data-merbership="dataMerbership" />
-        </div>
+    <div class="center box">
+      <div v-if="!dataMerbership">
+        <no-membership />
+      </div>
+      <div v-else>
+        <has-membership :data-merbership="dataMerbership" />
       </div>
     </div>
   </KeepAlive>
@@ -31,8 +29,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.box {
   background: #f3f4f6;
   padding: 4rem 1.6rem 1.6rem;
+  & > div {
+    height: 100%;
+    width: 100%;
+  }
 }
 </style>
