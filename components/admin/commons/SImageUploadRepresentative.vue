@@ -6,15 +6,23 @@
         <i class="ic-plus mb-28"></i>
         <span class="h4 mb-17">이미지를 등록해주세요.</span>
         <span class="bt-1r">5MB 이하의 JPG, GIF, PNG 파일을 선택해주세요.</span>
-        <input type="file" accept=".jpg, .jpeg, .png, .gif" class="is-blind" @change="handleFileUpload($event)" />
+        <input
+          type="file"
+          accept=".jpg, .jpeg, .png, .gif"
+          class="is-blind"
+          :disabled="disabled"
+          @change="handleFileUpload($event)"
+        />
       </span>
     </label>
-    <SButton v-if="imageSrc" button-type="primary" w-size="small" h-size="small" @click="removeImage"> 삭제 </SButton>
+    <SButton v-if="imageSrc && !disabled" button-type="primary" w-size="small" h-size="small" @click="removeImage">
+      삭제
+    </SButton>
 
     <SDialogModal :is-show="isFileError" @close="isFileError = false">
       <template #content>5MB이하의 JPG, GIF, PNG 파일을 업로드해주세요.</template>
       <template #modal-btn1>
-        <SButton button-type="primary" @click="isFileError = false">확인</SButton>
+        <SButton v-show="!disabled" button-type="primary" @click="isFileError = false">확인</SButton>
       </template>
     </SDialogModal>
   </div>
@@ -33,6 +41,10 @@ export default {
     imageSrc: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     },
     type: {
       type: String,
@@ -57,10 +69,15 @@ export default {
   },
   methods: {
     async handleFileUpload(e) {
-      const response = await this.handleUploadImage(e, this.type);
-      if (response) {
-        this.$emit('image-uploaded', response);
+      try {
+        const response = await this.handleUploadImage(e, this.type);
+        if (response) {
+          this.$emit('image-uploaded', response);
+        }
+      } catch (error) {
+        this.isFileError = true;
       }
+
       e.target.value = null;
       e.target.files = null;
     },

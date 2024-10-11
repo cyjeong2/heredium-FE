@@ -7,6 +7,7 @@
         v-model="content"
         :set-content="value"
         :is-hide-video="isHideVideo"
+        :disabled="true"
         @onImageUpload="onImageUpload"
         @onChange="onChange"
       />
