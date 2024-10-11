@@ -5,7 +5,7 @@
       <div v-html="detailPost.content_detail"></div>
     </div>
     <div>
-      <NuxtLink :to="detailPost.navigation_link" class="img-wrap">
+      <NuxtLink :to="`${detailPost.navigation_link}?id=${detailPost.id}`" class="img-wrap">
         <img :src="detailPost?.thumbnail_urls?.small" alt="heredium_membership" class="only-mobile" />
         <img :src="detailPost?.thumbnail_urls?.medium" alt="heredium_membership" class="only-pc" />
       </NuxtLink>
