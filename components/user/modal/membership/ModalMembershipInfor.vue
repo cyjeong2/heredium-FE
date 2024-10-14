@@ -89,7 +89,7 @@ export default {
     .title {
       font-size: 1.8rem;
       font-weight: 700;
-      margin-top: 8px;
+      margin-bottom: 8px;
     }
 
     &-box {
