@@ -155,8 +155,10 @@ export default {
     }
   }
 
-  .qr-box {
-    padding-bottom: 20px;
+  @media (min-width: 768px) {
+    .qr-box {
+      padding-bottom: 32px;
+    }
   }
 
   .button {
