@@ -1,7 +1,7 @@
 <template>
   <div v-if="!isExpired" class="coupon-card">
     <div class="img-wrap">
-      <img :src="detailCoupon.image_url" />
+      <img :src="couponImageSrc" />
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
@@ -45,11 +45,13 @@
 <script>
 import UButton from '../../common/UButton.vue';
 import ModalCouponInfor from '../../modal/coupon/ModalCouponInfor.vue';
+import { imageMixin } from '~/mixins/imageMixin';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
 
 export default {
   name: 'CouponCard',
   components: { ModalCouponInfor, UButton },
+  mixins: [imageMixin],
   props: {
     detailCoupon: {
       type: Object,
@@ -73,6 +75,9 @@ export default {
     createQrValue() {
       const { id, uuid } = this.detailCoupon;
       return uuid ? JSON.stringify({ id, uuid }) : '';
+    },
+    couponImageSrc() {
+      return this.getImage(this.detailCoupon.image_url);
     }
   },
   created() {
