@@ -20,7 +20,7 @@
             <div class="head">멤버십</div>
             <MembershipInfor :data-merbership="dataMembership" />
           </div>
-          <div class="box-coupon">
+          <div v-if="dataListCoupon" class="box-coupon">
             <div class="head only-pc">쿠폰함</div>
             <div class="head-mobile only-mobile">
               <div class="head">쿠폰함</div>
@@ -47,10 +47,24 @@ export default {
   name: 'MembershipAndCouponPage',
   components: { SideBarMyPage, MembershipInfor, CouponList },
   async asyncData({ $axios }) {
-    const dataListCoupon = await $axios.$get('/user/coupons/usage');
-    const dataMembership = await $axios.$get('/user/membership/info');
+    let dataListCoupon = null;
+    let dataMembership = null;
+    try {
+      dataMembership = await $axios.$get('/user/membership/info');
+    } catch (error) {
+      dataMembership = null;
+    }
 
-    return { dataMembership, dataListCoupon };
+    try {
+      dataListCoupon = await $axios.$get('/user/coupons/usage');
+    } catch (error) {
+      dataListCoupon = null;
+    }
+
+    return {
+      dataListCoupon,
+      dataMembership
+    };
   },
   data() {
     return {
@@ -207,6 +221,9 @@ export default {
   .box-contents {
     display: flex;
     column-gap: 2.4rem;
+    .box-membership {
+      max-width: 50%;
+    }
   }
 
   .head {
