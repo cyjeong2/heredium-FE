@@ -155,7 +155,7 @@ export default {
     }
   }
 
-  @media (min-width: 768px) {
+  @media (max-width: 768px) {
     .qr-box {
       padding-bottom: 32px;
     }
