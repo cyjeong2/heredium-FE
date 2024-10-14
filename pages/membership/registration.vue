@@ -1,7 +1,7 @@
 <template>
   <section v-if="isDataReady && !!postDetail" class="contents">
     <section class="banner">
-      <img :src="postDetail.image_url" alt="Heredium membership image" />
+      <img :src="postImageDetail" alt="Heredium membership image" />
     </section>
     <div class="membership-form-container">
       <h1>{{ postDetail.name }}</h1>
@@ -71,10 +71,12 @@ import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
+import { imageMixin } from '~/mixins/imageMixin';
 
 export default {
   name: 'MembershipRegistrationPage',
   components: { MembershipOption, URefundPolicy, UButton, UNoticePolicy, UWarningDialog, UExistedMembershipDialog },
+  mixins: [imageMixin],
   props: {},
   async asyncData({ query, $axios }) {
     try {
@@ -103,6 +105,11 @@ export default {
       },
       hasMembership: false
     };
+  },
+  computed: {
+    postImageDetail() {
+      return this.getImage(this.postDetail.image_url);
+    }
   },
   watch: {
     agreement(newValue) {

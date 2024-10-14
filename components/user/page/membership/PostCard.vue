@@ -6,21 +6,32 @@
     </div>
     <div>
       <NuxtLink :to="`${detailPost.navigation_link}?id=${detailPost.id}`" class="img-wrap">
-        <img :src="detailPost?.thumbnail_urls?.small" alt="heredium_membership" class="only-mobile" />
-        <img :src="detailPost?.thumbnail_urls?.medium" alt="heredium_membership" class="only-pc" />
+        <img :src="smallImage" alt="heredium_membership" class="only-mobile" />
+        <img :src="mediumImage" alt="heredium_membership" class="only-pc" />
       </NuxtLink>
     </div>
   </div>
 </template>
 
 <script>
+import { imageMixin } from '~/mixins/imageMixin';
+
 export default {
   name: 'PostCard',
+  mixins: [imageMixin],
   props: {
     detailPost: {
       type: Object,
       required: false,
       default: () => {}
+    }
+  },
+  computed: {
+    smallImage() {
+      return this.getImage(this.detailPost?.thumbnail_urls?.small);
+    },
+    mediumImage() {
+      return this.getImage(this.detailPost?.thumbnail_urls?.medium);
     }
   }
 };
