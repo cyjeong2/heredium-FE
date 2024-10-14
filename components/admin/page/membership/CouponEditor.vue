@@ -93,7 +93,7 @@ import { COUPON_DEFAULT } from '~/assets/js/types';
 
 const COUPON_TYPE_OPTION_LIST = [
   { value: '', label: '선택' },
-  { value: 'DRINK', label: '커피' },
+  { value: 'COFFEE', label: '커피' },
   { value: 'ARTSHOP', label: '아트숍' },
   { value: 'PROGRAM', label: '프로그램' },
   { value: 'EXHIBITION ', label: '전시' }
