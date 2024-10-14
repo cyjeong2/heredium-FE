@@ -27,7 +27,7 @@
           <i class="ic-close" />
         </button>
       </div>
-      <div class="center">
+      <div class="center qr-box">
         <QrcodeVue :value="createQrValue" :size="250" level="H" />
       </div>
     </template>
@@ -153,6 +153,10 @@ export default {
         margin-right: 3px;
       }
     }
+  }
+
+  .qr-box {
+    padding-bottom: 20px;
   }
 
   .button {
