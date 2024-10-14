@@ -34,7 +34,7 @@ export default {
   methods: {
     async getPostDetail(id) {
       try {
-        const { data } = await this.$axios.get(`/user/posts/${id}`);
+        const { data } = await this.$axios.get(`/admin/posts/${id}`);
         this.initFormData = {
           id: data.id,
           name: data.name,
