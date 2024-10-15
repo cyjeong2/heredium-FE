@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!isExpired" class="coupon-card">
+  <div v-if="!isExpired" :class="{ checked: isChecked }" @click="toggleCheck">
     <div class="img-wrap">
       <img :src="couponImageSrc" />
     </div>
@@ -39,6 +39,10 @@
       </div>
       <modal-coupon-infor :detail-coupon="detailCoupon" :open="openModalQr" @close="handleCloseModal" />
     </div>
+    <div v-if="isSelection">
+      <input type="radio" class="hidden-radio" :value="detailCoupon.id" @change="handleChange" />
+      <div class="circle" :class="{ active: isChecked }"></div>
+    </div>
   </div>
 </template>
 
@@ -62,6 +66,23 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    isSelection: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    value: {
+      type: [String, Number],
+      required: true
+    },
+    change: {
+      type: Function,
+      required: true
+    },
+    modelValue: {
+      type: [String, Number],
+      required: true
     }
   },
   data() {
@@ -72,12 +93,11 @@ export default {
     };
   },
   computed: {
-    createQrValue() {
-      const { id, uuid } = this.detailCoupon;
-      return uuid ? JSON.stringify({ id, uuid }) : '';
-    },
     couponImageSrc() {
       return this.getImage(this.detailCoupon.image_url);
+    },
+    isChecked() {
+      return this.modelValue === this.value;
     }
   },
   created() {
@@ -90,6 +110,14 @@ export default {
     }
   },
   methods: {
+    toggleCheck() {
+      if (this.isSelection && !this.isChecked) {
+        this.change(this.value);
+      }
+    },
+    handleChange() {
+      this.$emit('input', this.value);
+    },
     getFormattedDate(startDate, endDate) {
       return getDateCommonDateOutput(startDate, endDate);
     },
@@ -141,12 +169,17 @@ export default {
       display: flex;
       align-items: center;
       column-gap: 4px;
-      /* color: var(--color-u-placeholder); */
+    }
+
+    &.checked {
+      border: 1px solid var(--color-u-primary);
+      background-color: #f7f8f5;
     }
   }
 
   &-detail {
     display: flex;
+    flex: 1;
     flex-direction: column;
     row-gap: 8px;
     color: var(--color-u-placeholder);
@@ -218,5 +251,37 @@ export default {
   .button {
     width: 100% !important;
   }
+}
+
+.hidden-radio {
+  display: none;
+}
+
+.circle {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--color-u-grey-2);
+  background-color: var(--color-white);
+  border-radius: 50%;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.circle.active {
+  border-color: var(--color-u-primary);
+  position: relative;
+}
+.circle.active::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--color-u-primary);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

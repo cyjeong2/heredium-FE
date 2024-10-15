@@ -5,9 +5,17 @@
         <no-coupon />
       </div>
       <div v-else>
-        <div v-for="(item, index) in data" :key="index">
-          <coupon-card :is-history="isHistory" :detail-coupon="item" />
-        </div>
+        <coupon-card
+          v-for="(item, index) in data"
+          :key="index"
+          class="coupon-card"
+          :is-history="isHistory"
+          :detail-coupon="item"
+          :is-selection="isSelection"
+          :value="item.id"
+          :model-value="selectedIdCard"
+          :change="updateSelection"
+        />
       </div>
     </div>
   </KeepAlive>
@@ -30,6 +38,21 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    isSelection: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+  data() {
+    return {
+      selectedIdCard: ''
+    };
+  },
+  methods: {
+    updateSelection(id) {
+      this.selectedIdCard = id;
     }
   }
 };
