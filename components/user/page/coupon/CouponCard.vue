@@ -39,8 +39,8 @@
       </div>
       <modal-coupon-infor :detail-coupon="detailCoupon" :open="openModalQr" @close="handleCloseModal" />
     </div>
-    <div>
-      <input v-if="isSelection" type="radio" class="hidden-radio" :value="detailCoupon.id" @change="handleChange" />
+    <div v-if="isSelection">
+      <input type="radio" class="hidden-radio" :value="detailCoupon.id" @change="handleChange" />
       <div class="circle" :class="{ active: isChecked }"></div>
     </div>
   </div>
@@ -111,7 +111,7 @@ export default {
   },
   methods: {
     toggleCheck() {
-      if (!this.isChecked) {
+      if (this.isSelection && !this.isChecked) {
         this.change(this.value);
       }
     },
@@ -172,6 +172,7 @@ export default {
     }
 
     &.checked {
+      border: 1px solid var(--color-u-primary);
       background-color: #f7f8f5;
     }
   }
