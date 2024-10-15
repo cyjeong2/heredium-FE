@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="row">
-          <label>배경 이미지</label>
+          <label>배경 이미지<b class="must">*</b></label>
           <div class="has-btn">
             <div class="mr-28">
               <SInput
@@ -65,7 +65,7 @@
     <div class="edit-area">
       <div>
         <section class="membership-coupon has-title-side-btn">
-          <h3 class="mb-24">입장권 정보</h3>
+          <h3 class="mb-24">입장권 정보<b class="must">*</b></h3>
           <div>
             <div class="grid-table" :class="{ 'is-error': feedback?.emptyMemberships }">
               <AddMembershipOption :disabled="isEdit" @add-membership-option="handlePushMembershipOption" />
@@ -116,10 +116,9 @@
             <EditorContentOutput v-if="isEdit" :contents="detailData.content_detail" />
             <SummernoteEditor v-else v-model.trim="detailData.content_detail" />
           </div>
-          <p v-if="feedback?.contentDetail" class="feedback-text">콘텐츠를 입력해 주세요.</p>
         </section>
         <section class="nav-link mb-36">
-          <label>Nav Link</label>
+          <label>Nav Link<b class="must">*</b></label>
           <SInput
             v-model="detailData.navigation_link"
             w-size="xx-large"

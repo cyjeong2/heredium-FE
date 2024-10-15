@@ -12,7 +12,7 @@
     </div>
     <div class="benefit-information">
       <div class="field-group">
-        <label>Coupon name</label>
+        <label>Coupon name<b class="must">*</b></label>
         <div class="field-value">
           <SInput
             v-model="couponEditor.name"
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Period of use</label>
+        <label>Period of use<b class="must">*</b></label>
         <div class="field-value">
           <SInput
             v-model="couponEditor.period_in_days"
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Coupon type</label>
+        <label>Coupon type<b class="must">*</b></label>
         <div class="field-value">
           <SDropdown
             v-model="couponEditor.coupon_type"
@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Discount rate</label>
+        <label>Discount rate<b class="must">*</b></label>
         <div class="field-value">
           <SInput
             v-model="couponEditor.discount_percent"
@@ -198,6 +198,9 @@ export default {
   .right {
     display: flex;
     justify-content: end;
+  }
+  .must {
+    color: var(--color-blue);
   }
 }
 </style>
