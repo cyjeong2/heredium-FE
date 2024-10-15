@@ -10,7 +10,7 @@
         <SDivLine is-big />
 
         <div class="label">창조자</div>
-        <SSearchBar v-model="queryOptions.created_name" :placeholder="''" :w-size="'normal'" @search="onSearch()" />
+        <SSearchBar v-model="queryOptions.createdName" :placeholder="''" :w-size="'normal'" @search="onSearch()" />
         <SDivLine is-big />
 
         <SDropdown v-model="queryOptions.isEnabled" :option-list="enabledOptionList">노출:</SDropdown>
@@ -106,7 +106,7 @@ export default {
         isEnabled:
           this.$route.query.isEnabled === 'true' ? true : this.$route.query.isEnabled === 'false' ? false : null,
         name: this.$route.query.name || '',
-        created_name: this.$route.query.created_name || '',
+        createdName: this.$route.query.createdName || '',
         size: Number(this.$route.query.size) || 20
       },
       tableData: null
@@ -134,7 +134,7 @@ export default {
         this.queryOptions.endDate = this.$dayjs().format('YYYY-MM-DD');
         this.queryOptions.isEnabled = null;
         this.queryOptions.name = '';
-        this.queryOptions.created_name = '';
+        this.queryOptions.createdName = '';
       }
       this.queryOptions.page = 0;
       this.getPosts();

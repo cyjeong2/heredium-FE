@@ -154,10 +154,10 @@
     <SDialogModal :is-show="modal.isReset" @close="modal.isReset = false">
       <template #content>콘텐츠를 저장하지 않고<br />페이지를 새로 고침 하시겠습니까?</template>
       <template #modal-btn1>
-        <SButton @click="modal.isCancel = false">취소</SButton>
+        <SButton @click="modal.isReset = false">취소</SButton>
       </template>
       <template #modal-btn2>
-        <SButton button-type="primary" @click="reload()">확인</SButton>
+        <SButton button-type="primary" @click="reloadPage">확인</SButton>
       </template>
     </SDialogModal>
     <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
@@ -249,6 +249,9 @@ export default {
     this.isEdit = this.mode === 'edit';
   },
   methods: {
+    reloadPage() {
+      window.location.replace(window.location.href);
+    },
     toKoreaCurrency,
     reload() {
       this.$router.replace({ path: this.$route.path, query: this.$route.query });
