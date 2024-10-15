@@ -19,7 +19,8 @@ export default {
   components: { PostCard },
   async asyncData({ $axios }) {
     const dataPosts = await $axios.$get('/user/posts/enabled-list');
-    return { dataPosts };
+    const reversePosts = Array.isArray(dataPosts) ? dataPosts.reverse() : dataPosts;
+    return { dataPosts: reversePosts };
   },
   data() {
     return {

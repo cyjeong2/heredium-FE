@@ -72,11 +72,12 @@ import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMem
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
 import { imageMixin } from '~/mixins/imageMixin';
+import { userMixin } from '~/mixins/userMixin';
 
 export default {
   name: 'MembershipRegistrationPage',
   components: { MembershipOption, URefundPolicy, UButton, UNoticePolicy, UWarningDialog, UExistedMembershipDialog },
-  mixins: [imageMixin],
+  mixins: [imageMixin, userMixin],
   props: {},
   async asyncData({ query, $axios }) {
     try {
@@ -117,16 +118,12 @@ export default {
     }
   },
   mounted() {
-    this.checkUserLogin();
+    this.checkUserLogin({
+      callbackUrl: this.$route.fullPath
+    });
   },
   methods: {
     toKoreaCurrency,
-    checkUserLogin() {
-      const isLogged = !!this.$store.getters['service/auth/getAccessToken'];
-      if (!isLogged) {
-        this.$router.replace(`/auth/login?redirectPage=${this.$route.fullPath}`);
-      }
-    },
     updateSelection(id) {
       this.membershipIdSelected = id;
       const membershipOption = this.postDetail.memberships.find((item) => item.membership_id === id);

@@ -15,7 +15,7 @@
         }}</span>
       </p>
       <div class="coupon-remaining">
-        <div class="button">
+        <div v-if="!isSelection" class="button">
           <UButton
             v-if="!isHistory"
             class="reservation-btn"
@@ -81,8 +81,10 @@ export default {
       required: true
     },
     modelValue: {
-      type: [String, Number],
-      required: true
+      required: true,
+      validator(value) {
+        return value === null || ['number', 'string'].includes(typeof value);
+      }
     }
   },
   data() {
@@ -111,7 +113,7 @@ export default {
   },
   methods: {
     toggleCheck() {
-      if (this.isSelection && !this.isChecked) {
+      if (this.isSelection) {
         this.change(this.value);
       }
     },
@@ -128,9 +130,7 @@ export default {
       this.openModalQr = false;
     },
     checkExpiration() {
-      const endDateTime = new Date(this.detailCoupon.unused_coupons[0].expiration_date);
-      const today = new Date();
-      this.isExpired = endDateTime < today;
+      this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
     }
   }
 };
