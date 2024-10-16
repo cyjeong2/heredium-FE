@@ -110,7 +110,8 @@ import UButton from '~/components/user/common/UButton';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 import UDialogModal from '~/components/user/modal/UDialogModal';
 import UInput from '~/components/user/common/UInput.vue';
-import payMixin from '~/store/tosspaymentsMixin';
+// import payMixin from '~/store/tosspaymentsMixin';
+import payMixin from '~/store/nicepayMixin';
 export default {
   name: 'Pay1Page',
   components: { UInput, URegisterModal, UCheckbox, UButton, UDialogModal },
