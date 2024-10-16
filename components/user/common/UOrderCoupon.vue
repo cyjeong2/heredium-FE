@@ -106,6 +106,8 @@ export default {
         this.dataListCoupon = dataListCoupon;
       } catch (error) {
         // show empty coupon
+        console.error('cannot get coupon', error.response);
+        this.totalCoupon = 0;
       }
     },
     toggleCouponSelect(id) {

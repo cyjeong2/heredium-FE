@@ -192,6 +192,7 @@ import AddMembershipOption from '~/components/admin/page/membership/AddMembershi
 import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import { toKoreaCurrency } from '~/assets/js/converter';
 import EditorContentOutput from '~/components/common/EditorContentOutput.vue';
+import { API_ERROR } from '~/utils/message';
 
 export default {
   name: 'PostForm',
@@ -441,7 +442,9 @@ export default {
       try {
         await this.$axios.post('/admin/posts', this.detailData);
         this.modal = Object.assign(this.modal, { isConfirmSave: false, isSave: true });
-      } catch (error) {}
+      } catch (error) {
+        alert(API_ERROR);
+      }
     },
     async handleUpdateEnabledPost() {
       try {
@@ -452,7 +455,9 @@ export default {
           is_enabled: this.detailData.is_enabled
         });
         this.modal = Object.assign(this.modal, { isConfirmSave: false, isSave: true });
-      } catch (error) {}
+      } catch (error) {
+        alert(API_ERROR);
+      }
     }
   }
 };
