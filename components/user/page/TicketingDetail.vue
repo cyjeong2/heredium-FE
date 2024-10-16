@@ -158,11 +158,26 @@
                       </p>
                     </div>
                   </div>
+                  <UOrderCoupon :coupon-type="type" :init-coupon-id="coupon?.id" @update-coupon="handleUpdateCoupon" />
                 </div>
-                <div class="total">
+                <div class="row-price">
                   <div class="label">합계</div>
-                  <div class="total-price">
+                  <div class="cell-price">
                     <b>{{ getTotalPrice.toLocaleString('en') }}</b
+                    >원
+                  </div>
+                </div>
+                <div v-if="coupon?.id" class="row-price">
+                  <div class="label">쿠폰</div>
+                  <div class="cell-price">
+                    <b>{{ totalDiscount.toLocaleString('en') }}</b
+                    >원
+                  </div>
+                </div>
+                <div v-if="coupon?.id" class="row-price">
+                  <div class="label">지불할 총 금액</div>
+                  <div class="cell-price">
+                    <b>{{ paymentPrice.toLocaleString('en') }}</b
                     >원
                   </div>
                 </div>
@@ -193,10 +208,7 @@
               :href="detailData.buttonLink ? detailData.buttonLink : 'javascript:void(0);'"
               :target="detailData.isNewTab && detailData.buttonLink ? '_blank' : ''"
             >
-              <button
-                class="link-btn"
-                type="button"
-              >
+              <button class="link-btn" type="button">
                 {{ detailData.buttonTitle }}
               </button>
             </a>
@@ -274,6 +286,8 @@
 
 <script>
 import { isEmpty } from 'lodash/lang';
+import cloneDeep from 'lodash/cloneDeep';
+import UOrderCoupon from '../common/UOrderCoupon.vue';
 import UCheckbox from '~/components/user/common/UCheckbox';
 import UInputSpinner from '~/components/user/common/UInputSpinner';
 import UCalendar from '~/components/user/common/UCalendar';
@@ -286,6 +300,7 @@ import BrConvertText from '~/components/common/BrConvertText.vue';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
 import UTripleDialogModal from '~/components/user/modal/UTripleDialogModal.vue';
+import { discountRound, getBiggestPrice } from '~/utils/order';
 
 export default {
   name: 'TicketingDetail',
@@ -298,7 +313,8 @@ export default {
     UCalendar,
     UInputSpinner,
     UCheckbox,
-    UDialogModal
+    UDialogModal,
+    UOrderCoupon
   },
   mixins: [payMixin],
   props: {
@@ -348,7 +364,8 @@ export default {
         isNonMember: false
       },
       feedbackMsg: '',
-      isHana: this.$store.getters['service/hana/getIsHanaPay']
+      isHana: this.$store.getters['service/hana/getIsHanaPay'],
+      coupon: null
     };
   },
   async fetch() {
@@ -389,6 +406,28 @@ export default {
     },
     isEmptyDates() {
       return isEmpty(this.detailData.dates);
+    },
+    totalDiscount() {
+      if (!this.coupon?.id) {
+        return 0;
+      }
+      if (!this.detailData?.prices?.length) {
+        return 0;
+      }
+      const discountPercent = this.coupon.discount_percent ? Number(this.coupon.discount_percent) : 0;
+      const biggestPrice = getBiggestPrice(this.detailData.prices, this.isHana);
+
+      if (!biggestPrice) {
+        return 0;
+      }
+
+      return discountRound(biggestPrice, discountPercent);
+    },
+    paymentPrice() {
+      if (!this.coupon?.id || !this.totalDiscount) {
+        return this.getTotalPrice;
+      }
+      return this.getTotalPrice - this.totalDiscount;
     }
   },
   created() {
@@ -565,9 +604,10 @@ export default {
 
             await this.requestPayment(
               {
-                ticketOrderInfo
+                ticketOrderInfo,
+                couponUuid: this.coupon?.uuid ?? null
               },
-              this.getTotalPrice,
+              this.paymentPrice,
               failUrl,
               {
                 id: this.id,
@@ -611,6 +651,9 @@ export default {
 
       this.$store.commit('service/non-member-pay/setPayTargetData', nonMemberOrderInfo);
       await this.$router.push('/ticketing/non-member/pay1');
+    },
+    handleUpdateCoupon(coupon) {
+      this.coupon = cloneDeep(coupon);
     }
   }
 };
@@ -938,7 +981,7 @@ export default {
         }
       }
 
-      .total {
+      .row-price {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -946,7 +989,6 @@ export default {
         background-color: var(--color-white);
         padding: 0 1.6rem;
         border: 1px solid var(--color-black);
-        border-radius: 0 0 4px 4px;
 
         .label {
           font-size: 1.4rem;
@@ -954,7 +996,7 @@ export default {
           line-height: 100%;
         }
 
-        .total-price {
+        .cell-price {
           font-size: 1.6rem;
           font-weight: 700;
           line-height: 100%;
@@ -964,6 +1006,12 @@ export default {
             font-weight: 600;
           }
         }
+      }
+      .row-price + .row-price {
+        border-top: none;
+      }
+      .row-price:last-child {
+        border-radius: 0 0 4px 4px;
       }
     }
   }
@@ -1241,7 +1289,7 @@ export default {
           }
         }
 
-        .total {
+        .row-price {
           height: 5.2rem;
           padding: 0 2.4rem;
 
@@ -1251,7 +1299,7 @@ export default {
             line-height: 160%;
           }
 
-          .total-price {
+          .cell-price {
             line-height: 160%;
 
             b {
@@ -1271,7 +1319,8 @@ export default {
       }
     }
 
-    .submit-btn, .link-btn {
+    .submit-btn,
+    .link-btn {
       height: 5.2rem;
       font-size: 1.8rem;
     }

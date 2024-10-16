@@ -13,7 +13,7 @@
           :detail-coupon="item"
           :is-selection="isSelection"
           :value="item.id"
-          :model-value="selectedIdCard"
+          :model-value="selectedCouponId"
           :change="updateSelection"
         />
       </div>
@@ -43,16 +43,19 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    selectedCouponId: {
+      type: Number,
+      required: false,
+      default: null
     }
   },
   data() {
-    return {
-      selectedIdCard: ''
-    };
+    return {};
   },
   methods: {
     updateSelection(id) {
-      this.selectedIdCard = id;
+      this.$emit('toggle-coupon-select', id);
     }
   }
 };
