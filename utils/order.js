@@ -12,11 +12,14 @@ export function discountRound(rawPrice, percentage) {
 
 export function getBiggestPrice(orderListItem, isHana) {
   if (!orderListItem || !orderListItem.length) {
-    return null;
+    return 0;
   }
-  const rawPriceList = orderListItem.map((orderItem) =>
-    isHana && orderItem.discounts[0] ? orderItem.discounts[0].price : orderItem.price
-  );
+  const rawPriceList = orderListItem.map((orderItem) => {
+    if (!orderItem.count) {
+      return 0;
+    }
+    return isHana && orderItem.discounts[0] ? orderItem.discounts[0].price : orderItem.price;
+  });
   const maxPrice = Math.max(...rawPriceList);
 
   return maxPrice;
