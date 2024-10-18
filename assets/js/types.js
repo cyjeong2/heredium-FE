@@ -79,6 +79,15 @@ export const TICKET_STATE_TYPE = Object.freeze({
   EXPIRED: '기간 만료'
 });
 
+export const COUPON_STATE_TYPE = Object.freeze({
+  NUMBER_OF_ENTRIES: '입장횟수',
+  CREATED_DATE: '생성일시',
+  USER_REFUND: '최근 로그인',
+  LAST_LOGIN_DATE: '관리자 환불',
+  MEMBERSHIP: '멤버십',
+  ISSUANCE_STATUS: '쿠폰 발급 여부'
+});
+
 export const TICKET_TYPE = Object.freeze({
   NORMAL: '입장권',
   GROUP: '단체 입장권',
@@ -305,7 +314,9 @@ export const COUPON_DEFAULT = {
   period_in_days: 0,
   image_url: '',
   number_of_uses: 1,
-  is_permanent: false
+  is_permanent: false,
+  startDate: '',
+  endDate: ''
 };
 
 export const MEMBERSHIP_DEFAULT = {

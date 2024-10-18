@@ -12,7 +12,7 @@
     </div>
     <div class="benefit-information">
       <div class="field-group">
-        <label>Coupon name<b class="must">*</b></label>
+        <label>쿠폰명<b class="must">*</b></label>
         <div class="field-value">
           <SInput
             v-model="couponEditor.name"
@@ -23,8 +23,13 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Period of use<b class="must">*</b></label>
-        <div class="field-value">
+        <label>사용기간<b class="must">*</b></label>
+        <div v-if="isIssuance">
+          <SDatepicker v-model="couponEditor.startDate" :max="couponEditor.endDate" />
+          <span class="ml-8 mr-8">~</span>
+          <SDatepicker v-model="couponEditor.endDate" :min="couponEditor.startDate" />
+        </div>
+        <div v-else class="field-value">
           <SInput
             v-model="couponEditor.period_in_days"
             :disabled="disabled"
@@ -35,7 +40,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Coupon type<b class="must">*</b></label>
+        <label>쿠폰종류<b class="must">*</b></label>
         <div class="field-value">
           <SDropdown
             v-model="couponEditor.coupon_type"
@@ -47,7 +52,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Number of uses</label>
+        <label>사용횟수</label>
         <div class="field-value input-group">
           <SInput
             v-model="couponEditor.number_of_uses"
@@ -63,7 +68,7 @@
         </div>
       </div>
       <div class="field-group">
-        <label>Discount rate<b class="must">*</b></label>
+        <label>할인율<b class="must">*</b></label>
         <div class="field-value">
           <SInput
             v-model="couponEditor.discount_percent"
@@ -89,6 +94,7 @@ import SCheckbox from '../../commons/SCheckbox.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
 import SDropdown from '../../commons/SDropdown.vue';
+import SDatepicker from '../../commons/SDatepicker.vue';
 import { COUPON_DEFAULT } from '~/assets/js/types';
 
 const COUPON_TYPE_OPTION_LIST = [
@@ -101,12 +107,12 @@ const COUPON_TYPE_OPTION_LIST = [
 
 export default {
   name: 'CouponEditor',
-  components: { SImageUploadRepresentative, SCheckbox, SInput, SButton, SDropdown },
+  components: { SImageUploadRepresentative, SCheckbox, SInput, SButton, SDropdown, SDatepicker },
   props: {
     coupon: {
       type: Object,
-      required: true,
-      default: COUPON_DEFAULT
+      required: false,
+      default: null
     },
     error: {
       type: Object,
@@ -120,6 +126,11 @@ export default {
     },
     disabled: {
       type: Boolean,
+      default: false
+    },
+    isIssuance: {
+      type: Boolean,
+      required: false,
       default: false
     }
   },
@@ -139,7 +150,7 @@ export default {
     }
   },
   created() {
-    this.couponEditor = cloneDeep(this.coupon);
+    this.couponEditor = cloneDeep(this.coupon || COUPON_DEFAULT);
   },
   methods: {
     updateThumbnail(e) {

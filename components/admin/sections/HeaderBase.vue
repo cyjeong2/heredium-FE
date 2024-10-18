@@ -77,6 +77,9 @@
               <NuxtLink to="/admin/ticket/invitation">
                 <span class="bt-1r">초대권 발급</span>
               </NuxtLink>
+              <NuxtLink to="/admin/ticket/coupon">
+                <span class="bt-1r">쿠폰 발급</span>
+              </NuxtLink>
             </template>
           </div>
         </div>
