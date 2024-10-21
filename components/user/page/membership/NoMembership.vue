@@ -22,7 +22,7 @@ export default {
   components: { UButton },
   methods: {
     goToMembershipRegister() {
-      this.$router.push(`/membership/posts`);
+      this.$router.push(`/membership/registration`);
     }
   }
 };
