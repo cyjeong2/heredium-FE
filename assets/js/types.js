@@ -325,3 +325,8 @@ export const MEMBERSHIP_DEFAULT = {
   checked: false,
   coupons: [{ ...COUPON_DEFAULT }]
 };
+
+export const CONTENT_TAG = {
+  complete: '완전한',
+  'on-going': '일어나고있다'
+};
