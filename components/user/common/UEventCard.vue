@@ -76,6 +76,7 @@ export default {
   padding: 20px;
   cursor: pointer;
   justify-content: start;
+  width: 100%;
 }
 
 .event-card img {
