@@ -3,32 +3,40 @@
     <section class="banner">
       <img :src="postImageDetail" alt="Heredium membership image" />
     </section>
-    <div class="membership-form-container">
-      <h1>{{ postDetail.name }}</h1>
+    <h1 class="membership-section-content">{{ postDetail.name }}</h1>
+    <section class="content-detail membership-section-content">
+      <div v-html="postDetail.content_detail"></div>
+    </section>
+    <UEventCardList class="membership-section-content membership-benefits" :event-list="eventList" />
+    <div class="membership-section-content membership-form-container">
       <form>
-        <h2>멤버십 종류 선택</h2>
         <div class="membership-form-content">
+          <h3>멤버십 종류 선택</h3>
           <div class="warning-box">
             <img src="~assets/img/emoji/emoji_information.svg" alt="note" width="20px" height="20px" />
             <p>최대 1매까지 예매할 수 있습니다</p>
           </div>
 
-          <div class="membership-radio-list">
+          <div class="membership-radio-list membership-radio-list__mobile">
             <MembershipOption
               v-for="membership in postDetail.memberships"
               :key="membership.membership_id"
               :model-value="membershipIdSelected"
-              :value="membership.membership_id"
+              :membership="membership"
               :change="updateSelection"
             >
-              <template #label>오렌지</template>
-              <template v-if="typeof membership.price === 'number'" #price>{{
-                toKoreaCurrency(membership.price)
-              }}</template>
             </MembershipOption>
           </div>
-
-          <hr class="gray-divider" />
+          <div class="membership-radio-list membership-radio-list__desktop">
+            <MembershipOption
+              v-for="membership in postDetail.memberships"
+              :key="membership.membership_id"
+              :model-value="membershipIdSelected"
+              :membership="membership"
+              :change="updateSelection"
+            >
+            </MembershipOption>
+          </div>
 
           <div class="total-amount">
             <p>합계</p>
@@ -60,12 +68,17 @@
       />
       <UExistedMembershipDialog v-if="hasMembership" :on-confirm="goToMyMembership" />
     </div>
+    <section class="note membership-section-content">
+      <img :src="postImageNote" alt="Heredium membership note" />
+    </section>
   </section>
 </template>
 
 <script>
+import { concat } from 'lodash';
 import { toKoreaCurrency } from '~/assets/js/converter';
 import UButton from '~/components/user/common/UButton.vue';
+import UEventCardList from '~/components/user/common/UEventCardList.vue';
 import UNoticePolicy from '~/components/user/common/UNoticePolicy.vue';
 import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
@@ -76,16 +89,20 @@ import { userMixin } from '~/mixins/userMixin';
 
 export default {
   name: 'MembershipRegistrationPage',
-  components: { MembershipOption, URefundPolicy, UButton, UNoticePolicy, UWarningDialog, UExistedMembershipDialog },
+  components: {
+    MembershipOption,
+    URefundPolicy,
+    UButton,
+    UNoticePolicy,
+    UWarningDialog,
+    UExistedMembershipDialog,
+    UEventCardList
+  },
   mixins: [imageMixin, userMixin],
   props: {},
-  async asyncData({ query, $axios }) {
+  async asyncData({ $axios }) {
     try {
-      const postId = query.id;
-      if (!postId) {
-        return { postDetail: null, isDataReady: true };
-      }
-      const postDetail = await $axios.$get(`/user/posts/${postId}`);
+      const postDetail = await $axios.$get(`/user/posts`);
       return { postDetail, isDataReady: true };
     } catch (error) {
       console.error(error);
@@ -96,7 +113,7 @@ export default {
     return {
       isDataReady: false,
       postDetail: null,
-      membershipIdSelected: '',
+      membershipIdSelected: null,
       totalPrice: 0,
       isAgreeNoticePolicy: false,
       isAgreeRefundPolicy: false,
@@ -109,7 +126,31 @@ export default {
   },
   computed: {
     postImageDetail() {
-      return this.getImage(this.postDetail.image_url);
+      return this.getImage(this.postDetail?.thumbnail_urls?.large);
+    },
+    postImageNote() {
+      return this.getImage(this.postDetail?.note_image?.note_image_url);
+    },
+    eventList() {
+      let list = [];
+      if (!this.postDetail?.additional_info) {
+        return list;
+      }
+      const additionalInfo = this.postDetail.additional_info;
+      const eventList = ['exhibitions', 'programs'];
+      const statusList = ['future', 'ongoing', 'completed'];
+      for (const status of statusList) {
+        for (const event of eventList) {
+          const concatList = additionalInfo?.[event]?.[status];
+          if (concatList?.length) {
+            const adaptedList = concatList.map((item) =>
+              Object.assign(item, { tag: status === 'completed' ? 'complete' : 'on-going' })
+            );
+            list = concat(list, adaptedList);
+          }
+        }
+      }
+      return list;
     }
   },
   watch: {
@@ -124,9 +165,11 @@ export default {
   },
   methods: {
     toKoreaCurrency,
-    updateSelection(id) {
-      this.membershipIdSelected = id;
-      const membershipOption = this.postDetail.memberships.find((item) => item.membership_id === id);
+    updateSelection(membershipOption) {
+      if (this.membershipIdSelected === membershipOption.membership_id) {
+        return;
+      }
+      this.membershipIdSelected = membershipOption.membership_id;
       this.totalPrice = membershipOption.price || 0;
     },
     closeDialog() {
@@ -185,71 +228,158 @@ export default {
 
 <style lang="scss" scoped>
 .contents {
-  margin: 3.2rem 0 4rem;
+  margin: 0 0 4rem;
+  display: grid;
+  row-gap: 48px;
+  grid-template-columns: 1fr;
+}
+h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 3.2rem;
+  border-bottom: 1px solid var(--color-default);
+  padding-bottom: 20px;
+  color: var(--color-default);
+}
 
-  h1 {
-    font-size: 2.4rem;
-    font-weight: 700;
-    line-height: 3.2rem;
-    margin-bottom: 1.6rem;
-    border-bottom: 1px solid var(--color-default);
-    padding-bottom: 20px;
-    color: var(--color-default);
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 2.4rem;
+  color: var(--color-default);
+}
+
+.gray-divider {
+  color: var(--color-u-grey-2);
+  height: 1px;
+  margin: 24px 0;
+}
+
+.banner {
+  width: 100dvw;
+  display: flex;
+  justify-content: center;
+  img {
+    object-fit: contain;
+    min-height: 50px;
+    width: 100%;
   }
+}
 
-  h2 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    line-height: 2.4rem;
-    color: var(--color-default);
-  }
+.membership-section-content {
+  margin-left: 20px;
+  margin-right: 20px;
+}
 
-  .gray-divider {
-    color: var(--color-u-grey-2);
-    height: 1px;
-    margin: 24px 0;
-  }
+form {
+  margin-top: 48px;
 
-  .banner {
-    width: 100dvw;
+  .warning-box {
+    margin-top: 24px;
     display: flex;
-    justify-content: center;
-    img {
-      object-fit: contain;
-      min-height: 50px;
+    justify-content: start;
+    gap: 0.8rem;
+    color: var(--color-u-grey-4);
+    P {
+      flex: 1;
     }
   }
 
-  .membership-form-container {
-    padding: 40px 20px;
+  .membership-radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 12px;
   }
 
-  form {
-    margin-top: 48px;
+  .total-amount,
+  .agreement-list,
+  .btn-submit,
+  .membership-radio-list__desktop {
+    display: none;
+  }
+}
 
-    .warning-box {
-      margin-top: 24px;
-      display: flex;
-      justify-content: start;
-      gap: 0.8rem;
-      color: var(--color-u-grey-4);
-      P {
-        flex: 1;
+.note {
+  img {
+    width: 100%;
+    object-fit: contain;
+    height: auto;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .contents {
+    margin: 0 0 8.8rem;
+    padding: 0px 38px 12px 38px;
+    column-gap: 20px;
+    grid-template-columns: auto minmax(0, clamp(40%, 0%, 600px));
+    grid-template-areas:
+      'i2 i2'
+      'i1 i5'
+      'i3 i3'
+      'i4 i4'
+      'i6 i6';
+    & > .banner {
+      grid-area: i1;
+    }
+    & > h1 {
+      grid-area: i2;
+    }
+    & > .content-detail {
+      grid-area: i3;
+    }
+    & > .membership-benefits {
+      grid-area: i4;
+    }
+    & > .membership-form-container {
+      grid-area: i5;
+    }
+    & > .note {
+      grid-area: i6;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 4.2rem;
+      line-height: 150%;
+      /* position: absolute;
+      top: 0px;
+      left: 0;
+      width: calc(100dvw - 74px);
+      margin: 0 38px 20px 38px; */
+    }
+
+    h2 {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 2.4rem;
+      line-height: 150%;
+      letter-spacing: -1px;
+    }
+
+    .banner {
+      width: 100%;
+      flex: 1;
+      justify-content: end;
+      align-items: start;
+      img {
+        width: 100%;
+        max-width: 720px;
       }
     }
-
-    .membership-radio-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      width: 100%;
-      margin-top: 12px;
+    .membership-form-container {
+      padding: 0;
+      margin: 0;
+      form {
+        margin-top: 0;
+      }
     }
-
     .total-amount {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-top: 24px;
       p {
         font-size: 1.8rem;
         line-height: 2.8rem;
@@ -275,65 +405,17 @@ export default {
     }
 
     .btn-submit {
+      display: block;
       margin-top: 24px;
       width: 100%;
-      /* height: 48px; */
-    }
-  }
-}
-
-@media screen and (min-width: 769px) {
-  .contents {
-    margin: 1.2rem 0 8.8rem;
-    padding: 104px 38px 12px 38px;
-    display: flex;
-    gap: 24px;
-    flex-direction: row-reverse;
-    position: relative;
-
-    h1 {
-      font-weight: 700;
-      font-size: 4.2rem;
-      line-height: 150%;
-      position: absolute;
-      top: 0px;
-      left: 0;
-      width: calc(100dvw - 74px);
-      margin: 0 38px 20px 38px;
     }
 
-    h2 {
-      font-style: normal;
-      font-weight: 500;
-      font-size: 2.4rem;
-      line-height: 150%;
-      letter-spacing: -1px;
+    .membership-radio-list__desktop {
+      display: flex;
     }
-
-    .banner {
-      width: 100%;
-      flex: 1;
-      justify-content: end;
-      align-items: start;
-      img {
-        width: 100%;
-        max-width: 720px;
-      }
+    .membership-radio-list__mobile {
+      display: none;
     }
-    .membership-form-container {
-      width: 30%;
-      max-width: 600px;
-      padding: 0;
-      form {
-        margin-top: 0;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 1025px) {
-  .contents {
-    margin: 4rem 0 8.8rem;
   }
 }
 </style>

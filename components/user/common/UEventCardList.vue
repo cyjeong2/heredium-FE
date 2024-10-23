@@ -58,5 +58,12 @@ export default {
       justify-content: center;
     }
   }
+  @media screen and (min-width: 769px) {
+    .membership-benefits__title {
+      text-align: left;
+      border-bottom: 1px solid var(--color-u-grey-2);
+      padding-bottom: 20px;
+    }
+  }
 }
 </style>
