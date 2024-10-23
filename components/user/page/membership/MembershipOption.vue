@@ -60,15 +60,15 @@ export default {
   .hidden-radio {
     display: none;
   }
-
   .content {
-    width: 100%;
+    max-width: 100%;
   }
   img {
-    object-fit: cover;
+    object-fit: contain;
     width: 100%;
+    max-width: 100%;
     overflow: hidden;
-    height: 120px;
+    height: auto;
     border-radius: 8px;
     border: 2px solid transparent;
     cursor: pointer;

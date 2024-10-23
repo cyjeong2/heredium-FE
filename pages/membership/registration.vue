@@ -23,7 +23,7 @@
               :key="membership.membership_id"
               :model-value="membershipIdSelected"
               :membership="membership"
-              :change="updateSelection"
+              :change="openBottomSheet"
             >
             </MembershipOption>
           </div>
@@ -71,12 +71,36 @@
     <section class="note membership-section-content">
       <img :src="postImageNote" alt="Heredium membership note" />
     </section>
+    <UBottomSheet :visible.sync="isShowBottomSheet">
+      <div class="total-amount">
+        <p>합계</p>
+        <h5>
+          {{ toKoreaCurrency(totalPrice) }}
+        </h5>
+      </div>
+
+      <div class="agreement-list">
+        <UNoticePolicy :model-value="isAgreeNoticePolicy" @update:modelValue="isAgreeNoticePolicy = $event" />
+        <URefundPolicy :model-value="isAgreeRefundPolicy" @update:modelValue="isAgreeRefundPolicy = $event" />
+      </div>
+
+      <UButton
+        class="btn-submit"
+        w-size="100"
+        h-size="normal"
+        :disabled="!membershipIdSelected"
+        @click="handleSubmit()"
+      >
+        결제하기
+      </UButton>
+    </UBottomSheet>
   </section>
 </template>
 
 <script>
 import { concat } from 'lodash';
 import { toKoreaCurrency } from '~/assets/js/converter';
+import UBottomSheet from '~/components/user/common/UBottomSheet.vue';
 import UButton from '~/components/user/common/UButton.vue';
 import UEventCardList from '~/components/user/common/UEventCardList.vue';
 import UNoticePolicy from '~/components/user/common/UNoticePolicy.vue';
@@ -96,7 +120,8 @@ export default {
     UNoticePolicy,
     UWarningDialog,
     UExistedMembershipDialog,
-    UEventCardList
+    UEventCardList,
+    UBottomSheet
   },
   mixins: [imageMixin, userMixin],
   props: {},
@@ -121,7 +146,8 @@ export default {
         open: false,
         warningMessage: null
       },
-      hasMembership: false
+      hasMembership: false,
+      isShowBottomSheet: false
     };
   },
   computed: {
@@ -221,12 +247,16 @@ export default {
     },
     goToMyMembership() {
       this.$router.push('/mypage/purchase/membership');
+    },
+    openBottomSheet(membershipOption) {
+      this.isShowBottomSheet = true;
+      this.updateSelection(membershipOption);
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .contents {
   margin: 0 0 4rem;
   display: grid;
@@ -259,11 +289,11 @@ h2 {
   width: 100dvw;
   display: flex;
   justify-content: center;
-  img {
-    object-fit: contain;
-    min-height: 50px;
-    width: 100%;
-  }
+}
+.banner img {
+  object-fit: contain;
+  min-height: 50px;
+  width: 100%;
 }
 
 .membership-section-content {
@@ -273,40 +303,73 @@ h2 {
 
 form {
   margin-top: 48px;
+}
+.warning-box {
+  margin-top: 24px;
+  display: flex;
+  justify-content: start;
+  gap: 0.8rem;
+  color: var(--color-u-grey-4);
+}
+.warning-box p {
+  flex: 1;
+}
 
-  .warning-box {
-    margin-top: 24px;
+.membership-radio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.total-amount,
+.agreement-list,
+.btn-submit,
+.membership-radio-list__desktop {
+  display: none;
+}
+
+.note img {
+  width: 100%;
+  object-fit: contain;
+  height: auto;
+}
+
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.total-amount p {
+  font-size: 1.8rem;
+  line-height: 2.8rem;
+}
+.total-amount h5 {
+  font-size: 1.8rem;
+  line-height: 2.8rem;
+  color: var(--color-u-primary);
+  font-weight: bold;
+}
+
+.agreement-list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  .agreement-item {
     display: flex;
-    justify-content: start;
+    align-items: start;
     gap: 0.8rem;
-    color: var(--color-u-grey-4);
-    P {
-      flex: 1;
-    }
-  }
-
-  .membership-radio-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 100%;
-    margin-top: 12px;
-  }
-
-  .total-amount,
-  .agreement-list,
-  .btn-submit,
-  .membership-radio-list__desktop {
-    display: none;
   }
 }
 
-.note {
-  img {
-    width: 100%;
-    object-fit: contain;
-    height: auto;
-  }
+.btn-submit {
+  display: block;
+  margin-top: 24px;
+  width: 100%;
 }
 
 @media screen and (min-width: 769px) {
@@ -314,108 +377,77 @@ form {
     margin: 0 0 8.8rem;
     padding: 0px 38px 12px 38px;
     column-gap: 20px;
-    grid-template-columns: auto minmax(0, clamp(40%, 0%, 600px));
+    /* grid-template-columns: auto minmax(0, clamp(50%, 0%, 600px)); */
+    grid-template-columns: auto 350px;
     grid-template-areas:
       'i2 i2'
       'i1 i5'
       'i3 i3'
       'i4 i4'
       'i6 i6';
-    & > .banner {
-      grid-area: i1;
-    }
-    & > h1 {
-      grid-area: i2;
-    }
-    & > .content-detail {
-      grid-area: i3;
-    }
-    & > .membership-benefits {
-      grid-area: i4;
-    }
-    & > .membership-form-container {
-      grid-area: i5;
-    }
-    & > .note {
-      grid-area: i6;
-    }
-    h1 {
-      font-weight: 700;
-      font-size: 4.2rem;
-      line-height: 150%;
-      /* position: absolute;
-      top: 0px;
-      left: 0;
-      width: calc(100dvw - 74px);
-      margin: 0 38px 20px 38px; */
-    }
+  }
+  .contents > .banner {
+    grid-area: i1;
+  }
+  .contents > h1 {
+    grid-area: i2;
+  }
+  .contents > .content-detail {
+    grid-area: i3;
+  }
+  .contents > .membership-benefits {
+    grid-area: i4;
+  }
+  .contents > .membership-form-container {
+    grid-area: i5;
+  }
+  .contents > .note {
+    grid-area: i6;
+  }
+  .contents h1 {
+    font-weight: 700;
+    font-size: 4.2rem;
+    line-height: 150%;
+  }
 
-    h2 {
-      font-style: normal;
-      font-weight: 500;
-      font-size: 2.4rem;
-      line-height: 150%;
-      letter-spacing: -1px;
-    }
+  .contents h2 {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 2.4rem;
+    line-height: 150%;
+    letter-spacing: -1px;
+  }
 
-    .banner {
+  .contents .banner {
+    width: 100%;
+    flex: 1;
+    justify-content: start;
+    align-items: start;
+    img {
       width: 100%;
-      flex: 1;
-      justify-content: end;
-      align-items: start;
-      img {
-        width: 100%;
-        max-width: 720px;
-      }
+      max-width: 720px;
     }
-    .membership-form-container {
-      padding: 0;
-      margin: 0;
-      form {
-        margin-top: 0;
-      }
+  }
+  .contents .membership-form-container {
+    padding: 0;
+    margin: 0;
+    form {
+      margin-top: 0;
     }
-    .total-amount {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 24px;
-      p {
-        font-size: 1.8rem;
-        line-height: 2.8rem;
-      }
-      h5 {
-        font-size: 1.8rem;
-        line-height: 2.8rem;
-        color: var(--color-u-primary);
-        font-weight: bold;
-      }
-    }
+  }
+  .contents .total-amount,
+  .contents .agreement-list {
+    display: flex;
+  }
+  .contents .btn-submit {
+    display: block;
+  }
 
-    .agreement-list {
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      .agreement-item {
-        display: flex;
-        align-items: start;
-        gap: 0.8rem;
-      }
-    }
-
-    .btn-submit {
-      display: block;
-      margin-top: 24px;
-      width: 100%;
-    }
-
-    .membership-radio-list__desktop {
-      display: flex;
-    }
-    .membership-radio-list__mobile {
-      display: none;
-    }
+  .membership-radio-list__desktop {
+    display: flex;
+  }
+  .membership-radio-list__mobile {
+    display: none;
   }
 }
 </style>
