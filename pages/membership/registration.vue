@@ -95,6 +95,9 @@
       </UButton>
     </UBottomSheet>
   </section>
+  <section v-else>
+    <MembershipRegistrationUnavailable />
+  </section>
 </template>
 
 <script>
@@ -108,6 +111,7 @@ import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
+import MembershipRegistrationUnavailable from '~/components/user/page/membership/MembershipRegistrationUnavailable.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
 
@@ -121,7 +125,8 @@ export default {
     UWarningDialog,
     UExistedMembershipDialog,
     UEventCardList,
-    UBottomSheet
+    UBottomSheet,
+    MembershipRegistrationUnavailable
   },
   mixins: [imageMixin, userMixin],
   props: {},
