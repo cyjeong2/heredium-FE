@@ -53,9 +53,6 @@ export default {
   border: none;
   cursor: pointer;
   background-color: #f7f8f5;
-  &.checked img {
-    border-color: var(--color-u-primary);
-  }
 
   .hidden-radio {
     display: none;
@@ -73,6 +70,11 @@ export default {
     border: 2px solid transparent;
     cursor: pointer;
     pointer-events: none;
+  }
+}
+@media screen and (min-width: 769px) {
+  .membership-option.checked img {
+    border-color: var(--color-u-primary);
   }
 }
 </style>
