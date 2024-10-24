@@ -19,8 +19,8 @@
       </div>
     </div>
     <div class="top-menus mb-16">
-      <SButton class="mr-16" @click="handleCorporateMemberRegistration">법인회원 등록 </SButton>
-      <SButton class="mr-16" @click="uploadExcel">업로드하다 </SButton>
+      <SButton class="mr-16" @click="modal.isShowCreateCouponCompany = true">법인회원 등록 </SButton>
+      <SButton class="mr-16" @click="modal.isUploadData = true">업로드하다 </SButton>
       <SButton class="mr-16" @click="downloadTemplateExcel">양식 다운로드 </SButton>
       <SButton class="mr-16" @click="downloadExcel">엑셀 다운로드 </SButton>
 
@@ -107,6 +107,12 @@
         </table>
       </template>
     </SPageable>
+
+    <CouponCorporate
+      v-if="modal.isShowCreateCouponCompany"
+      @close="modal.isShowCreateCouponCompany = false"
+    ></CouponCorporate>
+    <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
   </div>
 </template>
 
@@ -120,10 +126,23 @@ import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SCheckboxGroup from '~/components/admin/commons/SCheckboxGroup';
 import { TICKET_MEMBERSHIP_STATE_TYPE } from '~/assets/js/types';
 import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
+import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
+import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 
 export default {
   name: 'MembershipTicketPage',
-  components: { SCheckbox, SCheckboxGroup, SDatepicker, STitle, SPageable, SDropdown, SButton, SSearchBar },
+  components: {
+    SCheckbox,
+    SCheckboxGroup,
+    SDatepicker,
+    STitle,
+    SPageable,
+    SDropdown,
+    SButton,
+    SSearchBar,
+    CouponCorporate,
+    UploadCorporateUser
+  },
   layout: 'admin/default',
   data() {
     return {
@@ -145,7 +164,11 @@ export default {
         size: Number(this.$route.query.size) || 20
       },
       tableData: null,
-      isCheckedAll: false
+      isCheckedAll: false,
+      modal: {
+        isShowCreateCouponCompany: false,
+        isUploadData: false
+      }
     };
   },
   computed: {

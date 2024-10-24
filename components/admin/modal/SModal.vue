@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <div v-if="isShow" class="modal-wrap">
-      <div class="modal-inner">
+      <div class="modal-inner" :style="{ width }">
         <div class="modal">
           <div class="head">
             <h1 class="tm-1b"><slot name="title"></slot></h1>
@@ -35,6 +35,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    width: {
+      type: String,
+      required: false,
+      default: '53.2rem'
     }
   },
   computed: {
