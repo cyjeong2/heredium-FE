@@ -79,6 +79,12 @@ export const TICKET_STATE_TYPE = Object.freeze({
   EXPIRED: '기간 만료'
 });
 
+export const TICKET_MEMBERSHIP_STATE_TYPE = Object.freeze({
+  COMPLETED: '결제 완료',
+  REFUND: '회원 환불',
+  EXPIRED: '기간 만료'
+});
+
 export const TICKET_TYPE = Object.freeze({
   NORMAL: '입장권',
   GROUP: '단체 입장권',
