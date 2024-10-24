@@ -89,12 +89,13 @@
                 <div :key="`membership_${membershipIndex}_price`" class="grid-table-body membership-price">
                   {{ toKoreaCurrency(membership.price) }}
                 </div>
-                <div
-                  :key="`membership_${membershipIndex}_action`"
-                  class="grid-table-body"
-                  @click="toggleExposeCoupon(membershipIndex)"
-                >
-                  <div class="collapse-icon" :class="{ expose: membershipIndexExpanded === membershipIndex }">
+                <div :key="`membership_${membershipIndex}_action`" class="grid-table-body membership-action">
+                  <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i>
+                  <div
+                    class="collapse-icon"
+                    :class="{ expose: membershipIndexExpanded === membershipIndex }"
+                    @click="toggleExposeCoupon(membershipIndex)"
+                  >
                     <i class="ic-arrow-next"></i>
                   </div>
                 </div>
@@ -387,10 +388,12 @@ export default {
       if (!thumbnail || !thumbnail.large || !thumbnail.medium || !thumbnail.small) {
         feedbackError.thumbnailUrl = true;
       }
-      if (!this.detailData.start_date) {
+      const startDate = this.detailData.start_date;
+      if (!startDate || !this.$dayjs(startDate, 'YYYY-MM-DD', true).isValid()) {
         feedbackError.start_date = true;
       }
-      if (!this.detailData.end_date) {
+      const endDate = this.detailData.end_date;
+      if (!endDate || !this.$dayjs(endDate, 'YYYY-MM-DD', true).isValid()) {
         feedbackError.end_date = true;
       }
       // const detailImage = this.detailData.note_image;
@@ -466,7 +469,7 @@ export default {
       } catch (error) {
         alert(API_ERROR);
       }
-    }
+    },
     // async handleUpdateEnabledPost() {
     //   try {
     //     if (typeof this.detailData.id !== 'number') {
@@ -480,6 +483,17 @@ export default {
     //     alert(API_ERROR);
     //   }
     // }
+    handleDeleteMembershipOption(index) {
+      if (typeof this.membershipIndexExpanded === 'number') {
+        if (this.membershipIndexExpanded === index) {
+          this.membershipIndexExpanded = null;
+        }
+        if (this.membershipIndexExpanded > index) {
+          this.membershipIndexExpanded = this.membershipIndexExpanded - 1;
+        }
+      }
+      this.detailData.memberships.splice(index, 1);
+    }
   }
 };
 </script>
@@ -591,6 +605,15 @@ export default {
   .membership-name,
   .membership-price {
     font-weight: 700;
+  }
+  .membership-action {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    i {
+      cursor: pointer;
+    }
   }
   .grid-table-body {
     padding: 32px 20px;

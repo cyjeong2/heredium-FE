@@ -6,6 +6,7 @@
           v-model="membershipImage"
           type="PROJECT_DETAIL_IMAGE"
           :image-src="membershipImage"
+          :class="{ 'is-error': isSubmitted && !membershipImage }"
           @image-uploaded="updateThumbnail"
           @image-removed="removeThumbnail"
         />
@@ -75,7 +76,7 @@ export default {
       this.membershipImage = '';
     },
     handleAddMembershipOption() {
-      if (!this.membershipName || !this.price) {
+      if (!this.membershipName || !this.price || !this.membershipImage) {
         this.isSubmitted = true;
         return null;
       }
@@ -99,6 +100,7 @@ export default {
   position: relative;
   flex: 1 1 56rem;
   width: 320px;
+  zoom: 0.7;
 }
 
 .create-membership {
