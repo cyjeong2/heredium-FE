@@ -7,10 +7,10 @@
       <div class="profile-area">
         <div class="profile-info">
           <h4>
-            안녕하세요, <span>{{ adminInfo.name }}</span
+            안녕하세요, <span>{{ adminInfo?.name }}</span
             >님!
           </h4>
-          <p class="nt-5">{{ adminInfo.email }}</p>
+          <p class="nt-5">{{ adminInfo?.email }}</p>
         </div>
       </div>
     </div>
@@ -262,7 +262,7 @@ export default {
       this.$router.push('/admin/login');
     },
     isShowByAuthLevel(allowAuthTypes) {
-      return allowAuthTypes.includes(this.adminInfo.auth);
+      return allowAuthTypes.includes(this.adminInfo?.auth);
     }
   }
 };
