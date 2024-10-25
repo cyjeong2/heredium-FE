@@ -4,7 +4,7 @@
       <SImageUploadRepresentative
         :image-src="couponEditor.image_url"
         type="SMALL"
-        :class="{ 'is-error': error?.imageUrl }"
+        :class="{ 'is-error': error?.imageUrl || feedbackError?.imageUrl }"
         :disabled="disabled"
         @image-uploaded="updateThumbnail"
         @image-removed="removeThumbnail"
@@ -17,7 +17,7 @@
           <SInput
             v-model="couponEditor.name"
             :disabled="disabled"
-            :class="{ 'is-error': error?.name }"
+            :class="{ 'is-error': error?.name || feedbackError?.name }"
             w-size="large"
           />
         </div>
@@ -28,20 +28,20 @@
           <SDatepicker
             v-model="couponEditor.start_date"
             :max="couponEditor.end_date"
-            :class="{ 'is-error': error?.start_date }"
+            :class="{ 'is-error': error?.start_date || feedbackError?.start_date }"
           />
           <span class="ml-8 mr-8">~</span>
           <SDatepicker
             v-model="couponEditor.end_date"
             :min="couponEditor.start_date"
-            :class="{ 'is-error': error?.end_date }"
+            :class="{ 'is-error': error?.end_date || feedbackError?.end_date }"
           />
         </div>
         <div v-else class="field-value">
           <SInput
             v-model="couponEditor.period_in_days"
             :disabled="disabled"
-            :class="{ 'is-error': error?.periodInDays }"
+            :class="{ 'is-error': error?.periodInDays || feedbackError?.periodInDays }"
             is-comma-num
             w-size="large"
           />
@@ -53,7 +53,7 @@
           <SDropdown
             v-model="couponEditor.coupon_type"
             :disabled="disabled"
-            :class="{ 'is-error': error?.couponType }"
+            :class="{ 'is-error': error?.couponType || feedbackError?.couponType }"
             :option-list="couponTypeOptionList"
             w-size="large"
           ></SDropdown>
@@ -67,7 +67,7 @@
             is-comma-num
             w-size="large"
             :disabled="couponEditor.is_permanent || disabled"
-            :class="{ 'is-error': error?.numberOfUses }"
+            :class="{ 'is-error': error?.numberOfUses || feedbackError?.numberOfUses }"
           />
           <div>
             <SCheckbox v-model="couponEditor.is_permanent" :disabled="disabled" />
@@ -80,7 +80,7 @@
         <div class="field-value">
           <SInput
             v-model="couponEditor.discount_percent"
-            :class="{ 'is-error': error?.discountPercent }"
+            :class="{ 'is-error': error?.discountPercent || feedbackError?.discountPercent }"
             is-comma-num
             maxlength="3"
             w-size="large"
@@ -89,7 +89,7 @@
         </div>
       </div>
       <div v-if="showAddButton && !disabled" class="right">
-        <SButton button-type="primary" w-size="medium" @click="$emit('add-coupon')"> Add </SButton>
+        <SButton button-type="primary" w-size="medium" @click="handleAddNewCoupon"> Add </SButton>
       </div>
     </div>
   </div>
@@ -103,15 +103,8 @@ import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative
 import SInput from '../../commons/SInput.vue';
 import SDropdown from '../../commons/SDropdown.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
-import { COUPON_DEFAULT } from '~/assets/js/types';
-
-const COUPON_TYPE_OPTION_LIST = [
-  { value: '', label: '선택' },
-  { value: 'COFFEE', label: '커피' },
-  { value: 'ARTSHOP', label: '아트숍' },
-  { value: 'PROGRAM', label: '프로그램' },
-  { value: 'EXHIBITION ', label: '전시' }
-];
+import { COUPON_DEFAULT, COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
+import { getErrorCouponEditor } from '~/utils/coupon';
 
 export default {
   name: 'CouponEditor',
@@ -140,12 +133,18 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    validateBeforeAddNewCoupon: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
     return {
       couponEditor: {},
-      couponTypeOptionList: COUPON_TYPE_OPTION_LIST
+      couponTypeOptionList: COUPON_TYPE_OPTION_LIST,
+      feedbackError: {}
     };
   },
 
@@ -153,6 +152,12 @@ export default {
     couponEditor: {
       handler(newVal) {
         this.$emit('update-coupon', newVal);
+      },
+      deep: true
+    },
+    error: {
+      handler() {
+        this.feedbackError = {};
       },
       deep: true
     }
@@ -166,6 +171,21 @@ export default {
     },
     removeThumbnail() {
       this.couponEditor.image_url = '';
+    },
+    handleAddNewCoupon() {
+      if (!this.validateBeforeAddNewCoupon) {
+        this.$emit('add-coupon');
+        return null;
+      }
+
+      const feedbackError = getErrorCouponEditor(this.couponEditor, this.isIssuance);
+      if (!feedbackError) {
+        this.$emit('add-coupon');
+        this.feedbackError = {};
+        return null;
+      }
+
+      this.feedbackError = feedbackError;
     }
   }
 };

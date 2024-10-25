@@ -284,8 +284,21 @@ export const ADMIN_DETAIL = {
 export const EVENT_DEFAULT = {
   eventType: 'ongoing_exhibition_count',
   quantity: 0
-}
+};
 
+export const COUPON_TYPE = {
+  COFFEE: 'COFFEE',
+  ARTSHOP: 'ARTSHOP',
+  PROGRAM: 'PROGRAM',
+  EXHIBITION: 'EXHIBITION'
+};
+
+export const COUPON_TYPE_OPTION_LIST = [
+  { value: COUPON_TYPE.COFFEE, label: '커피' },
+  { value: COUPON_TYPE.ARTSHOP, label: '아트숍' },
+  { value: COUPON_TYPE.PROGRAM, label: '프로그램' },
+  { value: COUPON_TYPE.EXHIBITION, label: '전시' }
+];
 
 export const POST_DETAIL = {
   name: '',
@@ -303,12 +316,12 @@ export const POST_DETAIL = {
   },
   end_date: '',
   start_date: '',
-  events:[{...EVENT_DEFAULT}],
+  events: [{ ...EVENT_DEFAULT }]
 };
 
 export const COUPON_DEFAULT = {
   name: '',
-  coupon_type: '',
+  coupon_type: COUPON_TYPE.COFFEE,
   discount_percent: '',
   period_in_days: 0,
   image_url: '',

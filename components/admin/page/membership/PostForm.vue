@@ -83,21 +83,10 @@
                 <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body">
                   <SCheckbox v-model="membership.checked" />
                 </div>
-                <div
-                  v-if="isEdit"
-                  :key="`membership_${membershipIndex}_name_edit`"
-                  class="grid-table-body membership-name"
-                >
+                <div :key="`membership_${membershipIndex}_name_edit`" class="grid-table-body membership-name">
                   <SInput v-model="membership.name" w-size="large" :class="{ 'is-error': !membership.name }" />
                 </div>
-                <div v-else :key="`membership_${membershipIndex}_name`" class="grid-table-body membership-name">
-                  {{ membership.name }}
-                </div>
-                <div
-                  v-if="isEdit"
-                  :key="`membership_${membershipIndex}_price_edit`"
-                  class="grid-table-body membership-price"
-                >
+                <div :key="`membership_${membershipIndex}_price_edit`" class="grid-table-body membership-price">
                   <SInput
                     v-model="membership.price"
                     is-comma-num
@@ -106,9 +95,6 @@
                     :class="{ 'is-error': !membership.price }"
                   />
                   원
-                </div>
-                <div v-else :key="`membership_${membershipIndex}_price`" class="grid-table-body membership-price">
-                  {{ toKoreaCurrency(membership.price) }}
                 </div>
                 <div :key="`membership_${membershipIndex}_action`" class="grid-table-body membership-action">
                   <!-- <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i> -->
@@ -128,6 +114,7 @@
                   :coupon="coupon"
                   :show-add-button="couponIndex === membership.coupons.length - 1"
                   :error="feedback?.memberships?.[membershipIndex]?.coupons?.[couponIndex]"
+                  :validate-before-add-new-coupon="true"
                   @add-coupon="handleAddCoupon(membershipIndex)"
                   @update-coupon="(e) => handleUpdateCoupon(e, membershipIndex, couponIndex)"
                 />
