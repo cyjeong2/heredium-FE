@@ -184,8 +184,6 @@ export default {
     this.fetch();
   },
   methods: {
-    handleCorporateMemberRegistration() {},
-    uploadExcel() {},
     downloadTemplateExcel() {
       const fileName = 'company_upload_membership_template';
 
