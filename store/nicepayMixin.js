@@ -69,11 +69,35 @@ export default {
         amount: paymentData.amount,
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
         returnUrl: `${window.location.origin}/ticketing/payment-gates-process?type=${originInfo.type}&id=${originInfo.id}&userType=${userType}`,
-        fnError(result) {
-          alert('결제 오류 : ' + result.errorMsg);
+        fnError(error) {
+          console.log('🚀 ~ fnError ~ error:', error);
           if (failUrl) {
             window.location.replace(failUrl);
+          } else {
+            window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
           }
+        },
+        fnSuccess(result) {
+          console.log('🚀 ~ serverAuth ~ fnSuccess', result);
+        }
+      });
+    },
+    membershipPayment(uuid, amount) {
+      const invalidPaymentData = !uuid || !amount || !window.AUTHNICE;
+      if (invalidPaymentData) {
+        alert('결제 오류');
+        return;
+      }
+      window.AUTHNICE.requestPay({
+        clientId: process.env.NICEPAY_CLIENT_ID,
+        method: 'card',
+        orderId: uuid, // Unique Order ID
+        amount,
+        goodsName: process.env.NICEPAY_PRODUCT_NAME,
+        returnUrl: `${window.location.origin}/mypage/purchase/membership`,
+        fnError(error) {
+          console.log('🚀 ~ fnError ~ error:', error);
+          window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
         },
         fnSuccess(result) {
           console.log('🚀 ~ serverAuth ~ fnSuccess', result);
