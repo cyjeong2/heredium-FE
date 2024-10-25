@@ -186,7 +186,9 @@
       </SPagination>
     </div>
     <div class="bottom">
-      <SButton button-type="primary" :disabled="isConfirmPending" @click="handleOpenModalConfirm">발급</SButton>
+      <SButton button-type="primary" :disabled="isConfirmPending || !couponUsingId" @click="handleOpenModalConfirm"
+        >발급</SButton
+      >
     </div>
     <SDialogModal :is-show="isShowErrorModal" @close="isShowErrorModal = false">
       <template #content>{{ errorMsg }}</template>
