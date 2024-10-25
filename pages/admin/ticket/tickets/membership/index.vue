@@ -73,17 +73,17 @@
                 <div>{{ item?.payment_status }}</div>
               </td>
               <td>
-                <div class="text-center">
+                <div>
                   {{ item?.payment_date && $dayjs(item?.payment_date).format('YYYY-MM-DD  HH:mm') }}
                 </div>
               </td>
               <td>
-                <div class="text-center">
+                <div>
                   {{ item?.start_date && $dayjs(item?.start_date).format('YYYY-MM-DD  HH:mm') }}
                 </div>
               </td>
               <td>
-                <div class="text-center">
+                <div>
                   {{ item?.end_date && $dayjs(item?.end_date).format('YYYY-MM-DD  HH:mm') }}
                 </div>
               </td>
@@ -163,7 +163,26 @@ export default {
   methods: {
     handleCorporateMemberRegistration() {},
     uploadExcel() {},
-    downloadTemplateExcel() {},
+    downloadTemplateExcel() {
+      const fileName = 'company_upload_membership_template';
+
+      this.$axios
+        .$get('file/template/company-membership/download', {
+          method: 'GET',
+          responseType: 'blob'
+        })
+        .then((res) => {
+          const href = URL.createObjectURL(res);
+          const link = document.createElement('a');
+
+          link.href = href;
+          link.setAttribute('download', `${fileName}.XLSX`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(href);
+        });
+    },
     downloadExcel() {
       const paymentDateFrom = this.queryOptions.paymentDateFrom
         ? this.$dayjs(this.queryOptions.startDate).format('YYYY-MM-DD 00:00:00')
@@ -171,10 +190,10 @@ export default {
       const paymentDateTo = this.queryOptions.paymentDateTo
         ? this.$dayjs(this.queryOptions.paymentDateTo).format('YYYY-MM-DD 23:59:59')
         : '';
-      const fileName = '티켓전체내역';
+      const fileName = '계정 목록';
 
       this.$axios
-        .$get('admin/companies/with-membership-info/excel', {
+        .$get('/admin/accounts/with-membership-info/excel', {
           method: 'GET',
           responseType: 'blob',
           params: {
@@ -210,14 +229,14 @@ export default {
         })
         .catch(() => {});
 
-      // this.tableData = await this.$axios.$get('/admin/accounts/with-membership-info', {
-      //   params: {
-      //     ...this.queryOptions,
-      //     paymentDateFrom: this.queryOptions.paymentDateFrom ? `${this.queryOptions.paymentDateFrom} 00:00:00` : '',
-      //     paymentDateTo: this.queryOptions.paymentDateTo ? `${this.queryOptions.paymentDateTo} 23:59:59` : ''
-      //   }
-      // });
-      // this.tableData?.startCount = this.tableData?.totalElements - this.tableData?.number * this.tableData?.size;
+      this.tableData = await this.$axios.$get('/admin/accounts/with-membership-info', {
+        params: {
+          ...this.queryOptions,
+          paymentDateFrom: this.queryOptions.paymentDateFrom ? `${this.queryOptions.paymentDateFrom} 00:00:00` : '',
+          paymentDateTo: this.queryOptions.paymentDateTo ? `${this.queryOptions.paymentDateTo} 23:59:59` : ''
+        }
+      });
+      this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
     },
     getImage(imageUrl) {
       return imageUrl ? this.$store.state.BASE_URL + imageUrl : require('~/assets/img/thumbnail_default.jpg');
@@ -294,22 +313,22 @@ export default {
       width: 16%;
     }
     &:nth-of-type(5) {
-      width: 8%;
+      width: 10%;
     }
     &:nth-of-type(6) {
-      width: 8%;
+      width: 10%;
     }
     &:nth-of-type(7) {
-      width: 8%;
+      width: 10%;
     }
     &:nth-of-type(8) {
-      width: 8%;
+      width: 10%;
     }
     &:nth-of-type(9) {
-      width: 5%;
+      width: 7%;
     }
     &:nth-of-type(10) {
-      width: 5%;
+      width: 8%;
     }
     &:nth-of-type(11) {
       width: 17%;
