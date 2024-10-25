@@ -114,7 +114,6 @@ export default {
       }
 
       const file = this.getFile();
-      console.log(file);
       if (!file) {
         this.feedback.fileName = true;
         this.fileName = '';

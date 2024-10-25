@@ -4,12 +4,11 @@
     <div class="search mb-28">
       <div class="mb-24">
         <SDropdown v-model="queryOptions.searchDateType" class="mr-16" :option-list="dateOptionList" />
-        <SDatepicker v-model="queryOptions.startDate" w-size="large" :max="queryOptions.endDate" />
+        <SDatepicker v-model="queryOptions.signUpDateFrom" w-size="large" :max="queryOptions.signUpDateTo" />
         <span class="ml-8 mr-8">~</span>
-        <SDatepicker v-model="queryOptions.endDate" w-size="large" :min="queryOptions.startDate" />
+        <SDatepicker v-model="queryOptions.signUpDateTo" w-size="large" :min="queryOptions.signUpDateFrom" />
         <SDivLine is-big />
-        <SDropdown v-model="queryOptions.gender" class="mr-24" :option-list="genderOptionList">성별:</SDropdown>
-        <SDropdown v-model="queryOptions.isMarketingReceive" :option-list="marketingOptionList"
+        <SDropdown v-model="queryOptions.isAgreeToReceiveMarketing" :option-list="marketingOptionList"
           >마케팅 수신 동의:</SDropdown
         >
       </div>
@@ -42,13 +41,12 @@
               <th>전시사용횟수</th>
               <th>프로그램사용횟수</th>
               <th>음료사용횟수</th>
-              <th>성별</th>
               <th>마케팅수신동의</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
-              <td colspan="13"><div>리스트가 없습니다.</div></td>
+              <td colspan="12"><div>리스트가 없습니다.</div></td>
             </tr>
             <template>
               <tr v-for="(item, index) in data" :key="item.id">
@@ -56,13 +54,13 @@
                   <div>{{ tableData.startCount - index }}</div>
                 </td>
                 <td>
-                  <div>{{ item.membership_name }}</div>
+                  <div class="text-left">{{ item.membership_name }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.id }}</div>
+                  <div class="text-left">{{ item.account_id }}</div>
                 </td>
                 <td>
-                  <div>{{ item.name }}</div>
+                  <div class="text-left">{{ item.name }}</div>
                 </td>
                 <td>
                   <div>{{ item.phone }}</div>
@@ -74,22 +72,19 @@
                   <div>{{ item.payment_date }}</div>
                 </td>
                 <td>
-                  <div>{{ item.number_of_membership }}</div>
+                  <div>{{ item.number_of_memberships }}</div>
                 </td>
                 <td>
-                  <div>{{ item.number_of_display_used }}</div>
+                  <div>{{ item.number_of_exhibitions_used }}</div>
                 </td>
                 <td>
-                  <div>{{ item.number_of_program }}</div>
+                  <div>{{ item.number_of_programs_used }}</div>
                 </td>
                 <td>
-                  <div>{{ item.number_of_drink }}</div>
+                  <div>{{ item.number_of_coffee_used }}</div>
                 </td>
                 <td>
-                  <div>{{ item.gender }}</div>
-                </td>
-                <td>
-                  <div>{{ item.isMarketingReceive ? '동의' : '미동의' }}</div>
+                  <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
                 </td>
               </tr>
             </template>
@@ -107,7 +102,7 @@ import SButton from '~/components/admin/commons/SButton';
 import SSearchBar from '~/components/admin/commons/SSearchBar';
 import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SDivLine from '~/components/admin/commons/SDivLine';
-import { GENDER_TYPE, PAGE_SIZE_OPTIONS } from '~/assets/js/types';
+import { PAGE_SIZE_OPTIONS } from '~/assets/js/types';
 import SPageable from '~/components/admin/commons/SPageable';
 
 export default {
@@ -125,10 +120,9 @@ export default {
       size: Number(this.$route.query.size) || 20,
       text: this.$route.query.text || '',
       searchDateType: this.$route.query.searchDateType || 'CREATED_DATE',
-      startDate: this.$route.query.startDate || '',
-      endDate: this.$route.query.endDate || '',
-      gender: this.$route.query.gender || null,
-      isMarketingReceive: this.$route.query.isMarketingReceive || null
+      signUpDateFrom: this.$route.query.signUpDateFrom || '',
+      signUpDateTo: this.$route.query.signUpDateTo || '',
+      isAgreeToReceiveMarketing: this.$route.query.isAgreeToReceiveMarketing || null
     };
 
     return {
@@ -140,15 +134,7 @@ export default {
         { value: true, label: '동의' },
         { value: false, label: '미 동의' }
       ],
-      genderOptionList: [
-        { value: null, label: '전체' },
-        { value: 'man', label: GENDER_TYPE.MAN },
-        { value: 'woman', label: GENDER_TYPE.WOMAN }
-      ],
-      dateOptionList: [
-        { value: 'CREATED_DATE', label: '가입일시' },
-        { value: 'LAST_LOGIN_DATE', label: '최근 로그인' }
-      ],
+      dateOptionList: [{ value: 'CREATED_DATE', label: '가입일시' }],
       pageSizeList: [...PAGE_SIZE_OPTIONS],
       tableData: []
     };
@@ -161,18 +147,18 @@ export default {
       })
       .catch(() => {});
 
-    const startDate = this.queryOptions.startDate
-      ? this.$dayjs(this.queryOptions.startDate).format('YYYY-MM-DD 00:00:00')
+    const signUpDateFrom = this.queryOptions.signUpDateFrom
+      ? this.$dayjs(this.queryOptions.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
       : '';
-    const endDate = this.queryOptions.endDate
-      ? this.$dayjs(this.queryOptions.endDate).format('YYYY-MM-DD 23:59:59')
+    const signUpDateTo = this.queryOptions.signUpDateTo
+      ? this.$dayjs(this.queryOptions.signUpDateTo).format('YYYY-MM-DD 23:59:59')
       : '';
 
-    this.tableData = await this.$axios.$get('/admin/accounts/', {
+    this.tableData = await this.$axios.$get('/admin/memberships/users/active', {
       params: {
         ...this.queryOptions,
-        startDate,
-        endDate
+        signUpDateFrom,
+        signUpDateTo
       }
     });
     this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
@@ -201,21 +187,21 @@ export default {
     },
     downloadExcel() {
       const fileName = '멤버십 회원';
-      const startDate = this.queryOptions.startDate
-        ? this.$dayjs(this.queryOptions.startDate).format('YYYY-MM-DD 00:00:00')
+      const signUpDateFrom = this.queryOptions.signUpDateFrom
+        ? this.$dayjs(this.queryOptions.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
         : '';
-      const endDate = this.queryOptions.endDate
-        ? this.$dayjs(this.queryOptions.endDate).format('YYYY-MM-DD 23:59:59')
+      const signUpDateTo = this.queryOptions.signUpDateTo
+        ? this.$dayjs(this.queryOptions.signUpDateTo).format('YYYY-MM-DD 23:59:59')
         : '';
 
       this.$axios
-        .$get('/admin/accounts/excel', {
+        .$get('/admin/memberships/users/active/excel', {
           responseType: 'blob',
           params: {
             ...this.queryOptions,
             fileName,
-            startDate,
-            endDate
+            signUpDateFrom,
+            signUpDateTo
           }
         })
         .then((res) => {
@@ -320,11 +306,6 @@ export default {
     }
     /* Number of drink uses */
     &:nth-of-type(11) {
-      width: 120px;
-      min-width: 120px;
-    }
-    /* Gender */
-    &:nth-of-type(12) {
       width: 120px;
       min-width: 120px;
     }
