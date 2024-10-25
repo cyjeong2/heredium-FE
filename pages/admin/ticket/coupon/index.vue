@@ -330,12 +330,30 @@ export default {
       if (!couponItem?.name) {
         feedback.name = true;
       }
-      if (!couponItem?.start_date) {
+
+      const today = this.$dayjs().startOf('day');
+      const startDate = this.$dayjs(couponItem.start_date, 'YYYY-MM-DD', true);
+      const endDate = this.$dayjs(couponItem.end_date, 'YYYY-MM-DD', true);
+
+      if (!couponItem?.start_date || !startDate.isValid()) {
         feedback.start_date = true;
       }
-      if (!couponItem?.end_date) {
+      if (couponItem.start_date && startDate.isBefore(today)) {
+        feedback.start_date = true;
+      }
+
+      if (!couponItem?.end_date || !endDate.isValid()) {
         feedback.end_date = true;
       }
+      if (couponItem.end_date && endDate.isBefore(today)) {
+        feedback.end_date = true;
+      }
+
+      if (couponItem.start_date && couponItem.end_date && endDate.isBefore(startDate)) {
+        feedback.start_date = true;
+        feedback.end_date = true;
+      }
+
       if (!couponItem?.coupon_type) {
         feedback.couponType = true;
       }
