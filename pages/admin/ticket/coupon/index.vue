@@ -186,7 +186,9 @@
       </SPagination>
     </div>
     <div class="bottom">
-      <SButton button-type="primary" :disabled="isConfirmPending" @click="handleOpenModalConfirm">발급</SButton>
+      <SButton button-type="primary" :disabled="isConfirmPending || !couponUsingId" @click="handleOpenModalConfirm"
+        >발급</SButton
+      >
     </div>
     <SDialogModal :is-show="isShowErrorModal" @close="isShowErrorModal = false">
       <template #content>{{ errorMsg }}</template>
@@ -542,7 +544,9 @@ export default {
       return isValid;
     },
     handleOpenModalConfirm() {
-      this.isConfirmSave = true;
+      if (this.isValidate()) {
+        this.isConfirmSave = true;
+      }
     },
     async issuedTicket() {
       this.isConfirmPending = true;
