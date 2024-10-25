@@ -524,7 +524,9 @@ export default {
       return isValid;
     },
     handleOpenModalConfirm() {
-      this.isConfirmSave = true;
+      if (this.isValidate()) {
+        this.isConfirmSave = true;
+      }
     },
     async issuedTicket() {
       this.isConfirmPending = true;
