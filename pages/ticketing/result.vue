@@ -102,7 +102,7 @@ export default {
   methods: {
     getTicketDateFormat() {
       const { startDate, endDate } = this.paymentData;
-      const targetDate = this.$dayjs(startDate).format('YYYY.MM.DD');
+      const targetDate = this.$dayjs(startDate).format('YYYY-MM-DD');
       const weekOfDay = dayOfWeekNumberToKoName(this.$dayjs(startDate).day());
       const startTime = this.$dayjs(startDate).format('HH:mm');
       const endTime = this.$dayjs(endDate).format('HH:mm');

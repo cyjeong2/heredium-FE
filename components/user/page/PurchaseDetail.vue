@@ -321,7 +321,7 @@ ${userName}님께서 ${targetName} 티켓을 선물하셨습니다.
       });
     },
     getTicketDateFormat(startDate) {
-      const targetDate = this.$dayjs(startDate).format('YYYY.MM.DD');
+      const targetDate = this.$dayjs(startDate).format('YYYY-MM-DD');
       const weekOfDay = dayOfWeekNumberToKoName(this.$dayjs(startDate).day());
       const startTime = this.$dayjs(startDate).format('HH:mm');
 

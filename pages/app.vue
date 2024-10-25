@@ -36,7 +36,7 @@
               :class="{ 'is-today': $dayjs().isSame($dayjs(item.startDate)) }"
               @click="showQRModal(index)"
             >
-              <p v-if="item.type === 'INVITE'" class="date">{{ $dayjs(item.endDate).format('YYYY.MM.DD') }} 까지</p>
+              <p v-if="item.type === 'INVITE'" class="date">{{ $dayjs(item.endDate).format('YYYY-MM-DD') }} 까지</p>
               <p v-else class="date">
                 {{ $dayjs(item.startDate).format('HH:mm') }} - {{ $dayjs(item.endDate).format('HH:mm') }}
               </p>

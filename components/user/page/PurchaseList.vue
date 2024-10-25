@@ -184,8 +184,8 @@ export default {
     },
     getDate(item) {
       return item.info.some((info) => info.type === '초대')
-        ? `${this.$dayjs(item.endDate).format('YYYY.MM.DD')}까지`
-        : `${this.$dayjs(item.startDate).format('YYYY.MM.DD (dd) HH:mm')} - ${this.$dayjs(item.endDate).format(
+        ? `${this.$dayjs(item.endDate).format('YYYY-MM-DD')}까지`
+        : `${this.$dayjs(item.startDate).format('YYYY-MM-DD (dd) HH:mm')} - ${this.$dayjs(item.endDate).format(
             'HH:mm'
           )}`;
     },
