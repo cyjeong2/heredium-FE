@@ -59,9 +59,10 @@ export default {
   }
   .content {
     max-width: 100%;
+    width: 100%;
   }
   img {
-    object-fit: contain;
+    object-fit: cover;
     width: 100%;
     max-width: 100%;
     overflow: hidden;

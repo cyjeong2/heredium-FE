@@ -100,7 +100,7 @@ export default {
 .representative-img {
   position: relative;
   flex: 1 1 56rem;
-  width: 120px;
+  width: 350px;
 }
 
 .create-membership {
