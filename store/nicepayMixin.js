@@ -1,7 +1,7 @@
 export default {
   head() {
     return {
-      script: [{ src: `${process.env.NICEPAY_DOMAIN}/v1/js/` }]
+      script: [{ src: 'https://pay.nicepay.co.kr/v1/js/' }]
     };
   },
   data() {
