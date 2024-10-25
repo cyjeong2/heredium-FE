@@ -20,10 +20,10 @@
               readonly
               :class="{ 'is-error': isSubmitted && feedback.fileName }"
             />
-            <input ref="detailFile" type="file" accept=".xlsx, .XLSX" class="is-blind" @change="updateFile($event)" />
+            <input ref="accountFile" type="file" accept=".xlsx, .XLSX" class="is-blind" @change="updateFile($event)" />
             <p class="sub">xlsx 파일</p>
           </div>
-          <SButton v-if="!fileName" @click="$refs.detailFile.click()">파일 첨부</SButton>
+          <SButton v-if="!fileName" @click="$refs.accountFile.click()">파일 첨부</SButton>
           <div v-else>
             <SButton @click="removeFile">삭제</SButton>
           </div>
@@ -103,6 +103,26 @@ export default {
     removeFile() {
       this.fileName = '';
     },
+    getFile() {
+      const fileInputRef = this.$refs?.accountFile;
+      const file = fileInputRef?.files && fileInputRef.files?.[0];
+      return file;
+    },
+    checkValidFile() {
+      if (!this.fileName) {
+        return false;
+      }
+
+      const file = this.getFile();
+      console.log(file);
+      if (!file) {
+        this.feedback.fileName = true;
+        this.fileName = '';
+        return false;
+      }
+
+      return true;
+    },
     validateData() {
       let isValid = true;
       const feedback = {};
@@ -110,25 +130,24 @@ export default {
         feedback.companyName = true;
         isValid = false;
       }
-      if (!this.fileName) {
+      if (!this.checkValidFile()) {
         feedback.fileName = true;
         isValid = false;
       }
       this.feedback = feedback;
       return isValid;
     },
-    handleSubmit() {
+    async handleSubmit() {
       this.isSubmitted = true;
       const isValidForm = this.validateData();
       if (!isValidForm) {
         return null;
       }
       try {
-        // const requestBody = {
-        //   name: this.companyName,
-        //   coupons: this.coupons
-        // };
-        // await this.$axios.post('/admin/companies', requestBody);
+        const file = this.getFile();
+        const formData = new FormData();
+        formData.append('files', file);
+        await this.$axios.$post(`/admin/companies/${this.companyName}/membership-registrations/upload`, formData);
         this.onclose();
       } catch (error) {
         alert(API_ERROR);
