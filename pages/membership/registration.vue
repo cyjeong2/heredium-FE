@@ -213,6 +213,7 @@ export default {
           open: true,
           warningMessage: '관람 유의사항에 동의해주세요.'
         };
+        this.isShowBottomSheet = false;
         return false;
       }
       if (!this.isAgreeRefundPolicy) {
@@ -220,6 +221,7 @@ export default {
           open: true,
           warningMessage: '환불 규정에 동의해주세요.'
         };
+        this.isShowBottomSheet = false;
         return false;
       }
       return true;
@@ -244,6 +246,7 @@ export default {
           const errorMessage = err.response.data?.MESSAGE || '';
           if (errorMessage === 'MEMBERSHIP_REGISTRATION_ALREADY_EXISTS') {
             this.hasMembership = true;
+            this.isShowBottomSheet = false;
             return null;
           }
         });
