@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
 import STitle from '~/components/admin/commons/STitle';
 import SDropdown from '~/components/admin/commons/SDropdown';
 import SButton from '~/components/admin/commons/SButton';
@@ -104,6 +105,7 @@ import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SDivLine from '~/components/admin/commons/SDivLine';
 import { PAGE_SIZE_OPTIONS } from '~/assets/js/types';
 import SPageable from '~/components/admin/commons/SPageable';
+import { API_ERROR } from '~/utils/message';
 
 export default {
   name: 'MembershipUserPage',
@@ -146,22 +148,26 @@ export default {
         query: this.queryOptions
       })
       .catch(() => {});
+    try {
+      const signUpDateFrom = this.queryOptions.signUpDateFrom
+        ? this.$dayjs(this.queryOptions.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
+        : '';
+      const signUpDateTo = this.queryOptions.signUpDateTo
+        ? this.$dayjs(this.queryOptions.signUpDateTo).format('YYYY-MM-DD 23:59:59')
+        : '';
 
-    const signUpDateFrom = this.queryOptions.signUpDateFrom
-      ? this.$dayjs(this.queryOptions.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
-      : '';
-    const signUpDateTo = this.queryOptions.signUpDateTo
-      ? this.$dayjs(this.queryOptions.signUpDateTo).format('YYYY-MM-DD 23:59:59')
-      : '';
-
-    this.tableData = await this.$axios.$get('/admin/memberships/users/active', {
-      params: {
-        ...this.queryOptions,
-        signUpDateFrom,
-        signUpDateTo
-      }
-    });
-    this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+      this.tableData = await this.$axios.$get('/admin/memberships/users/active', {
+        params: {
+          ...this.queryOptions,
+          signUpDateFrom,
+          signUpDateTo
+        }
+      });
+      this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+      this.queryOptionsSaved = cloneDeep(this.queryOptions);
+    } catch (error) {
+      alert(API_ERROR);
+    }
   },
   methods: {
     onChangePage(page) {
@@ -187,18 +193,18 @@ export default {
     },
     downloadExcel() {
       const fileName = '멤버십 회원';
-      const signUpDateFrom = this.queryOptions.signUpDateFrom
-        ? this.$dayjs(this.queryOptions.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
+      const signUpDateFrom = this.queryOptionsSaved.signUpDateFrom
+        ? this.$dayjs(this.queryOptionsSaved.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
         : '';
-      const signUpDateTo = this.queryOptions.signUpDateTo
-        ? this.$dayjs(this.queryOptions.signUpDateTo).format('YYYY-MM-DD 23:59:59')
+      const signUpDateTo = this.queryOptionsSaved.signUpDateTo
+        ? this.$dayjs(this.queryOptionsSaved.signUpDateTo).format('YYYY-MM-DD 23:59:59')
         : '';
 
       this.$axios
         .$get('/admin/memberships/users/active/excel', {
           responseType: 'blob',
           params: {
-            ...this.queryOptions,
+            ...this.queryOptionsSaved,
             fileName,
             signUpDateFrom,
             signUpDateTo
