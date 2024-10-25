@@ -69,6 +69,9 @@
               <NuxtLink to="/admin/ticket/tickets/invitation">
                 <span class="bt-1r">초대권</span>
               </NuxtLink>
+              <NuxtLink to="/admin/ticket/tickets/membership">
+                <span class="bt-1r">멤버십</span>
+              </NuxtLink>
             </template>
             <template v-if="isShowByAuthLevel(['ADMIN', 'SUPERVISOR'])">
               <NuxtLink to="/admin/ticket/group-view">

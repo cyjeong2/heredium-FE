@@ -15,7 +15,9 @@
       <div class="mb-24">
         <label>상태</label>
         <SCheckboxGroup v-model="queryOptions.state" :group-list="stateList">예정</SCheckboxGroup>
-        <b class="ml-28 mr-8">멤버십:</b><SCheckbox v-model="queryOptions.hasMembership" />
+        <div v-if="pageType !== 'membership'">
+          <b class="ml-28 mr-8">멤버십:</b><SCheckbox v-model="queryOptions.hasMembership" />
+        </div>
       </div>
       <div>
         <SSearchBar v-model="queryOptions.text" @search="onSearch()" />
@@ -30,6 +32,8 @@
         >
       </div>
       <div>
+        <SButton v-if="pageType === 'membership'" class="mr-16">법인회원 등록 </SButton>
+        <SButton v-if="pageType === 'membership'" class="mr-16" @click="downloadExcel">양식 다운로드 </SButton>
         <SButton class="mr-16" @click="downloadExcel">엑셀 다운로드</SButton>
         <SDropdown v-model="queryOptions.size" :option-list="sizeOptionList" @change="onSelectSizeChange"
           >리스트 수:</SDropdown
@@ -44,7 +48,8 @@
             { exhibition: pageType === 'exhibition' },
             { group: pageType === 'group' },
             { invitation: pageType === 'invitation' },
-            { coffee: pageType === 'coffee' }
+            { coffee: pageType === 'coffee' },
+            { membership: pageType === 'membership' }
           ]"
         >
           <thead :class="{ 'data-none': !data || !data[0] }">
@@ -78,7 +83,7 @@
                     ? '16'
                     : pageType === 'exhibition'
                     ? '14'
-                    : pageType === 'group'
+                    : pageType === 'group' || pageType === 'membership'
                     ? '12'
                     : pageType === 'coffee'
                     ? '15'
@@ -485,13 +490,14 @@ export default {
       }
     }
   }
-  &.group {
+  &.group,
+  &.membership {
     th {
       &:first-of-type {
         width: 4%;
       }
       &:nth-of-type(2) {
-        width: 4%;
+        width: 6%;
       }
       &:nth-of-type(3) {
         width: 20%;
