@@ -1,35 +1,61 @@
 <template>
   <div>
-    <SModal :is-show="true" width="500px" @close="onclose">
+    <SModal :is-show="true" width="600px" @close="onclose">
       <template #title>업로드하다</template>
       <template #content>
-        <div class="field-group">
-          <label class="mr-24"> 법인 회원 이름 </label>
-          <SDropdown
-            v-model="companyName"
-            :class="{ 'is-error': isSubmitted && feedback.companyName }"
-            :option-list="companyList"
-            w-size="large"
-          ></SDropdown>
-        </div>
-        <div class="field-group flex-start">
-          <div class="mr-28">
-            <SInput
-              v-model="fileName"
+        <div v-if="!result">
+          <div class="field-group">
+            <label class="mr-24"> 법인 회원 이름 </label>
+            <SDropdown
+              v-model="companyName"
+              :class="{ 'is-error': isSubmitted && feedback.companyName }"
+              :option-list="companyList"
               w-size="large"
-              readonly
-              :class="{ 'is-error': isSubmitted && feedback.fileName }"
-            />
-            <input ref="accountFile" type="file" accept=".xlsx, .XLSX" class="is-blind" @change="updateFile($event)" />
-            <p class="sub">xlsx 파일</p>
+            ></SDropdown>
           </div>
-          <SButton v-if="!fileName" @click="$refs.accountFile.click()">파일 첨부</SButton>
-          <div v-else>
-            <SButton @click="removeFile">삭제</SButton>
+          <div class="field-group flex-start">
+            <div class="mr-28">
+              <SInput
+                v-model="fileName"
+                w-size="x-large"
+                readonly
+                :class="{ 'is-error': isSubmitted && feedback.fileName }"
+              />
+              <input
+                ref="accountFile"
+                type="file"
+                accept=".xlsx, .XLSX"
+                class="is-blind"
+                @change="updateFile($event)"
+              />
+              <p class="sub">xlsx 파일</p>
+            </div>
+            <SButton v-if="!fileName" @click="$refs.accountFile.click()">파일 첨부</SButton>
+            <div v-else>
+              <SButton @click="removeFile">삭제</SButton>
+            </div>
+          </div>
+        </div>
+        <div v-else class="result-container">
+          <div class="result-total">
+            <h2 class="success-cases mr-24">성공: {{ result?.success_cases?.length }}</h2>
+            <h2 class="failed-cases">실패한: {{ result?.failed_cases?.length }}</h2>
+          </div>
+          <div v-if="result?.success_cases?.length" class="result-box">
+            <h3 class="success-cases">성공 목록</h3>
+            <ol class="result-list success-list">
+              <li v-for="(item, index) in result.success_cases" :key="index">{{ index + 1 }}. {{ item }}</li>
+            </ol>
+          </div>
+          <div v-if="result?.failed_cases?.length" class="result-box">
+            <h3 class="failed-cases">실패 목록</h3>
+            <ol class="result-list failed-list">
+              <li v-for="(item, index) in result.failed_cases" :key="index">{{ index + 1 }}. {{ item }}</li>
+            </ol>
           </div>
         </div>
       </template>
-      <template #modal-btn1>
+      <template v-if="!result" #modal-btn1>
         <SButton button-type="primary" @click="handleSubmit">취소</SButton>
       </template>
     </SModal>
@@ -69,7 +95,8 @@ export default {
       companyList: [],
       feedback: {},
       isSubmitted: false,
-      isFileError: false
+      isFileError: false,
+      result: null
     };
   },
   async fetch() {
@@ -145,9 +172,12 @@ export default {
       try {
         const file = this.getFile();
         const formData = new FormData();
-        formData.append('files', file);
-        await this.$axios.$post(`/admin/companies/${this.companyName}/membership-registrations/upload`, formData);
-        this.onclose();
+        formData.append('file', file);
+        const res = await this.$axios.$post(
+          `/admin/companies/${this.companyName}/membership-registrations/upload`,
+          formData
+        );
+        this.result = res;
       } catch (error) {
         alert(API_ERROR);
       }
@@ -168,5 +198,34 @@ export default {
 }
 .flex-start {
   align-items: start;
+}
+
+.result-container {
+  text-align: start;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.result-total {
+  display: flex;
+  justify-content: start;
+}
+.result-box {
+  margin-top: 12px;
+}
+.success-cases {
+  text-align: center;
+  color: var(--color-green);
+}
+.failed-cases {
+  text-align: center;
+  color: var(--color-u-error);
+}
+.result-list {
+  ol {
+    list-style-type: decimal;
+  }
+  ol + ol {
+    margin-top: 3px;
+  }
 }
 </style>
