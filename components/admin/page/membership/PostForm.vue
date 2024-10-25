@@ -383,7 +383,6 @@ export default {
       if (onlyHasCouponsFeedback && emptyErrorCoupon) {
         return null;
       }
-      console.log(feedback);
       return feedback;
     },
     isValidate() {
@@ -468,27 +467,11 @@ export default {
           await this.$axios.put('/admin/posts', this.detailData);
         }
         this.modal = Object.assign(this.modal, { isConfirmSave: false, isSave: true });
-        // this.reloadPage();
-        console.log('ok');
       } catch (error) {
-        console.log(API_ERROR);
         alert(API_ERROR);
         this.modal.isConfirmSave = false;
       }
     },
-    // async handleUpdateEnabledPost() {
-    //   try {
-    //     if (typeof this.detailData.id !== 'number') {
-    //       return;
-    //     }
-    //     await this.$axios.put(`/admin/posts/${this.detailData.id}/update-is-enabled`, {
-    //       is_enabled: this.detailData.is_enabled
-    //     });
-    //     this.modal = Object.assign(this.modal, { isConfirmSave: false, isSave: true });
-    //   } catch (error) {
-    //     alert(API_ERROR);
-    //   }
-    // }
     handleDeleteMembershipOption(index) {
       if (typeof this.membershipIndexExpanded === 'number') {
         if (this.membershipIndexExpanded === index) {
