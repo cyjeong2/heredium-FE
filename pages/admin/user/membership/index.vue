@@ -48,46 +48,44 @@
             <tr v-if="!data || !data[0]">
               <td colspan="12"><div>리스트가 없습니다.</div></td>
             </tr>
-            <template>
-              <tr v-for="(item, index) in data" :key="item.id">
-                <td>
-                  <div>{{ tableData.startCount - index }}</div>
-                </td>
-                <td>
-                  <div class="text-left">{{ item.membership_name }}</div>
-                </td>
-                <td>
-                  <div class="text-left">{{ item.account_id }}</div>
-                </td>
-                <td>
-                  <div class="text-left">{{ item.name }}</div>
-                </td>
-                <td>
-                  <div>{{ item.phone }}</div>
-                </td>
-                <td>
-                  <div>{{ item.payment_status }}</div>
-                </td>
-                <td>
-                  <div>{{ item.payment_date }}</div>
-                </td>
-                <td>
-                  <div>{{ item.number_of_memberships }}</div>
-                </td>
-                <td>
-                  <div>{{ item.number_of_exhibitions_used }}</div>
-                </td>
-                <td>
-                  <div>{{ item.number_of_programs_used }}</div>
-                </td>
-                <td>
-                  <div>{{ item.number_of_coffee_used }}</div>
-                </td>
-                <td>
-                  <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
-                </td>
-              </tr>
-            </template>
+            <tr v-for="(item, index) in data" :key="item.id">
+              <td>
+                <div>{{ tableData.startCount - index }}</div>
+              </td>
+              <td>
+                <div class="text-left">{{ item.membership_name }}</div>
+              </td>
+              <td>
+                <div class="text-left">{{ item.account_id }}</div>
+              </td>
+              <td>
+                <div class="text-left">{{ item.name }}</div>
+              </td>
+              <td>
+                <div>{{ item.phone }}</div>
+              </td>
+              <td>
+                <div>{{ item.payment_status }}</div>
+              </td>
+              <td>
+                <div>{{ item.payment_date }}</div>
+              </td>
+              <td>
+                <div>{{ item.number_of_memberships }}</div>
+              </td>
+              <td>
+                <div>{{ item.number_of_exhibitions_used }}</div>
+              </td>
+              <td>
+                <div>{{ item.number_of_programs_used }}</div>
+              </td>
+              <td>
+                <div>{{ item.number_of_coffee_used }}</div>
+              </td>
+              <td>
+                <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </template>
