@@ -138,6 +138,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    refreshTime: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
   data() {
@@ -152,6 +157,12 @@ export default {
     couponEditor: {
       handler(newVal) {
         this.$emit('update-coupon', newVal);
+      },
+      deep: true
+    },
+    refreshTime: {
+      handler(newVal) {
+        this.couponEditor = cloneDeep(this.coupon || COUPON_DEFAULT);
       },
       deep: true
     },

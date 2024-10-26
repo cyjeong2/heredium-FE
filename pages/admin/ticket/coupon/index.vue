@@ -8,11 +8,12 @@
           :coupon="couponData"
           :is-issuance="true"
           :error="feedback"
+          :refresh-time="syncCouponDataTime"
           @update-coupon="(e) => handleUpdateCoupon(e)"
         />
         <div class="box-button">
           <SButton button-type="primary" @click="handleAddCoupon()">검색</SButton>
-          <SButton>초기화</SButton>
+          <SButton @click="resetCoupon">초기화</SButton>
         </div>
       </div>
     </div>
@@ -261,6 +262,7 @@ export default {
   data() {
     return {
       couponData: {},
+      syncCouponDataTime: 0,
       couponUsingId: null,
       feedback: {},
       dateOptionList: [{ value: 'CREATED_DATE', label: '등록일시' }],
@@ -590,6 +592,10 @@ export default {
       delete params.size;
       params.fileName = `Export filter account in coupon issue page ${this.$dayjs().format('YYYY-MM-DD HH:mm:ss')}`;
       this.downloadExcel(params.fileName, '/admin/accounts/with-membership/excel', params);
+    },
+    resetCoupon() {
+      this.couponData = cloneDeep(COUPON_DEFAULT);
+      this.syncCouponDataTime = Date.now();
     }
   }
 };
