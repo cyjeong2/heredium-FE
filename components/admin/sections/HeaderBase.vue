@@ -69,7 +69,7 @@
               <NuxtLink to="/admin/ticket/tickets/invitation">
                 <span class="bt-1r">초대권</span>
               </NuxtLink>
-              <NuxtLink to="/admin/ticket/tickets/membership">
+              <NuxtLink to="/admin/ticket/membership">
                 <span class="bt-1r">멤버십</span>
               </NuxtLink>
             </template>

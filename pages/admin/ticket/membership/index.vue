@@ -4,9 +4,9 @@
     <div class="search mb-28">
       <div class="mb-24">
         <SDropdown v-model="queryOptions.searchDateType" :option-list="dateOptionList" class="mr-16" />
-        <SDatepicker v-model="queryOptions.startDate" :max="queryOptions.endDate" />
+        <SDatepicker v-model="queryOptions.paymentDateFrom" :max="queryOptions.paymentDateTo" />
         <span class="ml-8 mr-8">~</span>
-        <SDatepicker v-model="queryOptions.endDate" :min="queryOptions.startDate" />
+        <SDatepicker v-model="queryOptions.paymentDateTo" :min="queryOptions.paymentDateFrom" />
       </div>
       <div class="mb-24">
         <label>상태</label>
@@ -154,8 +154,8 @@ export default {
       ],
       queryOptions: {
         searchDateType: 'PAYMENT_DATE',
-        paymentDateFrom: this.$route.query.startDate || '',
-        paymentDateTo: this.$route.query.endDate || '',
+        paymentDateFrom: this.$route.query.paymentDateFrom || '',
+        paymentDateTo: this.$route.query.paymentDateTo || '',
         paymentStatus:
           typeof this.$route.query.paymentStatus === 'string'
             ? [this.$route.query.paymentStatus]
@@ -206,7 +206,7 @@ export default {
     },
     downloadExcel() {
       const paymentDateFrom = this.queryOptions.paymentDateFrom
-        ? this.$dayjs(this.queryOptions.startDate).format('YYYY-MM-DD 00:00:00')
+        ? this.$dayjs(this.queryOptions.paymentDateFrom).format('YYYY-MM-DD 00:00:00')
         : '';
       const paymentDateTo = this.queryOptions.paymentDateTo
         ? this.$dayjs(this.queryOptions.paymentDateTo).format('YYYY-MM-DD 23:59:59')

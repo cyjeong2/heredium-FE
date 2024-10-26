@@ -31,7 +31,7 @@
           <SCheckbox v-model="queryOptions.hasNumberOfEntries">입장횟수</SCheckbox>
           <SCheckbox v-model="queryOptions.alreadyLoginedBefore">최근 로그인</SCheckbox>
           <SCheckbox v-model="queryOptions.hasMembership">멤버십</SCheckbox>
-          <SCheckbox v-model="queryOptions.alreadyUsedCouponBefore">쿠폰 발급 여부</SCheckbox>
+          <SCheckbox v-model="queryOptions.alreadyDeliveredAdminSiteCoupon">쿠폰 발급 여부</SCheckbox>
         </div>
         <div>
           <SSearchBar v-model="queryOptions.text" @search="onUserSearch()" />
@@ -237,7 +237,7 @@ const INIT_GET_ACCOUNT_PARAMS = {
   signUpDateTo: '',
   hasNumberOfEntries: false,
   alreadyLoginedBefore: false,
-  alreadyUsedCouponBefore: false,
+  alreadyDeliveredAdminSiteCoupon: false,
   hasMembership: false,
   text: '',
   excludeIds: []
@@ -466,7 +466,7 @@ export default {
           signUpDateTo: '',
           hasNumberOfEntries: false,
           alreadyLoginedBefore: false,
-          alreadyUsedCouponBefore: false,
+          alreadyDeliveredAdminSiteCoupon: false,
           hasMembership: false,
           text: '',
           excludeIds: []
