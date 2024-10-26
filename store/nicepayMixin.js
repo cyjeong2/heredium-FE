@@ -83,6 +83,7 @@ export default {
       });
     },
     membershipPayment(uuid, amount) {
+      console.log('vao');
       const invalidPaymentData = !uuid || !amount || !window.AUTHNICE;
       if (invalidPaymentData) {
         alert('결제 오류');
@@ -94,7 +95,7 @@ export default {
         orderId: uuid, // Unique Order ID
         amount,
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
-        // returnUrl: `${window.location.origin}/mypage/purchase/membership`,
+        returnUrl: `${window.location.origin}/mypage/purchase/membership`,
         fnError(error) {
           console.log('🚀 ~ fnError ~ error 99:', error);
           window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);

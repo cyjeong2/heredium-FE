@@ -241,9 +241,8 @@ export default {
           membership_id: this.membershipIdSelected
         })
         .then((res) => {
-          console.log(res);
-          const amount = res?.amount;
-          const orderId = res?.payment_order_id;
+          const amount = res.data?.amount;
+          const orderId = res.data?.payment_order_id;
           if (amount !== this.totalPrice) {
             alert('가격이 일치하지 않습니다.');
             return null;
@@ -254,6 +253,7 @@ export default {
           }
           this.membershipPayment(orderId, amount);
         })
+
         .catch((err) => {
           const errorMessage = err.response.data?.MESSAGE || '';
           if (errorMessage === 'MEMBERSHIP_REGISTRATION_ALREADY_EXISTS') {
