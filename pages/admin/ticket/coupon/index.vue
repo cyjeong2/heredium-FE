@@ -265,7 +265,7 @@ export default {
       syncCouponDataTime: 0,
       couponUsingId: null,
       feedback: {},
-      dateOptionList: [{ value: 'CREATED_DATE', label: '등록일시' }],
+      dateOptionList: [{ value: 'CREATED_DATE', label: '생성일시' }],
       queryOptions: INIT_GET_ACCOUNT_PARAMS,
       exportParams: INIT_GET_ACCOUNT_PARAMS,
       tableData: null,
