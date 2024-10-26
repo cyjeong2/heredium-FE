@@ -45,8 +45,7 @@
           <SButton button-type="primary" @click="addUser"> + 선택추가</SButton>
         </div>
         <div class="right">
-          <SButton class="mr-16">엑셀 일괄업로드</SButton>
-          <SButton class="mr-16">엑셀 다운로드</SButton>
+          <SButton class="mr-16" @click="exportMemberTable">엑셀 다운로드</SButton>
           <SDropdown v-model="queryOptions.size" :option-list="optionList" @change="onSizeChange">리스트 수:</SDropdown>
         </div>
       </div>
@@ -227,6 +226,21 @@ import SDialogModal from '~/components/admin/modal/SDialogModal';
 import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import { API_ERROR } from '~/utils/message';
 import { COUPON_DEFAULT } from '~/assets/js/types';
+import { downloadMixin } from '~/mixins/donloadMixin';
+
+const INIT_GET_ACCOUNT_PARAMS = {
+  page: 0,
+  size: 5,
+  searchDateType: 'CREATED_DATE',
+  signUpDateFrom: '',
+  signUpDateTo: '',
+  hasNumberOfEntries: false,
+  alreadyLoginedBefore: false,
+  alreadyUsedCouponBefore: false,
+  hasMembership: false,
+  text: '',
+  excludeIds: []
+};
 
 export default {
   name: 'CouponPage',
@@ -242,6 +256,7 @@ export default {
     SSearchBar,
     CouponEditor
   },
+  mixins: [downloadMixin],
   layout: 'admin/default',
   data() {
     return {
@@ -249,19 +264,8 @@ export default {
       couponUsingId: null,
       feedback: {},
       dateOptionList: [{ value: 'CREATED_DATE', label: '등록일시' }],
-      queryOptions: {
-        page: 0,
-        size: 5,
-        searchDateType: 'CREATED_DATE',
-        signUpDateFrom: '',
-        signUpDateTo: '',
-        hasNumberOfEntries: false,
-        alreadyLoginedBefore: false,
-        alreadyUsedCouponBefore: false,
-        hasMembership: false,
-        text: '',
-        excludeIds: []
-      },
+      queryOptions: INIT_GET_ACCOUNT_PARAMS,
+      exportParams: INIT_GET_ACCOUNT_PARAMS,
       tableData: null,
       isCheckedAll: false,
       optionList: [
@@ -427,6 +431,7 @@ export default {
           startCount: this.tableData.totalElements - this.tableData.number * this.tableData.size,
           content: this.tableData.content.map((item) => ({ ...item, isChecked: false }))
         };
+        this.updateExportParams();
       } catch (error) {
         alert(API_ERROR);
       }
@@ -464,6 +469,7 @@ export default {
           text: '',
           excludeIds: []
         };
+        this.updateExportParams();
       }
       this.queryOptions.page = 0;
       this.fetch();
@@ -473,6 +479,7 @@ export default {
 
       targetUserList.forEach((value) => {
         this.queryOptions.excludeIds.push(value.id);
+        this.updateExportParams();
         this.selectedData.userList.push({
           ...value,
           isChecked: false
@@ -486,6 +493,7 @@ export default {
 
       if (isAll) {
         this.queryOptions.excludeIds = [];
+        this.updateExportParams();
         this.selectedData.userList = [];
       } else {
         selectedUserList.forEach((user) => {
@@ -494,6 +502,7 @@ export default {
           const selectedTargetIndex = this.selectedData.userList.findIndex((item) => item.id === id);
 
           this.queryOptions.excludeIds.splice(excludeTargetIndex, 1);
+          this.updateExportParams();
           this.selectedData.userList.splice(selectedTargetIndex, 1);
         });
       }
@@ -567,6 +576,16 @@ export default {
     },
     refreshPage() {
       window.location.reload();
+    },
+    updateExportParams() {
+      this.exportParams = cloneDeep(this.queryOptions);
+    },
+    exportMemberTable() {
+      const params = cloneDeep(this.exportParams);
+      delete params.page;
+      delete params.size;
+      params.fileName = `Export filter account in coupon issue page ${this.$dayjs().format('YYYY-MM-DD HH:mm:ss')}`;
+      this.downloadExcel(params.fileName, '/admin/accounts/with-membership/excel', params);
     }
   }
 };
