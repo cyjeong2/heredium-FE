@@ -83,7 +83,6 @@ export default {
       });
     },
     membershipPayment(uuid, amount) {
-      console.log('vao');
       const invalidPaymentData = !uuid || !amount || !window.AUTHNICE;
       if (invalidPaymentData) {
         alert('결제 오류');
@@ -95,30 +94,13 @@ export default {
         orderId: uuid, // Unique Order ID
         amount,
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
-        returnUrl: `${window.location.origin}/mypage/purchase/membership`,
+        returnUrl: `${window.location.origin}/payment/nicepay-confirm-payment`,
         fnError(error) {
           console.log('🚀 ~ fnError ~ error 99:', error);
           window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
         },
         fnSuccess(result) {
           console.log('🚀 ~ serverAuth ~ fnSuccess 103:', result);
-          this.$axios
-            .post('/user/membership/confirm-payment', {
-              payRequest: {
-                orderId: uuid,
-                paymentKey: 'string',
-                amount,
-                type: 'TOSSPAYMENTS'
-              }
-            })
-            .then(() => {
-              this.$router.push('/mypage/purchase/membership');
-            })
-            .catch((err) => {
-              const errorMessage = err.response.data?.MESSAGE || '';
-              console.log('🚀 ~ fnSuccess ~ errorMessage 118:', errorMessage);
-              this.$router.push(`/payment/error?error=${errorMessage}`);
-            });
         }
       });
     }
