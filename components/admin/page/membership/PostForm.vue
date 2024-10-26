@@ -84,17 +84,19 @@
                   <SCheckbox v-model="membership.checked" />
                 </div>
                 <div :key="`membership_${membershipIndex}_name_edit`" class="grid-table-body membership-name">
-                  <SInput v-model="membership.name" w-size="large" :class="{ 'is-error': !membership.name }" />
+                  <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
                 </div>
                 <div :key="`membership_${membershipIndex}_price_edit`" class="grid-table-body membership-price">
-                  <SInput
-                    v-model="membership.price"
-                    is-comma-num
-                    w-size="large"
-                    text-align="right"
-                    :class="{ 'is-error': !membership.price }"
-                  />
-                  원
+                  <div class="price-input">
+                    <SInput
+                      v-model="membership.price"
+                      is-comma-num
+                      w-size="full"
+                      text-align="right"
+                      :class="{ 'is-error': !membership.price }"
+                    />
+                  </div>
+                  <div class="currency">원</div>
                 </div>
                 <div :key="`membership_${membershipIndex}_action`" class="grid-table-body membership-action">
                   <!-- <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i> -->
@@ -593,7 +595,13 @@ export default {
   }
   .membership-name,
   .membership-price {
+    display: flex;
+    gap: 12px;
+    align-items: center;
     font-weight: 700;
+    .price-input {
+      flex: 1;
+    }
   }
   .membership-action {
     display: flex;

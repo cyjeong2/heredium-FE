@@ -14,10 +14,10 @@
             ></SDropdown>
           </div>
           <div class="field-group flex-start">
-            <div class="mr-28">
+            <div class="mr-28 select-file-box">
               <SInput
                 v-model="fileName"
-                w-size="x-large"
+                w-size="full"
                 readonly
                 :class="{ 'is-error': isSubmitted && feedback.fileName }"
               />
@@ -30,10 +30,9 @@
               />
               <p class="sub">xlsx 파일</p>
             </div>
+
             <SButton v-if="!fileName" @click="$refs.accountFile.click()">파일 첨부</SButton>
-            <div v-else>
-              <SButton @click="removeFile">삭제</SButton>
-            </div>
+            <SButton v-else @click="removeFile">삭제</SButton>
           </div>
         </div>
         <div v-else class="result-container">
@@ -192,6 +191,9 @@ export default {
   text-align: start;
   display: flex;
   align-items: center;
+  .select-file-box {
+    flex: 1;
+  }
 }
 .field-group + .field-group {
   margin-top: 24px;
