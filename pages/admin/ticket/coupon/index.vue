@@ -582,6 +582,10 @@ export default {
     },
     exportMemberTable() {
       const params = cloneDeep(this.exportParams);
+      params.signUpDateFrom = params.signUpDateFrom
+        ? this.$dayjs(params.signUpDateFrom).format('YYYY-MM-DD 00:00:00')
+        : '';
+      params.signUpDateTo = params.signUpDateTo ? this.$dayjs(params.signUpDateTo).format('YYYY-MM-DD 23:59:59') : '';
       delete params.page;
       delete params.size;
       params.fileName = `Export filter account in coupon issue page ${this.$dayjs().format('YYYY-MM-DD HH:mm:ss')}`;
