@@ -28,12 +28,13 @@
           <SDatepicker
             v-model="couponEditor.start_date"
             :max="couponEditor.end_date"
+            :min="minDate"
             :class="{ 'is-error': error?.start_date || feedbackError?.start_date }"
           />
           <span class="ml-8 mr-8">~</span>
           <SDatepicker
             v-model="couponEditor.end_date"
-            :min="couponEditor.start_date"
+            :min="couponEditor.start_date ? couponEditor.start_date : minDate"
             :class="{ 'is-error': error?.end_date || feedbackError?.end_date }"
           />
         </div>
@@ -105,6 +106,7 @@ import SDropdown from '../../commons/SDropdown.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
 import { COUPON_DEFAULT, COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 import { getErrorCouponEditor } from '~/utils/coupon';
+import { minDate } from '~/assets/js/commons';
 
 export default {
   name: 'CouponEditor',
@@ -149,7 +151,8 @@ export default {
     return {
       couponEditor: {},
       couponTypeOptionList: COUPON_TYPE_OPTION_LIST,
-      feedbackError: {}
+      feedbackError: {},
+      minDate: null
     };
   },
 
@@ -175,6 +178,7 @@ export default {
   },
   created() {
     this.couponEditor = cloneDeep(this.coupon || COUPON_DEFAULT);
+    this.minDate = minDate;
   },
   methods: {
     updateThumbnail(e) {
