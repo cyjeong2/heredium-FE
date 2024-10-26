@@ -113,6 +113,7 @@ import MembershipOption from '~/components/user/page/membership/MembershipOption
 import MembershipRegistrationUnavailable from '~/components/user/page/membership/MembershipRegistrationUnavailable.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
+import nicepayMixin from '~/store/nicepayMixin';
 
 export default {
   name: 'MembershipRegistrationPage',
@@ -126,7 +127,7 @@ export default {
     UBottomSheet,
     MembershipRegistrationUnavailable
   },
-  mixins: [imageMixin, userMixin],
+  mixins: [imageMixin, userMixin, nicepayMixin],
   props: {},
   async asyncData({ $axios }) {
     try {
@@ -239,8 +240,19 @@ export default {
         .post('/user/membership/register', {
           membership_id: this.membershipIdSelected
         })
-        .then(() => {
-          this.goToMyMembership();
+        .then((res) => {
+          console.log(res);
+          const amount = res?.amount;
+          const orderId = res?.payment_order_id;
+          if (amount !== this.totalPrice) {
+            alert('가격이 일치하지 않습니다.');
+            return null;
+          }
+          if (!orderId || !amount) {
+            alert('결제 오류');
+            return null;
+          }
+          this.membershipPayment(orderId, amount);
         })
         .catch((err) => {
           const errorMessage = err.response.data?.MESSAGE || '';

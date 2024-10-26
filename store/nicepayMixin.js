@@ -70,7 +70,7 @@ export default {
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
         returnUrl: `${window.location.origin}/ticketing/payment-gates-process?type=${originInfo.type}&id=${originInfo.id}&userType=${userType}`,
         fnError(error) {
-          console.log('🚀 ~ fnError ~ error:', error);
+          console.log('🚀 ~ fnError ~ 73 error:', error);
           if (failUrl) {
             window.location.replace(failUrl);
           } else {
@@ -78,7 +78,7 @@ export default {
           }
         },
         fnSuccess(result) {
-          console.log('🚀 ~ serverAuth ~ fnSuccess', result);
+          console.log('🚀 ~ serverAuth ~ 81 fnSuccess', result);
         }
       });
     },
@@ -94,13 +94,30 @@ export default {
         orderId: uuid, // Unique Order ID
         amount,
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
-        returnUrl: `${window.location.origin}/mypage/purchase/membership`,
+        // returnUrl: `${window.location.origin}/mypage/purchase/membership`,
         fnError(error) {
-          console.log('🚀 ~ fnError ~ error:', error);
+          console.log('🚀 ~ fnError ~ error 99:', error);
           window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
         },
         fnSuccess(result) {
-          console.log('🚀 ~ serverAuth ~ fnSuccess', result);
+          console.log('🚀 ~ serverAuth ~ fnSuccess 103:', result);
+          this.$axios
+            .post('/user/membership/confirm-payment', {
+              payRequest: {
+                orderId: uuid,
+                paymentKey: 'string',
+                amount,
+                type: 'TOSSPAYMENTS'
+              }
+            })
+            .then(() => {
+              this.$router.push('/mypage/purchase/membership');
+            })
+            .catch((err) => {
+              const errorMessage = err.response.data?.MESSAGE || '';
+              console.log('🚀 ~ fnSuccess ~ errorMessage 118:', errorMessage);
+              this.$router.push(`/payment/error?error=${errorMessage}`);
+            });
         }
       });
     }
