@@ -113,7 +113,7 @@ import MembershipOption from '~/components/user/page/membership/MembershipOption
 import MembershipRegistrationUnavailable from '~/components/user/page/membership/MembershipRegistrationUnavailable.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
-import nicepayMixin from '~/store/nicepayMixin';
+import tosspaymentsMixin from '~/store/tosspaymentsMixin';
 
 export default {
   name: 'MembershipRegistrationPage',
@@ -127,7 +127,7 @@ export default {
     UBottomSheet,
     MembershipRegistrationUnavailable
   },
-  mixins: [imageMixin, userMixin, nicepayMixin],
+  mixins: [imageMixin, userMixin, tosspaymentsMixin],
   props: {},
   async asyncData({ $axios }) {
     try {
