@@ -15,9 +15,7 @@
       <div class="mb-24">
         <label>상태</label>
         <SCheckboxGroup v-model="queryOptions.state" :group-list="stateList">예정</SCheckboxGroup>
-        <div>
-          <b class="ml-28 mr-8">멤버십:</b><SCheckbox v-model="queryOptions.hasMembership" />
-        </div>
+        <SCheckbox v-model="queryOptions.hasMembership">멤버십</SCheckbox>
       </div>
       <div>
         <SSearchBar v-model="queryOptions.text" @search="onSearch()" />
@@ -46,7 +44,7 @@
             { exhibition: pageType === 'exhibition' },
             { group: pageType === 'group' },
             { invitation: pageType === 'invitation' },
-            { coffee: pageType === 'coffee' },
+            { coffee: pageType === 'coffee' }
           ]"
         >
           <thead :class="{ 'data-none': !data || !data[0] }">
