@@ -94,7 +94,7 @@ export default {
         orderId: uuid, // Unique Order ID
         amount,
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
-        returnUrl: `${window.location.origin}/payment/nicepay-confirm-payment`,
+        returnUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=NICEPAYMENTS`,
         fnError(error) {
           console.log('🚀 ~ fnError ~ error 99:', error);
           window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
