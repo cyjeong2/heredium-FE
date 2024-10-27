@@ -98,8 +98,8 @@ export default {
           amount,
           orderId: uuid,
           orderName: 'Payment for register membership',
-          customerName: userInfo.name,
-          customerEmail: userInfo.email,
+          customerName: userInfo.name || '',
+          customerEmail: userInfo.email || '',
           cardInstallmentPlan: 0,
           successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=TOSSPAYMENTS`,
           failUrl: `${window.location.origin}/payment/error`
