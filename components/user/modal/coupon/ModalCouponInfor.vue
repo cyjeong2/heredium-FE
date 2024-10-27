@@ -56,8 +56,14 @@ export default {
   },
   computed: {
     createQrValue() {
-      const { id, uuid } = this.detailCoupon;
-      return uuid ? JSON.stringify({ id, uuid }) : '';
+      const unusedCoupons = this.detailCoupon?.unused_coupons || [];
+      for (let index = 0; index < unusedCoupons.length; index++) {
+        const coupon = unusedCoupons[index];
+        if (coupon.uuid) {
+          return coupon.uuid;
+        }
+      }
+      return '';
     }
   },
   methods: {
