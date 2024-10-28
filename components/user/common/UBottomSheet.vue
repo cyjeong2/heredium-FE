@@ -83,5 +83,10 @@ export default {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+  /* Transition effect */
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    transition: none;
+  }
 }
 </style>
