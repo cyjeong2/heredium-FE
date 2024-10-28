@@ -1,7 +1,11 @@
 <template>
   <div class="center">
     <div>
-      <img src="~assets/img/icon/icon_no_membership.svg" />
+      <picture>
+        <source srcset="~/assets/img/mobile/noresult.png" media="(max-width: 768px)" />
+        <source srcset="~/assets/img/pc/noresult.png" media="(min-width: 769px)" />
+        <img src="~/assets/img/mobile/noresult.png" alt="" />
+      </picture>
     </div>
     <div class="content">
       <div class="center">
@@ -34,7 +38,6 @@ export default {
   text-align: center;
   color: var(--color-u-placeholder);
   margin-bottom: 3.2rem;
-  margin-top: 2rem;
 }
 
 .button {

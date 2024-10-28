@@ -1,6 +1,10 @@
 <template>
   <div class="container">
-    <img src="~assets/img/icon/icon_membership_unavailable.svg" />
+    <picture>
+      <source srcset="~/assets/img/mobile/noresult.png" media="(max-width: 768px)" />
+      <source srcset="~/assets/img/pc/noresult.png" media="(min-width: 769px)" />
+      <img src="~/assets/img/mobile/noresult.png" alt="" />
+    </picture>
     <h3>현재 멤버십 프로그램이 진행되지 않고 있습니다.</h3>
   </div>
 </template>

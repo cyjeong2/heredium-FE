@@ -28,6 +28,8 @@
                 <span>전체 쿠폰 내역 </span> <i class="m umic-arrow_forward" />
               </NuxtLink>
             </div>
+            <p class="only-mobile note-mobile">사용 가능한 쿠폰 리스트입니다.</p>
+
             <div class="contents">
               <CouponList :data="availableCouponsList" @refresh-coupon-list="refreshCouponList" />
             </div>
@@ -126,6 +128,11 @@ export default {
     align-content: center;
     justify-content: space-between;
   }
+}
+
+.note-mobile {
+  color: var(--color-u-placeholder);
+  margin-bottom: 2.4rem;
 }
 
 .head {
