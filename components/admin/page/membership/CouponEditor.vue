@@ -24,29 +24,34 @@
       </div>
       <div class="field-group">
         <label>사용기간<b class="must">*</b></label>
-        <div v-if="isIssuance">
-          <SDatepicker
-            v-model="couponEditor.start_date"
-            :max="couponEditor.end_date"
-            :min="minDate"
-            :class="{ 'is-error': error?.start_date || feedbackError?.start_date }"
-          />
-          <span class="ml-8 mr-8">~</span>
-          <SDatepicker
-            v-model="couponEditor.end_date"
-            :min="couponEditor.start_date ? couponEditor.start_date : minDate"
-            :class="{ 'is-error': error?.end_date || feedbackError?.end_date }"
-          />
-        </div>
-        <div v-else class="field-value">
-          <SInput
-            v-model="couponEditor.period_in_days"
-            :disabled="disabled"
-            :class="{ 'is-error': error?.periodInDays || feedbackError?.periodInDays }"
-            is-comma-num
-            w-size="large"
-          />
-        </div>
+        <s-flex-input-grid>
+          <template #input>
+            <div v-if="isIssuance">
+              <SDatepicker
+                v-model="couponEditor.start_date"
+                :max="couponEditor.end_date"
+                :min="minDate"
+                :class="{ 'is-error': error?.start_date || feedbackError?.start_date }"
+              />
+              <span class="ml-8 mr-8">~</span>
+              <SDatepicker
+                v-model="couponEditor.end_date"
+                :min="couponEditor.start_date ? couponEditor.start_date : minDate"
+                :class="{ 'is-error': error?.end_date || feedbackError?.end_date }"
+              />
+            </div>
+            <div v-else class="field-value">
+              <SInput
+                v-model="couponEditor.period_in_days"
+                :disabled="disabled"
+                :class="{ 'is-error': error?.periodInDays || feedbackError?.periodInDays }"
+                is-comma-num
+                w-size="large"
+              />
+            </div>
+          </template>
+          <template #content>일</template>
+        </s-flex-input-grid>
       </div>
       <div class="field-group">
         <label>쿠폰종류<b class="must">*</b></label>
@@ -63,30 +68,46 @@
       <div class="field-group">
         <label>사용횟수</label>
         <div class="field-value input-group">
-          <SInput
-            v-model="couponEditor.number_of_uses"
-            is-comma-num
-            w-size="large"
-            :disabled="couponEditor.is_permanent || disabled"
-            :class="{ 'is-error': error?.numberOfUses || feedbackError?.numberOfUses }"
-          />
-          <div>
-            <SCheckbox v-model="couponEditor.is_permanent" :disabled="disabled" />
-            <p>Permanent discount</p>
-          </div>
+          <s-flex-input-grid>
+            <template #input>
+              <s-flex-input-grid>
+                <template #input>
+                  <SInput
+                    v-model="couponEditor.number_of_uses"
+                    is-comma-num
+                    w-size="full"
+                    :disabled="couponEditor.is_permanent || disabled"
+                    :class="{ 'is-error': error?.numberOfUses || feedbackError?.numberOfUses }"
+                  />
+                </template>
+                <template #content>회</template>
+              </s-flex-input-grid>
+            </template>
+            <template #content>
+              <div>
+                <SCheckbox v-model="couponEditor.is_permanent" :disabled="disabled" />
+                <p>Permanent discount</p>
+              </div></template
+            >
+          </s-flex-input-grid>
         </div>
       </div>
       <div class="field-group">
         <label>할인율<b class="must">*</b></label>
         <div class="field-value">
-          <SInput
-            v-model="couponEditor.discount_percent"
-            :class="{ 'is-error': error?.discountPercent || feedbackError?.discountPercent }"
-            is-comma-num
-            maxlength="3"
-            w-size="large"
-            :disabled="disabled"
-          />
+          <s-flex-input-grid>
+            <template #input>
+              <SInput
+                v-model="couponEditor.discount_percent"
+                :class="{ 'is-error': error?.discountPercent || feedbackError?.discountPercent }"
+                is-comma-num
+                maxlength="3"
+                w-size="large"
+                :disabled="disabled"
+              />
+            </template>
+            <template #content>%</template>
+          </s-flex-input-grid>
         </div>
       </div>
       <div v-if="showAddButton && !disabled" class="right">
@@ -104,13 +125,14 @@ import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative
 import SInput from '../../commons/SInput.vue';
 import SDropdown from '../../commons/SDropdown.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
+import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import { COUPON_DEFAULT, COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 import { getErrorCouponEditor } from '~/utils/coupon';
 import { minDate } from '~/assets/js/commons';
 
 export default {
   name: 'CouponEditor',
-  components: { SImageUploadRepresentative, SCheckbox, SInput, SButton, SDropdown, SDatepicker },
+  components: { SImageUploadRepresentative, SCheckbox, SInput, SButton, SDropdown, SDatepicker, SFlexInputGrid },
   props: {
     coupon: {
       type: Object,

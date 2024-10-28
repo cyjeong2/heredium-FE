@@ -27,7 +27,7 @@
           <UButton v-else class="reservation-btn" disabled> QR코드 </UButton>
         </div>
         <div v-if="!isHistory && detailCoupon.unused_coupons.length > 0" class="status active">
-          <span>사용완</span>
+          <span>사용가능</span>
         </div>
         <div v-else class="status deactive">
           <span>사용완료</span>

@@ -69,7 +69,7 @@
     <div class="edit-area">
       <div>
         <section class="membership-coupon has-title-side-btn">
-          <h3 class="mb-24">입장권 정보<b class="must">*</b></h3>
+          <h3 class="mb-24">멤버십 정보<b class="must">*</b></h3>
           <div>
             <div class="grid-table" :class="{ 'is-error': feedback?.emptyMemberships }">
               <AddMembershipOption @add-membership-option="handlePushMembershipOption" />
@@ -86,17 +86,21 @@
                 <div :key="`membership_${membershipIndex}_name_edit`" class="grid-table-body membership-name">
                   <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
                 </div>
-                <div :key="`membership_${membershipIndex}_price_edit`" class="grid-table-body membership-price">
-                  <div class="price-input">
-                    <SInput
-                      v-model="membership.price"
-                      is-comma-num
-                      w-size="full"
-                      text-align="right"
-                      :class="{ 'is-error': !membership.price }"
-                    />
-                  </div>
-                  <div class="currency">원</div>
+                <div :key="`membership_${membershipIndex}_price_edit`" class="grid-table-body">
+                  <SFlexInputGrid>
+                    <template #input>
+                      <SInput
+                        v-model="membership.price"
+                        is-comma-num
+                        w-size="full"
+                        text-align="right"
+                        :class="{ 'is-error': !membership.price }"
+                      />
+                    </template>
+                    <template #content>
+                      <div class="currency">원</div>
+                    </template>
+                  </SFlexInputGrid>
                 </div>
                 <div :key="`membership_${membershipIndex}_action`" class="grid-table-body membership-action">
                   <!-- <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i> -->
@@ -186,6 +190,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import SDatepicker from '../../commons/SDatepicker.vue';
+import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import STitle from '~/components/admin/commons/STitle';
 import SButton from '~/components/admin/commons/SButton';
 import SInput from '~/components/admin/commons/SInput';
@@ -214,7 +219,8 @@ export default {
     SImageUploadRepresentative,
     AddMembershipOption,
     CouponEditor,
-    SDatepicker
+    SDatepicker,
+    SFlexInputGrid
   },
   mixins: [imageMixin],
   props: {
@@ -404,10 +410,6 @@ export default {
       if (!endDate || !this.$dayjs(endDate, 'YYYY-MM-DD', true).isValid()) {
         feedbackError.end_date = true;
       }
-      // const detailImage = this.detailData.note_image;
-      // if (!detailImage || !detailImage.note_image_url || !detailImage.original_file_name) {
-      //   feedbackError.detailImage = true;
-      // }
       if (!this.detailData.content_detail) {
         feedbackError.contentDetail = true;
       }
@@ -440,25 +442,16 @@ export default {
       return feedbackError;
     },
     checkEdit() {
-      // if (this.isEdit) {
-      //   this.modal.isConfirmSave = true;
-      //   return null;
-      // }
       const feedback = this.isValidate();
       if (isEmpty(feedback)) {
         this.modal.isConfirmSave = true;
       } else {
+        alert('모든 정보를 입력해 주세요.');
         this.feedback = feedback;
       }
     },
     handleSubmitForm() {
-      // if (this.mode === 'create') {
       this.handleRegistrationPost();
-      // this.reloadPage();
-      // }
-      // if (this.mode === 'edit') {
-      //   this.handleUpdateEnabledPost();
-      // }
     },
     async handleRegistrationPost() {
       this.detailData = { ...this.detailData, additional_info: {}, events: null };
@@ -593,8 +586,7 @@ export default {
     align-items: center;
     justify-content: center;
   }
-  .membership-name,
-  .membership-price {
+  .membership-name {
     display: flex;
     gap: 12px;
     align-items: center;

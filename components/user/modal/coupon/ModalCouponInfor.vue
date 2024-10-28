@@ -15,7 +15,7 @@
           </p>
           <div class="coupon-remaining">
             <div class="status active">
-              <span>사용완</span>
+              <span>사용가능</span>
             </div>
             <div>
               <span>{{ detailCoupon.unused_coupons.length }}</span
