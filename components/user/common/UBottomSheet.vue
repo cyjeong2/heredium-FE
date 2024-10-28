@@ -65,4 +65,23 @@ export default {
 .slide-up-leave-to {
   transform: translateY(100%);
 }
+
+@media screen and (min-width: 769px) {
+  .bottom-sheet {
+    position: fixed;
+    bottom: unset;
+    right: unset;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .bottom-sheet-content {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
 </style>

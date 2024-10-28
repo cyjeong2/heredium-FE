@@ -17,7 +17,7 @@
             <p>최대 1매까지 예매할 수 있습니다</p>
           </div>
 
-          <div class="membership-radio-list membership-radio-list__mobile">
+          <div class="membership-radio-list">
             <MembershipOption
               v-for="membership in postDetail.memberships"
               :key="membership.membership_id"
@@ -27,39 +27,7 @@
             >
             </MembershipOption>
           </div>
-          <div class="membership-radio-list membership-radio-list__desktop">
-            <MembershipOption
-              v-for="membership in postDetail.memberships"
-              :key="membership.membership_id"
-              :model-value="membershipIdSelected"
-              :membership="membership"
-              :change="updateSelection"
-            >
-            </MembershipOption>
-          </div>
-
-          <div class="total-amount">
-            <p>합계</p>
-            <h5>
-              {{ toKoreaCurrency(totalPrice) }}
-            </h5>
-          </div>
-
-          <div class="agreement-list">
-            <UNoticePolicy :model-value="isAgreeNoticePolicy" @update:modelValue="isAgreeNoticePolicy = $event" />
-            <URefundPolicy :model-value="isAgreeRefundPolicy" @update:modelValue="isAgreeRefundPolicy = $event" />
-          </div>
         </div>
-
-        <UButton
-          class="btn-submit"
-          w-size="100"
-          h-size="normal"
-          :disabled="!membershipIdSelected"
-          @click="handleSubmit()"
-        >
-          결제하기
-        </UButton>
       </form>
       <UWarningDialog
         v-if="dialogWarning.open"
@@ -343,8 +311,7 @@ form {
 
 .membership-form-container .total-amount,
 .membership-form-container .agreement-list,
-.membership-form-container .btn-submit,
-.membership-form-container .membership-radio-list__desktop {
+.membership-form-container .btn-submit {
   display: none;
 }
 
@@ -455,13 +422,6 @@ form {
   }
   .contents .btn-submit {
     display: block;
-  }
-
-  .membership-radio-list__desktop {
-    display: flex !important;
-  }
-  .membership-radio-list__mobile {
-    display: none !important;
   }
 }
 </style>
