@@ -287,6 +287,10 @@ h2 {
   margin-right: 20px;
 }
 
+.content-detail {
+  max-width: calc(100dvw - 40px);
+}
+
 form {
   margin-top: 48px;
 }
@@ -303,8 +307,9 @@ form {
 
 .membership-radio-list {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   width: 100%;
   margin-top: 12px;
 }
@@ -361,30 +366,13 @@ form {
   .contents {
     margin: 0 0 8.8rem;
     padding: 0px 38px 12px 38px;
-    column-gap: 20px;
-    /* grid-template-columns: auto minmax(0, clamp(50%, 0%, 600px)); */
-    grid-template-columns: auto 350px;
-    grid-template-areas:
-      'i2 i2'
-      'i1 i4'
-      'i3 i3'
-      'i5 i5';
   }
-  .contents > .banner {
-    grid-area: i1;
+
+  .membership-section-content {
+    margin-left: 0;
+    margin-right: 0;
   }
-  .contents > h1 {
-    grid-area: i2;
-  }
-  .contents > .content-detail {
-    grid-area: i3;
-  }
-  .contents > .membership-form-container {
-    grid-area: i4;
-  }
-  .contents > .note {
-    grid-area: i5;
-  }
+
   .contents h1 {
     font-weight: 700;
     font-size: 4.2rem;
@@ -406,15 +394,20 @@ form {
     align-items: start;
     img {
       width: 100%;
+      min-width: 100%;
       max-width: 720px;
     }
   }
+
   .contents .membership-form-container {
     padding: 0;
     margin: 0;
     form {
       margin-top: 0;
     }
+  }
+  .membership-radio-list {
+    grid-template-columns: 1fr 1fr;
   }
   .contents .total-amount,
   .contents .agreement-list {

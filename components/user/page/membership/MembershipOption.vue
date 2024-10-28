@@ -1,17 +1,21 @@
 <template>
-  <div class="membership-option" :class="{ checked: isChecked }" @click="toggleCheck">
-    <input type="radio" :value="modelValue" :checked="isChecked" class="hidden-radio" />
-    <div class="content">
-      <img :src="membershipImage" />
+  <div class="membership-option">
+    <div class="content" :style="{ backgroundImage: `url(${membershipImage})` }">
+      <p class="membership-name">{{ membership.name }}</p>
+      <b class="membership-price">{{ toKoreaCurrency(membership.price) }}</b>
+      <UButton class="register-membership" w-size="small" h-size="small" @click="toggleCheck">가입하기</UButton>
     </div>
   </div>
 </template>
 
 <script>
+import UButton from '../../common/UButton.vue';
 import { imageMixin } from '~/mixins/imageMixin';
+import { toKoreaCurrency } from '~/assets/js/converter';
 
 export default {
   name: 'MembershipOption',
+  components: { UButton },
   mixins: [imageMixin],
   props: {
     modelValue: {
@@ -30,14 +34,12 @@ export default {
     }
   },
   computed: {
-    isChecked() {
-      return this.modelValue === this.membership?.membership_id;
-    },
     membershipImage() {
       return this.getImage(this.membership?.image_url);
     }
   },
   methods: {
+    toKoreaCurrency,
     toggleCheck() {
       this.change({ ...this.membership });
     }
@@ -49,34 +51,33 @@ export default {
 .membership-option {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   border: none;
   cursor: pointer;
-  background-color: #f7f8f5;
 
-  .hidden-radio {
-    display: none;
-  }
   .content {
     max-width: 100%;
     width: 100%;
-  }
-  img {
-    object-fit: cover;
-    width: 100%;
-    max-width: 100%;
+    height: 169px;
+    max-width: 400px;
     overflow: hidden;
-    height: auto;
-    max-height: 200px;
     border-radius: 8px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    pointer-events: none;
-  }
-}
-@media screen and (min-width: 769px) {
-  .membership-option.checked img {
-    border-color: var(--color-u-primary);
+    padding: 24px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: var(--color-white);
+    .membership-name {
+      font-size: 2rem;
+      line-height: 2.8rem;
+    }
+    .membership-price {
+      font-size: 3.6rem;
+      line-height: 4.8rem;
+    }
+    .register-membership {
+      margin-top: 12px;
+    }
   }
 }
 </style>
