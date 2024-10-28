@@ -2,7 +2,11 @@
   <KeepAlive>
     <div class="center no-coupon">
       <div>
-        <img src="~assets/img/icon/icon_error.svg" />
+        <picture>
+          <source srcset="~/assets/img/mobile/noresult.png" media="(max-width: 768px)" />
+          <source srcset="~/assets/img/pc/noresult.png" media="(min-width: 769px)" />
+          <img src="~/assets/img/mobile/noresult.png" alt="" />
+        </picture>
       </div>
       <div class="content">
         <div class="center">
@@ -21,11 +25,11 @@ export default {
 
 <style lang="scss" scoped>
 .no-coupon {
-  padding: 8.5rem 0;
-  color: var(--color-u-placeholder);
+  padding: 3.5rem 0;
 
   .content {
-    margin-top: 2rem;
+    font-size: 1.6rem;
+    font-weight: 500;
   }
 }
 </style>
