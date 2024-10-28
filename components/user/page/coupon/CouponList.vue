@@ -6,8 +6,8 @@
       </div>
       <div v-else>
         <coupon-card
-          v-for="(item, index) in data"
-          :key="index"
+          v-for="item in data"
+          :key="`coupon-${item.id}-${item.unused_coupons?.length}`"
           class="coupon-card"
           :is-history="isHistory"
           :detail-coupon="item"
