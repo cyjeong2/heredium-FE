@@ -6,7 +6,8 @@ export default {
   },
   data() {
     return {
-      tossPayments: null
+      tossPayments: null,
+      error: null
     };
   },
   methods: {
@@ -105,8 +106,16 @@ export default {
           failUrl: `${window.location.origin}/payment/error`
         })
         .catch((err) => {
-          console.log('🚀 ~ membershipPayment ~ err:', err);
-          this.$router.push('/payment/error');
+          const errorString = String(err);
+          console.log('🚀 ~ membershipPayment ~ errorString:', errorString);
+          switch (errorString) {
+            case 'Error: 결제가 취소되었습니다.':
+              break;
+
+            default:
+              this.$router.push('/payment/error');
+              break;
+          }
         });
     },
     initPayments() {
