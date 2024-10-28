@@ -178,7 +178,18 @@ export default {
         );
         this.result = res;
       } catch (error) {
-        alert(API_ERROR);
+        const errorMessage = error.response.data?.MESSAGE || '';
+        switch (errorMessage) {
+          case 'INVALID_EXCEL_FILE':
+            alert('xlsx 파일을 선택해주세요.');
+            break;
+          case 'INVALID_EXCEL_COLUMNS':
+            alert('업로드된 엑셀 파일의 열이 지정된 템플릿과 일치하지 않습니다.');
+            break;
+          default:
+            alert(API_ERROR);
+            break;
+        }
       }
     }
   }
