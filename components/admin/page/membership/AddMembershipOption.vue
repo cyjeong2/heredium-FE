@@ -24,14 +24,21 @@
         </div>
         <div class="field-group">
           <label> 가격 </label>
-          <SInput
-            v-model="price"
-            is-comma-num
-            w-size="large"
-            text-align="right"
-            :class="{ 'is-error': isSubmitted && !price }"
-            :disabled="disabled"
-          />
+          <s-flex-input-grid>
+            <template #input>
+              <SInput
+                v-model="price"
+                is-comma-num
+                w-size="large"
+                text-align="right"
+                :class="{ 'is-error': isSubmitted && !price }"
+                :disabled="disabled"
+              />
+            </template>
+            <template #content>
+              <div class="currency">원</div>
+            </template>
+          </s-flex-input-grid>
         </div>
       </div>
     </div>
@@ -46,6 +53,7 @@
 
 <script>
 import SButton from '../../commons/SButton.vue';
+import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
 
@@ -54,7 +62,7 @@ const DEFAULT_MEMBERSHIP_PRICE = 0;
 
 export default {
   name: 'AddMembershipOption',
-  components: { SInput, SButton, SImageUploadRepresentative },
+  components: { SInput, SButton, SImageUploadRepresentative, SFlexInputGrid },
   props: {
     disabled: {
       type: Boolean,
@@ -124,7 +132,7 @@ export default {
       label {
         font-weight: bold;
         margin-right: 8px;
-        min-width: 6rem;
+        width: 20%;
       }
       input {
         width: 200px;

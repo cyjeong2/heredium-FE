@@ -1,6 +1,6 @@
 <template>
   <div>
-    <STitle emoji="frame">전시</STitle>
+    <STitle emoji="frame">멤버십</STitle>
     <div class="search mb-28">
       <div class="mb-24">
         <SDropdown v-model="queryOptions.searchDateType" :option-list="dateOptionList" class="mr-16" />
