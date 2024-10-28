@@ -3,8 +3,8 @@
     <SideBarMyPage />
     <section>
       <div class="ticketing-head">
-        <h2 class="only-pc-flex" @click="goBack"><i class="pc uic-arrow_pre" />쿠폰함</h2>
-        <h2 class="only-mobile">Coupon History</h2>
+        <h2 class="only-pc-flex" @click="goBack"><i class="pc uic-arrow_pre" />전체 쿠폰 내역</h2>
+        <h2 class="only-mobile">전체 쿠폰 내역</h2>
       </div>
       <div class="ticketing-body">
         <div class="contents">

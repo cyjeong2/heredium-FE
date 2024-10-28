@@ -9,7 +9,7 @@
         <div class="ticketing-info only-pc-flex">
           <div class="left">
             <i class="pc uic-info" />
-            <p>사용가능 쿠폰 및 지난 1개월 사용한 쿠폰 내역입니다.</p>
+            <p>사용 가능한 쿠폰 리스트입니다.</p>
           </div>
           <NuxtLink :to="'/mypage/purchase/membership/coupon-history'" class="only-pc-flex">
             <span>전체 쿠폰 내역 </span> <i class="pc uic-arrow_next" />
