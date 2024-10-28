@@ -59,10 +59,11 @@ export default {
       const unusedCoupons = this.detailCoupon?.unused_coupons || [];
       for (let index = 0; index < unusedCoupons.length; index++) {
         const coupon = unusedCoupons[index];
-        if (coupon.uuid) {
+        if (coupon && coupon.uuid && !coupon.is_expired) {
           return coupon.uuid;
         }
       }
+      alert('쿠폰이 모두 사용되었습니다.');
       return '';
     }
   },

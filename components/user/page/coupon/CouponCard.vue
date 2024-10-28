@@ -128,6 +128,7 @@ export default {
     },
     handleCloseModal() {
       this.openModalQr = false;
+      this.$emit('refresh-coupon-list');
     },
     checkExpiration() {
       this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);

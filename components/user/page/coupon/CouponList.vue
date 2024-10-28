@@ -15,6 +15,7 @@
           :value="item.id"
           :model-value="selectedCouponId"
           :change="updateSelection"
+          @refresh-coupon-list="handleRefreshCouponList"
         />
       </div>
     </div>
@@ -56,6 +57,9 @@ export default {
   methods: {
     updateSelection(id) {
       this.$emit('toggle-coupon-select', id);
+    },
+    handleRefreshCouponList() {
+      this.$emit('refresh-coupon-list');
     }
   }
 };

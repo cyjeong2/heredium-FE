@@ -29,7 +29,7 @@
               </NuxtLink>
             </div>
             <div class="contents">
-              <CouponList :data="availableCouponsList" />
+              <CouponList :data="availableCouponsList" @refresh-coupon-list="refreshCouponList" />
             </div>
           </div>
         </div>
@@ -79,7 +79,11 @@ export default {
         this.dataMembership = dataMembership;
       } catch (error) {
         // show empty
+        this.dataMembership = null;
       }
+    },
+    refreshCouponList() {
+      this.getCouponList();
     }
   }
 };
