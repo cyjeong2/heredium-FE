@@ -151,16 +151,6 @@ export default {
       return list;
     }
   },
-  watch: {
-    agreement(newValue) {
-      console.log(newValue);
-    }
-  },
-  mounted() {
-    this.checkUserLogin({
-      callbackUrl: this.$route.fullPath
-    });
-  },
   methods: {
     toKoreaCurrency,
     updateSelection(membershipOption) {
@@ -235,8 +225,16 @@ export default {
       this.$router.push('/mypage/purchase/membership');
     },
     openBottomSheet(membershipOption) {
-      this.isShowBottomSheet = true;
       this.updateSelection(membershipOption);
+
+      const isLogged = this.checkUserLogin({
+        callbackUrl: this.$route.fullPath
+      });
+      if (!isLogged) {
+        return null;
+      }
+
+      this.isShowBottomSheet = true;
     }
   }
 };

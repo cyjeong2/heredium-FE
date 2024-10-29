@@ -8,6 +8,7 @@ export const userMixin = {
         } else {
           this.$router.replace(`/auth/login`);
         }
+        return false;
       }
       return true;
     },
