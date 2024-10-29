@@ -76,6 +76,7 @@
                     v-model="couponEditor.number_of_uses"
                     is-comma-num
                     w-size="full"
+                    maxlength="2"
                     :disabled="couponEditor.is_permanent || disabled"
                     :class="{ 'is-error': error?.numberOfUses || feedbackError?.numberOfUses }"
                   />
@@ -97,11 +98,10 @@
         <div class="field-value">
           <s-flex-input-grid>
             <template #input>
-              <SInput
+              <SDiscountInput
                 v-model="couponEditor.discount_percent"
                 :class="{ 'is-error': error?.discountPercent || feedbackError?.discountPercent }"
-                is-comma-num
-                maxlength="2"
+                maxlength="3"
                 w-size="large"
                 :disabled="disabled"
               />
@@ -126,13 +126,23 @@ import SInput from '../../commons/SInput.vue';
 import SDropdown from '../../commons/SDropdown.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
 import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
+import SDiscountInput from '../../commons/SDiscountInput.vue';
 import { COUPON_DEFAULT, COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 import { getErrorCouponEditor } from '~/utils/coupon';
 import { minDate } from '~/assets/js/commons';
 
 export default {
   name: 'CouponEditor',
-  components: { SImageUploadRepresentative, SCheckbox, SInput, SButton, SDropdown, SDatepicker, SFlexInputGrid },
+  components: {
+    SImageUploadRepresentative,
+    SCheckbox,
+    SInput,
+    SButton,
+    SDropdown,
+    SDatepicker,
+    SFlexInputGrid,
+    SDiscountInput
+  },
   props: {
     coupon: {
       type: Object,
