@@ -30,7 +30,6 @@ export default {
 
 <style lang="scss" scoped>
 .box {
-  background: #f3f4f6;
   padding: 1rem 1.6rem 1.6rem;
   & > div {
     height: 100%;

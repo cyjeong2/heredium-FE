@@ -25,7 +25,7 @@ export default {
 
 <style lang="scss" scoped>
 .no-coupon {
-  padding: 3.5rem 0;
+  padding: 1.5rem 0;
 
   .content {
     font-size: 1.6rem;
