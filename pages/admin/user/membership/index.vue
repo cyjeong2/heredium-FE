@@ -35,7 +35,6 @@
               <th>아이디</th>
               <th>이름</th>
               <th>연락처</th>
-              <th>결제상태</th>
               <th>결제일시</th>
               <th>멤버십횟수</th>
               <th>전시사용횟수</th>
@@ -46,7 +45,7 @@
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
-              <td colspan="12"><div>리스트가 없습니다.</div></td>
+              <td colspan="11"><div>리스트가 없습니다.</div></td>
             </tr>
             <tr v-for="(item, index) in data" :key="item.id">
               <td>
@@ -63,9 +62,6 @@
               </td>
               <td>
                 <div>{{ item.phone }}</div>
-              </td>
-              <td>
-                <div>{{ item.payment_status }}</div>
               </td>
               <td>
                 <div>{{ item.payment_date }}</div>
