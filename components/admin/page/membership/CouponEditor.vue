@@ -101,7 +101,7 @@
                 v-model="couponEditor.discount_percent"
                 :class="{ 'is-error': error?.discountPercent || feedbackError?.discountPercent }"
                 is-comma-num
-                maxlength="3"
+                maxlength="2"
                 w-size="large"
                 :disabled="disabled"
               />
