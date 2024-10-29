@@ -12,7 +12,7 @@
           @update-coupon="(e) => handleUpdateCoupon(e)"
         />
         <div class="box-button">
-          <SButton button-type="primary" @click="handleAddCoupon()">검색</SButton>
+          <SButton button-type="primary" @click="handleAddCoupon()">저장</SButton>
           <SButton @click="resetCoupon">초기화</SButton>
         </div>
       </div>
