@@ -103,7 +103,7 @@ export default {
           customerEmail: userInfo.email || '',
           cardInstallmentPlan: 0,
           successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=TOSSPAYMENTS`,
-          failUrl: `${window.location.origin}/payment/error`
+          failUrl: `${window.location.origin}/membership/registration`
         })
         .catch((err) => {
           const errorString = String(err);
