@@ -20,7 +20,7 @@
     </div>
     <div class="top-menus mb-16">
       <SButton class="mr-16" @click="modal.isShowCreateCouponCompany = true">법인회원 등록 </SButton>
-      <SButton class="mr-16" @click="modal.isUploadData = true">업로드하다 </SButton>
+      <SButton class="mr-16" @click="modal.isUploadData = true">법인회원 등록 </SButton>
       <SButton class="mr-16" @click="downloadTemplateExcel">양식 다운로드 </SButton>
       <SButton class="mr-16" @click="downloadExcel">엑셀 다운로드 </SButton>
 
@@ -91,7 +91,7 @@
                 <div>{{ item?.number_of_coupons }}</div>
               </td>
               <td>
-                <div>{{ item?.amount }}</div>
+                <div class="text-right">{{ getThreeCommaNum(item.amount) }}</div>
               </td>
               <td>
                 <div>{{ item?.email }}</div>
@@ -128,6 +128,7 @@ import { TICKET_MEMBERSHIP_STATE_TYPE } from '~/assets/js/types';
 import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
 import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
+import { threeCommaNum } from '~/assets/js/commons';
 
 export default {
   name: 'MembershipTicketPage',
@@ -184,6 +185,9 @@ export default {
     this.fetch();
   },
   methods: {
+    getThreeCommaNum(num) {
+      return threeCommaNum(num);
+    },
     downloadTemplateExcel() {
       const fileName = 'company_upload_membership_template';
 
