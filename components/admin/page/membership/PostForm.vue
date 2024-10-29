@@ -129,7 +129,7 @@
           </div>
         </section>
         <section class="editor mb-16">
-          <h3 class="mb-16">멤버십 컨텐츠<b class="must">*</b></h3>
+          <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
           <div class="editor-wrap" :class="{ 'is-error': feedback?.contentDetail }">
             <SummernoteEditor v-model.trim="detailData.content_detail" />
           </div>

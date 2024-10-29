@@ -5,15 +5,21 @@
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
-      <p v-if="!isHistory" class="date">
-        <img src="~assets/img/icon/icon_calender.svg" />
-        <span>{{
-          getFormattedDate(
-            detailCoupon.unused_coupons[0].delivered_date,
-            detailCoupon.unused_coupons[0].expiration_date
-          )
-        }}</span>
-      </p>
+      <div v-if="!isHistory" class="discount">
+        <div class="date">
+          <img src="~assets/img/icon/icon_discount_tag.svg" />
+          <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
+        </div>
+        <div class="date">
+          <img src="~assets/img/icon/icon_calender.svg" />
+          <span>{{
+            getFormattedDate(
+              detailCoupon.unused_coupons[0].delivered_date,
+              detailCoupon.unused_coupons[0].expiration_date
+            )
+          }}</span>
+        </div>
+      </div>
       <div class="coupon-remaining">
         <div v-if="!isSelection" class="button">
           <UButton
@@ -165,11 +171,17 @@ export default {
       color: var(--color-default);
     }
 
+    .discount {
+      display: flex;
+      column-gap: 12px;
+    }
+
     .date {
       font-size: 1.2rem;
       display: flex;
       align-items: center;
       column-gap: 4px;
+      min-width: 5.2rem;
     }
 
     &.checked {

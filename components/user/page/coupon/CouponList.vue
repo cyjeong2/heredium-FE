@@ -1,9 +1,7 @@
 <template>
   <KeepAlive>
     <div class="center box">
-      <div v-if="data.length === 0">
-        <no-coupon />
-      </div>
+      <div v-if="!data || data?.length === 0"><no-coupon /></div>
       <div v-else>
         <coupon-card
           v-for="item in data"

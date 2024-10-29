@@ -8,7 +8,7 @@
       </div>
       <div class="ticketing-body">
         <div class="contents">
-          <CouponList :data="dataListCoupon" :is-history="true" />
+          <CouponList :data="usedCouponsList" :is-history="true" />
         </div>
       </div>
     </section>
@@ -22,17 +22,26 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 export default {
   name: 'CouponHistory',
   components: { SideBarMyPage, CouponList },
-  async asyncData({ $axios }) {
-    const dataListCoupon = await $axios.$get('/user/coupons/usage');
 
-    return { dataListCoupon };
-  },
   data() {
     return {
-      dataListCoupon: null
+      usedCouponsList: null
     };
   },
+  mounted() {
+    this.getCouponList();
+  },
   methods: {
+    async getCouponList() {
+      try {
+        const dataListCoupon = await this.$axios.$get('/user/coupons/usage');
+        const usedCouponsList = dataListCoupon.filter((item) => item.used_coupons?.length > 0);
+
+        this.usedCouponsList = usedCouponsList;
+      } catch (error) {
+        // show empty coupon
+      }
+    },
     goBack() {
       this.$router.push('/mypage/purchase/membership');
     }

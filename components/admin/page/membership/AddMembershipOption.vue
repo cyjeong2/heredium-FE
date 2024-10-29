@@ -45,7 +45,7 @@
     <div class="create-membership__action">
       <SButton button-type="primary" :disabled="disabled" @click="handleAddMembershipOption">
         <i class="ic-plus mb-28"></i>
-        추가하다
+        추가
       </SButton>
     </div>
   </div>
