@@ -8,7 +8,23 @@
       </div>
       <div class="ticketing-body">
         <div class="contents">
-          <CouponList :data="usedCouponsList" :is-history="true" />
+          <div v-if="!dataListCoupon || dataListCoupon?.length === 0"><no-coupon /></div>
+          <div v-else>
+            <CouponCard
+              v-for="item in availableCouponsList"
+              :key="`coupon-${item.id}-${item.unused_coupons?.length}`"
+              class="coupon-card"
+              :detail-coupon="item"
+              @refresh-coupon-list="refreshCouponList"
+            />
+
+            <CouponCardDisabled
+              v-for="(item, index) in usedCouponsList"
+              :key="index"
+              class="coupon-card"
+              :detail-coupon="item"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -16,15 +32,19 @@
 </template>
 
 <script>
-import CouponList from '~/components/user/page/coupon/CouponList.vue';
+import CouponCard from '~/components/user/page/coupon/CouponCard.vue';
+import CouponCardDisabled from '~/components/user/page/coupon/CouponCardDisabled.vue';
+import NoCoupon from '~/components/user/page/coupon/NoCoupon.vue';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 
 export default {
   name: 'CouponHistory',
-  components: { SideBarMyPage, CouponList },
+  components: { SideBarMyPage, CouponCardDisabled, NoCoupon, CouponCard },
 
   data() {
     return {
+      dataListCoupon: null,
+      availableCouponsList: null,
       usedCouponsList: null
     };
   },
@@ -35,12 +55,25 @@ export default {
     async getCouponList() {
       try {
         const dataListCoupon = await this.$axios.$get('/user/coupons/usage');
-        const usedCouponsList = dataListCoupon.filter((item) => item.used_coupons?.length > 0);
 
+        const usedCouponsList = dataListCoupon.filter((item) => item.used_coupons?.length > 0);
+        const availableCouponsList = dataListCoupon
+          .map((item) => ({
+            ...item,
+            unused_coupons: item.unused_coupons.filter((coupon) => !coupon.is_expired)
+          }))
+          .filter((item) => item.unused_coupons.length > 0);
+
+        this.dataListCoupon = dataListCoupon;
+        this.availableCouponsList = availableCouponsList;
         this.usedCouponsList = usedCouponsList;
+        console.log('availableCouponsList', availableCouponsList);
       } catch (error) {
         // show empty coupon
       }
+    },
+    refreshCouponList() {
+      this.getCouponList();
     },
     goBack() {
       this.$router.push('/mypage/purchase/membership');

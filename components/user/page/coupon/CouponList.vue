@@ -7,7 +7,6 @@
           v-for="item in data"
           :key="`coupon-${item.id}-${item.unused_coupons?.length}`"
           class="coupon-card"
-          :is-history="isHistory"
           :detail-coupon="item"
           :is-selection="isSelection"
           :value="item.id"
@@ -33,11 +32,6 @@ export default {
       required: false,
       default: () => []
     },
-    isHistory: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
     isSelection: {
       type: Boolean,
       required: false,
@@ -52,6 +46,7 @@ export default {
   data() {
     return {};
   },
+
   methods: {
     updateSelection(id) {
       this.$emit('toggle-coupon-select', id);

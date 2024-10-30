@@ -5,7 +5,7 @@
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
-      <div v-if="!isHistory" class="discount">
+      <div class="discount">
         <div class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
@@ -23,24 +23,23 @@
       <div class="coupon-remaining">
         <div v-if="!isSelection" class="button">
           <UButton
-            v-if="!isHistory"
             class="reservation-btn"
             :disabled="isExpired || detailCoupon.unused_coupons.length === 0"
             @click="handleOpenModal"
           >
             QR코드
           </UButton>
-          <UButton v-else class="reservation-btn" disabled> QR코드 </UButton>
         </div>
-        <div v-if="!isHistory && detailCoupon.unused_coupons.length > 0" class="status active">
+        <div v-if="detailCoupon.unused_coupons.length > 0" class="status active">
           <span>사용가능</span>
         </div>
         <div v-else class="status deactive">
           <span>사용완료</span>
         </div>
         <div>
-          <span>{{ detail.length }}</span
-          >회남음
+          <span>{{
+            detailCoupon.unused_coupons[0].is_permanent ? '무제한' : `${detailCoupon.unused_coupons.length}회남음`
+          }}</span>
         </div>
       </div>
       <modal-coupon-infor :detail-coupon="detailCoupon" :open="openModalQr" @close="handleCloseModal" />
@@ -68,11 +67,6 @@ export default {
       required: false,
       default: () => {}
     },
-    isHistory: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
     isSelection: {
       type: Boolean,
       required: false,
@@ -80,7 +74,8 @@ export default {
     },
     value: {
       type: [String, Number],
-      required: true
+      required: false,
+      default: ''
     },
     change: {
       type: Function,
@@ -96,8 +91,7 @@ export default {
   data() {
     return {
       openModalQr: false,
-      isExpired: false,
-      detail: {}
+      isExpired: false
     };
   },
   computed: {
@@ -110,12 +104,6 @@ export default {
   },
   created() {
     this.checkExpiration();
-
-    if (this.isHistory) {
-      this.detail = this.detailCoupon.used_coupons;
-    } else {
-      this.detail = this.detailCoupon.unused_coupons;
-    }
   },
   methods: {
     toggleCheck() {

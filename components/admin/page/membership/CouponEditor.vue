@@ -87,7 +87,7 @@
             <template #content>
               <div>
                 <SCheckbox v-model="couponEditor.is_permanent" :disabled="disabled" />
-                <p>Permanent discount</p>
+                <p>상시할인</p>
               </div></template
             >
           </s-flex-input-grid>

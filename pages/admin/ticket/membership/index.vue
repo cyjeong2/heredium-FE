@@ -19,8 +19,8 @@
       </div>
     </div>
     <div class="top-menus mb-16">
-      <SButton class="mr-16" @click="modal.isShowCreateCouponCompany = true">법인회원 등록 </SButton>
-      <SButton class="mr-16" @click="modal.isUploadData = true">법인회원 등록 </SButton>
+      <SButton class="mr-16" @click="modal.isShowCreateCouponCompany = true">법인 항목 추가</SButton>
+      <SButton class="mr-16" @click="modal.isUploadData = true">엑셀 파일 업로드</SButton>
       <SButton class="mr-16" @click="downloadTemplateExcel">양식 다운로드 </SButton>
       <SButton class="mr-16" @click="downloadExcel">엑셀 다운로드 </SButton>
 
