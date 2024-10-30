@@ -11,7 +11,7 @@
     <div class="membership-section-content membership-form-container">
       <form>
         <div class="membership-form-content">
-          <h3>멤버십 종류 선택</h3>
+          <h1>멤버십 종류 선택</h1>
           <div class="warning-box">
             <img src="~assets/img/emoji/emoji_information.svg" alt="note" width="20px" height="20px" />
             <p>최대 1매까지 예매할 수 있습니다</p>
@@ -243,14 +243,14 @@ export default {
 <style lang="css" scoped>
 .contents {
   display: grid;
-  row-gap: 48px;
+  row-gap: 40px;
   grid-template-columns: 1fr;
   padding: 0 !important;
 }
 h1 {
-  font-size: 2.4rem;
+  font-size: 2.8rem;
   font-weight: 700;
-  line-height: 3.2rem;
+  line-height: 100%;
   border-bottom: 1px solid var(--color-default);
   padding-bottom: 20px;
   color: var(--color-default);
@@ -286,14 +286,11 @@ h2 {
 }
 
 .content-detail {
-  max-width: calc(100dvw - 40px);
+  max-width: 100%;
 }
 
-form {
-  margin-top: 48px;
-}
 .warning-box {
-  margin-top: 24px;
+  margin-top: 20px;
   display: flex;
   justify-content: start;
   gap: 0.8rem;
