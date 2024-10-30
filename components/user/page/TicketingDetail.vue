@@ -411,9 +411,15 @@ export default {
       }
       return sumPrice;
     },
-    isFree() {
-      return this.detailData.prices.filter((item) => item.count > 0).reduce((cur, pre) => cur + pre.price, 0) === 0;
-    },
+    // isFree() {
+    //   const purchaseItem = this.detailData.prices.filter((item) => item.count > 0);
+    //   const countPurchaseItem = purchaseItem?.length || 0;
+    //   const isDiscountFullPrice = this.coupon && this.coupon.discount_percent === 100;
+    //   if (isDiscountFullPrice && countPurchaseItem === 1) {
+    //     return true;
+    //   }
+    //   return purchaseItem.reduce((cur, pre) => cur + pre.price, 0) === 0;
+    // },
     isEmptyDates() {
       return isEmpty(this.detailData.dates);
     },
@@ -546,7 +552,7 @@ export default {
     async goPaymentProcess() {
       if (this.isValidate()) {
         const isLogged = !!this.$store.getters['service/auth/getAccessToken'];
-        const isFree = this.isFree;
+        const isFree = this.paymentPrice === 0;
         const roundId = this.selectedRound;
         const priceList = this.detailData.prices
           .filter((item) => item.count > 0)
@@ -561,7 +567,8 @@ export default {
           if (isFree) {
             await this.$axios
               .$post('/user/tickets/user/free', {
-                ticketOrderInfo
+                ticketOrderInfo,
+                couponUuid: this.coupon?.uuid || null
               })
               .then((res) => {
                 this.$router.push({
@@ -641,7 +648,7 @@ export default {
       }
     },
     async nonMemberPayment() {
-      const isFree = this.isFree;
+      const isFree = this.paymentPrice === 0;
       const roundId = this.selectedRound;
       const priceList = this.detailData.prices
         .filter((item) => item.count > 0)
