@@ -341,7 +341,7 @@ export const MEMBERSHIP_DEFAULT = {
   name: '',
   price: 0,
   image_url: '',
-  checked: false,
+  is_enabled: true,
   coupons: [{ ...COUPON_DEFAULT }]
 };
 

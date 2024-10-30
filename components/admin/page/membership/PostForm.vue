@@ -81,7 +81,7 @@
               <!-- BODY -->
               <template v-for="(membership, membershipIndex) in detailData.memberships">
                 <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body">
-                  <SCheckbox v-model="membership.checked" />
+                  <SCheckbox v-model="membership.is_enabled" />
                 </div>
                 <div :key="`membership_${membershipIndex}_name_edit`" class="grid-table-body membership-name">
                   <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
