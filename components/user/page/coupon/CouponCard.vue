@@ -38,7 +38,7 @@
         </div>
         <div>
           <span>{{
-            detailCoupon.unused_coupons[0].is_permanent ? '무제한' : `${detailCoupon.unused_coupons.length}회남음`
+            detailCoupon.unused_coupons[0].is_permanent ? '상시할인' : `${detailCoupon.unused_coupons.length}회남음`
           }}</span>
         </div>
       </div>
