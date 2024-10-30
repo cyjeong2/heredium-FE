@@ -1,5 +1,5 @@
 <template>
-  <section v-if="isDataReady && !!postDetail" class="contents">
+  <section v-if="isDataReady && !!postDetail" class="contents container">
     <section class="banner">
       <img :src="postImageDetail" alt="Heredium membership image" />
     </section>
@@ -63,7 +63,7 @@
       </UButton>
     </UBottomSheet>
   </section>
-  <section v-else>
+  <section v-else class="container">
     <MembershipRegistrationUnavailable />
   </section>
 </template>
@@ -242,10 +242,10 @@ export default {
 
 <style lang="css" scoped>
 .contents {
-  margin: 0 0 4rem;
   display: grid;
   row-gap: 48px;
   grid-template-columns: 1fr;
+  padding: 0 !important;
 }
 h1 {
   font-size: 2.4rem;
@@ -362,13 +362,13 @@ form {
 
 @media screen and (min-width: 769px) {
   .contents {
-    margin: 0 0 8.8rem;
-    padding: 0px 38px 12px 38px;
+    /* margin: 0 0 8.8rem; */
+    padding: unset;
   }
 
   .membership-section-content {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: 20px;
+    margin-right: 20px;
   }
 
   .contents h1 {
@@ -399,7 +399,6 @@ form {
 
   .contents .membership-form-container {
     padding: 0;
-    margin: 0;
     form {
       margin-top: 0;
     }
