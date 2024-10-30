@@ -270,7 +270,7 @@ h2 {
 }
 
 .banner {
-  margin: 48px 20px 0 20px;
+  padding: 48px 20px 0 20px;
   display: flex;
   justify-content: center;
 }
