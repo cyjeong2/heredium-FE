@@ -63,7 +63,8 @@ export default {
     img {
       width: 310px;
       height: 630px;
-      object-fit: 'cover';
+      object-fit: cover;
+      border-radius: 4px;
     }
   }
 }

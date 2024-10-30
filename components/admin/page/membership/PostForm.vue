@@ -285,8 +285,8 @@ export default {
     },
 
     updateNoteImage(e) {
-      this.detailData.note_image.note_image_url = e.savedFileName;
-      this.detailData.note_image.original_file_name = e.originalFileName;
+      this.detailData.note_image.note_image_url = e.savedFileName || '';
+      this.detailData.note_image.original_file_name = e.originalFileName || '';
     },
 
     removeNoteImage() {

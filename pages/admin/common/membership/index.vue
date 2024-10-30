@@ -53,6 +53,7 @@ export default {
           };
         });
         transformData.memberships = memberships;
+        transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
         this.initFormData = data;
         this.mode = 'edit';
       } catch (error) {
