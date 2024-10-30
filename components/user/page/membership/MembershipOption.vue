@@ -1,10 +1,10 @@
 <template>
   <div class="membership-option">
-    <div class="content" :style="{ backgroundImage: `url(${membershipImage})` }">
-      <p class="membership-name">{{ membership.name }}</p>
-      <b class="membership-price">{{ toKoreaCurrency(membership.price) }}</b>
-      <UButton class="register-membership" w-size="small" h-size="small" @click="toggleCheck">가입하기</UButton>
+    <div class="image-box">
+      <img :src="membershipImage" :alt="`${membership.name}-membership-image`" />
     </div>
+
+    <UButton class="register-membership" w-size="full" h-size="small" @click="toggleCheck">가입하기</UButton>
   </div>
 </template>
 
@@ -49,34 +49,21 @@ export default {
 
 <style scoped lang="scss">
 .membership-option {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border: none;
-  cursor: pointer;
-
-  .content {
-    max-width: 100%;
-    width: 100%;
-    height: 169px;
-    max-width: 400px;
-    overflow: hidden;
+  background-color: transparent;
+  width: 350px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  .image-box {
+    padding: 20px;
     border-radius: 8px;
-    padding: 24px;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    color: var(--color-white);
-    .membership-name {
-      font-size: 2rem;
-      line-height: 2.8rem;
-    }
-    .membership-price {
-      font-size: 3.6rem;
-      line-height: 4.8rem;
-    }
-    .register-membership {
-      margin-top: 12px;
+    border: 1px solid var(--color-u-grey-1);
+    box-shadow: 0 0.7rem 1rem rgba(0, 0, 0, 0.06);
+    img {
+      width: 310px;
+      height: 630px;
+      object-fit: 'cover';
     }
   }
 }

@@ -270,7 +270,7 @@ h2 {
 }
 
 .banner {
-  width: 100dvw;
+  margin: 48px 20px 0 20px;
   display: flex;
   justify-content: center;
 }
@@ -301,12 +301,15 @@ h2 {
 }
 
 .membership-radio-list {
-  display: flex;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1rem;
+  column-gap: 1rem;
+  row-gap: 3rem;
   width: 100%;
   margin-top: 12px;
+}
+.membership-radio-list > div {
+  margin: auto;
 }
 
 .membership-form-container .total-amount,
