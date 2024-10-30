@@ -26,7 +26,7 @@
       </div>
     </template>
     <template #modal-btn1>
-      <SButton button-type="primary" @click="handleCreateCouponCompany">취소</SButton>
+      <SButton button-type="primary" @click="handleCreateCouponCompany">확인</SButton>
     </template>
   </SModal>
 </template>

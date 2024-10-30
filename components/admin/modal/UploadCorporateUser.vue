@@ -55,7 +55,7 @@
         </div>
       </template>
       <template v-if="!result" #modal-btn1>
-        <SButton button-type="primary" @click="handleSubmit">취소</SButton>
+        <SButton button-type="primary" @click="handleSubmit">확인</SButton>
       </template>
     </SModal>
     <SDialogModal :is-show="isFileError" @close="isFileError = false">
