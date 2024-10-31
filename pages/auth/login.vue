@@ -306,7 +306,7 @@ export default {
             this.$store.commit('service/auth/setAccessToken', token);
             const userInfo = await this.$axios.$get('/user/account/info').catch(() => {});
             this.$store.commit('service/auth/setUserInfo', userInfo);
-            console.log(this.redirectPage);
+            // console.log(this.redirectPage);
             let redirectTo = '/';
             if (this.redirectPage) {
               redirectTo = this.redirectPage;

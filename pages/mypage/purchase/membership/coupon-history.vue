@@ -67,7 +67,7 @@ export default {
         this.dataListCoupon = dataListCoupon;
         this.availableCouponsList = availableCouponsList;
         this.usedCouponsList = usedCouponsList;
-        console.log('availableCouponsList', availableCouponsList);
+        // console.log('availableCouponsList', availableCouponsList);
       } catch (error) {
         // show empty coupon
       }

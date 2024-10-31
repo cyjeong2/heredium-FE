@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h5>{{ $route.query?.['payment-type'] || 'TOSSPAYMENTS' }}</h5>
-    <p>{{ JSON.stringify($route.query) }}</p>
+    <!-- <h5>{{ $route.query?.['payment-type'] || 'TOSSPAYMENTS' }}</h5>
+    <p>{{ JSON.stringify($route.query) }}</p> -->
   </div>
 </template>
 
@@ -36,8 +36,8 @@ export default {
   created() {},
   mounted() {
     const paymentMethod = this.$route.query?.['payment-type'] || 'TOSSPAYMENTS';
-    console.log('🚀 ~ mounted ~ paymentMethod:', this.$route.query);
-    console.log('🚀 ~ mounted ~ paymentMethod:', paymentMethod);
+    // console.log('🚀 ~ mounted ~ paymentMethod:', this.$route.query);
+    // console.log('🚀 ~ mounted ~ paymentMethod:', paymentMethod);
     switch (paymentMethod) {
       case 'TOSSPAYMENTS':
         this.handleConfirmPaymentViaTossPay();
@@ -59,7 +59,7 @@ export default {
         this.$router.push(`/payment/error`);
         return null;
       }
-      console.log('fghjk', this.paymentData);
+      // console.log('fghjk', this.paymentData);
       if (Number(this.paymentData?.authResultCode) === '0000') {
         this.$router.push(`/payment/error?error=${this.paymentData?.authResultMsg}`);
         return null;
@@ -74,7 +74,7 @@ export default {
     handleConfirmPaymentViaTossPay() {
       const { orderId, paymentKey, amount } = this.$route.query;
       if (!orderId || !paymentKey || !amount) {
-        console.log('🚀 ~ handleConfirmPaymentViaTossPay ~ !orderId || !payment:', orderId, paymentKey, amount);
+        // console.log('🚀 ~ handleConfirmPaymentViaTossPay ~ !orderId || !payment:', orderId, paymentKey, amount);
         this.$router.push(`/payment/error?error=잘못 된 접근 입니다.`);
         return null;
       }
@@ -95,7 +95,7 @@ export default {
         })
         .catch((err) => {
           const errorMessage = err.response.data?.MESSAGE || '';
-          console.log('🚀 ~ fnSuccess ~ errorMessage 118:', errorMessage);
+          // console.log('🚀 ~ fnSuccess ~ errorMessage 118:', errorMessage);
           this.$router.push(`/payment/error?error=${errorMessage}`);
         });
     }
