@@ -157,3 +157,15 @@ export const dashboardCountToList = (countData) => {
 
   return countList;
 };
+
+export function toKoreaCurrency(amount) {
+  try {
+    if (amount === undefined || amount === null || amount === '') {
+      return '';
+    }
+    const amountNumber = parseInt(amount, 10);
+    return `${amountNumber.toLocaleString('en-US')}원`;
+  } catch (error) {
+    return '';
+  }
+}

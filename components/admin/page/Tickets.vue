@@ -15,6 +15,7 @@
       <div class="mb-24">
         <label>상태</label>
         <SCheckboxGroup v-model="queryOptions.state" :group-list="stateList">예정</SCheckboxGroup>
+        <SCheckbox v-model="queryOptions.hasMembership">멤버십</SCheckbox>
       </div>
       <div>
         <SSearchBar v-model="queryOptions.text" @search="onSearch()" />
@@ -58,6 +59,7 @@
               <th v-if="pageType !== 'invitation'">회차</th>
               <th>구매 수</th>
               <th v-if="pageType !== 'group' && pageType !== 'invitation'">금액</th>
+              <th>멤버십</th>
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
@@ -73,14 +75,14 @@
               <td
                 :colspan="
                   pageType === 'all'
-                    ? '15'
+                    ? '16'
                     : pageType === 'exhibition'
-                    ? '13'
-                    : pageType === 'group'
-                    ? '11'
-                    : pageType === 'coffee'
                     ? '14'
-                    : '9'
+                    : pageType === 'group'
+                    ? '12'
+                    : pageType === 'coffee'
+                    ? '15'
+                    : '10'
                 "
               >
                 <div>리스트가 없습니다.</div>
@@ -124,6 +126,9 @@
               </td>
               <td v-if="pageType !== 'group' && pageType !== 'invitation'">
                 <div class="text-right">{{ getThreeCommaNum(item.price) }}</div>
+              </td>
+              <td>
+                <div>{{ item.membershipRegistrationInfo?.name || '-' }}</div>
               </td>
               <td>
                 <div>{{ item.email || '-' }}</div>
@@ -313,6 +318,7 @@ export default {
         this.queryOptions.startDate = '';
         this.queryOptions.endDate = '';
         this.queryOptions.state = [];
+        this.queryOptions.hasMembership = false;
         this.queryOptions.text = '';
         if (this.pageType === 'all') {
           this.queryOptions.type = null;
@@ -457,7 +463,7 @@ export default {
         width: 26rem;
       }
       &:nth-of-type(8) {
-        width: 10rem;
+        width: 26rem;
       }
       &:nth-of-type(9) {
         width: 14rem;
@@ -469,6 +475,9 @@ export default {
         width: 18rem;
       }
       &:nth-of-type(12) {
+        width: 18rem;
+      }
+      &:nth-of-type(13) {
         width: 45rem;
       }
       &:last-of-type {
@@ -482,7 +491,7 @@ export default {
         width: 4%;
       }
       &:nth-of-type(2) {
-        width: 4%;
+        width: 6%;
       }
       &:nth-of-type(3) {
         width: 20%;
@@ -491,56 +500,62 @@ export default {
         width: 10%;
       }
       &:nth-of-type(5) {
-        width: 5%;
+        width: 8%;
       }
       &:nth-of-type(6) {
-        width: 13%;
+        width: 20%;
       }
       &:nth-of-type(7) {
-        width: 9%;
+        width: 17%;
       }
       &:nth-of-type(8) {
         width: 9%;
       }
       &:nth-of-type(9) {
-        width: 8%;
+        width: 10%;
       }
       &:nth-of-type(10) {
+        width: 8%;
+      }
+      &:nth-of-type(11) {
         width: 12%;
       }
       &:last-of-type {
-        width: 7%;
+        width: 10%;
       }
     }
   }
   &.invitation {
     th {
       &:first-of-type {
-        width: 4%;
+        width: 5%;
       }
       &:nth-of-type(2) {
         width: 30%;
       }
       &:nth-of-type(3) {
-        width: 5%;
+        width: 6%;
       }
       &:nth-of-type(4) {
-        width: 17%;
+        width: 20%;
       }
       &:nth-of-type(5) {
-        width: 9%;
+        width: 20%;
       }
       &:nth-of-type(6) {
         width: 9%;
       }
       &:nth-of-type(7) {
-        width: 7%;
+        width: 12%;
       }
       &:nth-of-type(8) {
         width: 12%;
       }
+      &:nth-of-type(9) {
+        width: 12%;
+      }
       &:last-of-type {
-        width: 7%;
+        width: 12%;
       }
     }
   }
@@ -581,6 +596,9 @@ export default {
       }
       &:nth-of-type(12) {
         width: 7%;
+      }
+      &:nth-of-type(13) {
+        width: 7.5%;
       }
       &:nth-of-type(13) {
         width: 7.5%;
@@ -628,6 +646,9 @@ export default {
       width: 18rem;
     }
     &:nth-of-type(14) {
+      width: 18rem;
+    }
+    &:nth-of-type(15) {
       width: 45rem;
     }
     &:last-of-type {

@@ -150,3 +150,5 @@ export const getDateCommonDateOutput = (startDate, endDate) => {
 
   return returnFormat;
 };
+
+export const minDate = new Date().toISOString().slice(0, 10);

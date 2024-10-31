@@ -34,7 +34,6 @@ export default {
   },
   methods: {
     btnHandler(e, item) {
-      console.log(item.value);
       this.$emit('input', item.value);
     }
   }

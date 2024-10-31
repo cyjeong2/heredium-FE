@@ -7,6 +7,7 @@
           <h2>구매내역</h2>
           <NuxtLink to="/mypage/purchase/all" class="tab">전시·프로그램</NuxtLink>
           <NuxtLink to="/mypage/purchase/coffee" class="tab">커피</NuxtLink>
+          <NuxtLink to="/mypage/purchase/membership" class="tab">멤버십·쿠폰함</NuxtLink>
           <NuxtLink to="/mypage/info" class="big-tab">내 정보 수정</NuxtLink>
         </div>
       </section>
@@ -320,7 +321,7 @@ ${userName}님께서 ${targetName} 티켓을 선물하셨습니다.
       });
     },
     getTicketDateFormat(startDate) {
-      const targetDate = this.$dayjs(startDate).format('YYYY.MM.DD');
+      const targetDate = this.$dayjs(startDate).format('YYYY-MM-DD');
       const weekOfDay = dayOfWeekNumberToKoName(this.$dayjs(startDate).day());
       const startTime = this.$dayjs(startDate).format('HH:mm');
 

@@ -89,7 +89,7 @@ export default {
       width: 14.4,
       isDatePickerShow: false,
       masks: {
-        title: 'YYYY.MM'
+        title: 'YYYY-MM'
       }
     };
   },
@@ -105,6 +105,9 @@ export default {
         break;
       case 'x-large':
         width = 21.8;
+        break;
+      case 'xx-large':
+        width = 28;
         break;
       default:
         width = 14.4;

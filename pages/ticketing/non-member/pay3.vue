@@ -81,6 +81,7 @@
 import UInput from '~/components/user/common/UInput';
 import UButton from '~/components/user/common/UButton';
 import payMixin from '~/store/tosspaymentsMixin';
+// import payMixin from '~/store/nicepayMixin';
 import UDialogModal from '~/components/user/modal/UDialogModal.vue';
 
 export default {

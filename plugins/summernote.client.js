@@ -78,7 +78,25 @@ Vue.component('SummerEditor', {
         ['view', ['fullscreen', 'codeview', 'help']]
       ],
       callbacks: {
-        onInit: this.onInit,
+        onInit: () => {
+          this.onInit();
+
+          // Override alignCenter button behavior
+          const alignCenterIcon = document.querySelector('.note-icon-align-center');
+          const alignCenterButton = alignCenterIcon ? alignCenterIcon.parentElement : null;
+          if (alignCenterButton) {
+            alignCenterButton.addEventListener('click', () => {
+              // Get the selected content in the editor
+              const selectedElement = this.summerNote.summernote('createRange').sc;
+              if (selectedElement) {
+                // Apply custom alignment CSS to the selected content
+                selectedElement.style.display = 'flex';
+                selectedElement.style.justifyContent = 'center';
+                selectedElement.style.width = '100%';
+              }
+            });
+          }
+        },
         onChange: this.onChange,
         onImageUpload: this.onImageUpload,
         onImageUploadError: this.onImageUploadError,

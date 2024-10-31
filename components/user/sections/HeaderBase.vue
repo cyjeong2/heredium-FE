@@ -96,6 +96,9 @@
           </div>
         </div>
         <div class="depth-nav">
+          <NuxtLink to="/membership/registration" @click.native="menuOff">Membership</NuxtLink>
+        </div>
+        <div class="depth-nav">
           <NuxtLink v-slot="{ isActive, href, navigate }" to="/coffee" custom @click.native="menuOff">
             <a :class="{ 'nuxt-link-active': isActive }" @click="clearAndGo(navigate, href)">
               <img src="~assets/img/coffee_calligraphy_m.svg" alt="" />
@@ -195,6 +198,9 @@
                 </li>
               </ul>
             </div>
+          </li>
+          <li>
+            <NuxtLink to="/membership/registration" @click.native="pcMenuTop">Membership</NuxtLink>
           </li>
           <li>
             <NuxtLink to="/coffee" @click.native="pcMenuTop">

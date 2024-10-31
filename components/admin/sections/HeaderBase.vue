@@ -7,10 +7,10 @@
       <div class="profile-area">
         <div class="profile-info">
           <h4>
-            안녕하세요, <span>{{ adminInfo.name }}</span
+            안녕하세요, <span>{{ adminInfo?.name }}</span
             >님!
           </h4>
-          <p class="nt-5">{{ adminInfo.email }}</p>
+          <p class="nt-5">{{ adminInfo?.email }}</p>
         </div>
       </div>
     </div>
@@ -34,6 +34,9 @@
             </NuxtLink>
             <NuxtLink to="/admin/common/program">
               <span class="bt-1r">프로그램</span>
+            </NuxtLink>
+            <NuxtLink to="/admin/common/membership">
+              <span class="bt-1r">멤버십</span>
             </NuxtLink>
             <NuxtLink to="/admin/common/holiday">
               <span class="bt-1r">휴무일 설정</span>
@@ -66,6 +69,9 @@
               <NuxtLink to="/admin/ticket/tickets/invitation">
                 <span class="bt-1r">초대권</span>
               </NuxtLink>
+              <NuxtLink to="/admin/ticket/membership">
+                <span class="bt-1r">멤버십</span>
+              </NuxtLink>
             </template>
             <template v-if="isShowByAuthLevel(['ADMIN', 'SUPERVISOR'])">
               <NuxtLink to="/admin/ticket/group-view">
@@ -73,6 +79,9 @@
               </NuxtLink>
               <NuxtLink to="/admin/ticket/invitation">
                 <span class="bt-1r">초대권 발급</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/ticket/coupon">
+                <span class="bt-1r">쿠폰 발급</span>
               </NuxtLink>
             </template>
           </div>
@@ -145,6 +154,9 @@
           <div v-if="depthNavState.user" class="depth-menu">
             <NuxtLink to="/admin/user/common">
               <span class="bt-1r">계정리스트</span>
+            </NuxtLink>
+            <NuxtLink to="/admin/user/membership">
+              <span class="bt-1r">멤버십</span>
             </NuxtLink>
             <NuxtLink to="/admin/user/hana">
               <span class="bt-1r">하나1Q 계정 리스트</span>
@@ -253,7 +265,7 @@ export default {
       this.$router.push('/admin/login');
     },
     isShowByAuthLevel(allowAuthTypes) {
-      return allowAuthTypes.includes(this.adminInfo.auth);
+      return allowAuthTypes.includes(this.adminInfo?.auth);
     }
   }
 };

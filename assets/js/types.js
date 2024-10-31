@@ -79,6 +79,12 @@ export const TICKET_STATE_TYPE = Object.freeze({
   EXPIRED: '기간 만료'
 });
 
+export const TICKET_MEMBERSHIP_STATE_TYPE = Object.freeze({
+  COMPLETED: '결제 완료',
+  REFUND: '회원 환불',
+  EXPIRED: '기간 만료'
+});
+
 export const TICKET_TYPE = Object.freeze({
   NORMAL: '입장권',
   GROUP: '단체 입장권',
@@ -279,4 +285,67 @@ export const ADMIN_DETAIL = {
   password: '',
   phone: '',
   auth: 'SUPERVISOR'
+};
+
+export const EVENT_DEFAULT = {
+  eventType: 'ongoing_exhibition_count',
+  quantity: 0
+};
+
+export const COUPON_TYPE = {
+  COFFEE: 'COFFEE',
+  ARTSHOP: 'ARTSHOP',
+  PROGRAM: 'PROGRAM',
+  EXHIBITION: 'EXHIBITION'
+};
+
+export const COUPON_TYPE_OPTION_LIST = [
+  { value: COUPON_TYPE.COFFEE, label: '커피' },
+  { value: COUPON_TYPE.ARTSHOP, label: '아트숍' },
+  { value: COUPON_TYPE.PROGRAM, label: '프로그램' },
+  { value: COUPON_TYPE.EXHIBITION, label: '전시' }
+];
+
+export const POST_DETAIL = {
+  name: '',
+  memberships: [],
+  note_image: {
+    note_image_url: '',
+    original_file_name: ''
+  },
+  is_enabled: true,
+  content_detail: '',
+  thumbnail_urls: {
+    small: '',
+    medium: '',
+    large: ''
+  },
+  end_date: '',
+  start_date: '',
+  events: [{ ...EVENT_DEFAULT }]
+};
+
+export const COUPON_DEFAULT = {
+  name: '',
+  coupon_type: COUPON_TYPE.COFFEE,
+  discount_percent: '',
+  period_in_days: 0,
+  image_url: '',
+  number_of_uses: 1,
+  is_permanent: false,
+  start_date: '',
+  end_date: ''
+};
+
+export const MEMBERSHIP_DEFAULT = {
+  name: '',
+  price: 0,
+  image_url: '',
+  is_enabled: true,
+  coupons: [{ ...COUPON_DEFAULT }]
+};
+
+export const CONTENT_TAG = {
+  complete: '완전한',
+  'on-going': '일어나고있다'
 };

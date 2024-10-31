@@ -73,7 +73,7 @@ export default {
         }
       ],
       masks: {
-        title: 'YYYY.MM'
+        title: 'YYYY-MM'
       },
       fromPage: {
         month: '',

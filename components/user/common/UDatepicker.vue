@@ -88,7 +88,7 @@ export default {
       width: 14.4,
       isDatePickerShow: false,
       masks: {
-        title: 'YYYY.MM'
+        title: 'YYYY-MM'
       }
     };
   },

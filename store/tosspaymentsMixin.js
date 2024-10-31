@@ -6,7 +6,8 @@ export default {
   },
   data() {
     return {
-      tossPayments: null
+      tossPayments: null,
+      error: null
     };
   },
   methods: {
@@ -81,6 +82,39 @@ export default {
         .catch((error) => {
           if (error.code === 'USER_CANCEL') {
             // 결제 고객이 결제창을 닫았을 때 에러 처리
+          }
+        });
+    },
+    async membershipPayment(uuid, amount) {
+      this.initPayments();
+      const invalidPaymentData = !uuid || !amount || !this.tossPayments;
+      if (invalidPaymentData) {
+        alert('결제 오류');
+        return;
+      }
+
+      const userInfo = this.$store.getters['service/auth/getUserInfo'];
+      await this.tossPayments
+        .requestPayment('카드', {
+          amount,
+          orderId: uuid,
+          orderName: 'Payment for register membership',
+          customerName: userInfo.name || '',
+          customerEmail: userInfo.email || '',
+          cardInstallmentPlan: 0,
+          successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=TOSSPAYMENTS`,
+          failUrl: `${window.location.origin}/membership/registration`
+        })
+        .catch((err) => {
+          const errorString = String(err);
+          console.log('🚀 ~ membershipPayment ~ errorString:', errorString);
+          switch (errorString) {
+            case 'Error: 결제가 취소되었습니다.':
+              break;
+
+            default:
+              this.$router.push('/payment/error');
+              break;
           }
         });
     },
