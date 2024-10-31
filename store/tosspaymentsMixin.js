@@ -94,6 +94,16 @@ export default {
       }
 
       const userInfo = this.$store.getters['service/auth/getUserInfo'];
+
+      let payType = 'TOSSPAYMENTS';
+      if (this.$store.state.deviceInfo.isApp) {
+        if (this.$store.state.deviceInfo.isIOS) {
+          payType = 'TOSSPAYMENTS_IOS';
+        } else if (this.$store.state.deviceInfo.isAndroid) {
+          payType = 'TOSSPAYMENTS_ANDROID';
+        }
+      }
+
       await this.tossPayments
         .requestPayment('카드', {
           amount,
@@ -102,7 +112,7 @@ export default {
           customerName: userInfo.name || '',
           customerEmail: userInfo.email || '',
           cardInstallmentPlan: 0,
-          successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=TOSSPAYMENTS`,
+          successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=${payType}`,
           failUrl: `${window.location.origin}/membership/registration`
         })
         .catch((err) => {

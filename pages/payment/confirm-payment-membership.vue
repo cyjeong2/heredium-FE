@@ -37,6 +37,12 @@ export default {
       case 'TOSSPAYMENTS':
         this.handleConfirmPaymentViaTossPay();
         break;
+      case 'TOSSPAYMENTS_IOS':
+        this.handleConfirmPaymentViaTossPay();
+        break;
+      case 'TOSSPAYMENTS_ANDROID':
+        this.handleConfirmPaymentViaTossPay();
+        break;
       case 'NICEPAYMENTS':
         this.handleConfirmPaymentViaNicePay();
         break;
