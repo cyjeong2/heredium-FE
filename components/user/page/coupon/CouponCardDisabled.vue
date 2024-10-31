@@ -24,11 +24,6 @@
         <div class="status deactive">
           <span>사용완료</span>
         </div>
-        <div>
-          <span>{{
-            detailCoupon.used_coupons[0].is_permanent ? '무제한' : `${detailCoupon.used_coupons.length}회남음`
-          }}</span>
-        </div>
       </div>
     </div>
   </div>
