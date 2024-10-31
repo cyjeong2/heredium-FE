@@ -16,7 +16,7 @@ export default {
   asyncData({ req }) {
     const encodeData = req.body.EncodeData;
     const email = req.body.email;
-    console.log(req.body);
+    // console.log(req.body);
     return { encodeData, email };
   },
   data() {

@@ -97,8 +97,8 @@ export default {
 
       const userInfo = this.$store.getters['service/auth/getUserInfo'];
 
-      console.log('this.deviceInfo', this.$store.state.deviceInfo);
-      console.log('this.payType', this.payType);
+      // console.log('this.deviceInfo', this.$store.state.deviceInfo);
+      // console.log('this.payType', this.payType);
       this.urlSuccess = `${window.location.origin}/payment/confirm-payment-membership?payment-type=${this.payType}`;
       await this.tossPayments
         .requestPayment('카드', {
@@ -113,7 +113,7 @@ export default {
         })
         .catch((err) => {
           const errorString = String(err);
-          console.log('🚀 ~ membershipPayment ~ errorString:', errorString);
+          // console.log('🚀 ~ membershipPayment ~ errorString:', errorString);
           switch (errorString) {
             case 'Error: 결제가 취소되었습니다.':
               break;
