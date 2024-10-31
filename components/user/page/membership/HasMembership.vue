@@ -10,7 +10,7 @@
           <p>유효기간: {{ getFormattedDate(dataMerbership.registration_date, dataMerbership.expiration_date) }}</p>
         </div>
       </div>
-      <UButton class="button" @click="handleOpenModal">멤버십 QR코드 </UButton>
+      <!-- <UButton class="button" @click="handleOpenModal">멤버십 QR코드 </UButton> -->
       <modal-membership-infor :data-merbership="dataMerbership" :open="openModalQr" @close="handleCloseModal" />
     </div>
   </KeepAlive>
@@ -18,12 +18,11 @@
 
 <script>
 import ModalMembershipInfor from '../../modal/membership/ModalMembershipInfor.vue';
-import UButton from '~/components/user/common/UButton';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
 
 export default {
   name: 'MembershipInfor',
-  components: { UButton, ModalMembershipInfor },
+  components: { ModalMembershipInfor },
   props: {
     dataMerbership: {
       type: Object,
