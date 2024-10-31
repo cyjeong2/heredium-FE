@@ -8,7 +8,8 @@ export default {
     return {
       tossPayments: null,
       error: null,
-      payType: ''
+      payType: '',
+      urlSuccess: ''
     };
   },
   methods: {
@@ -98,6 +99,7 @@ export default {
 
       console.log('this.deviceInfo', this.$store.state.deviceInfo);
       console.log('this.payType', this.payType);
+      this.urlSuccess = `${window.location.origin}/payment/confirm-payment-membership?payment-type=${this.payType}`;
       await this.tossPayments
         .requestPayment('카드', {
           amount,
