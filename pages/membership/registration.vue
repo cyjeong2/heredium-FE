@@ -12,7 +12,6 @@
       <form>
         <div class="membership-form-content">
           <h1>멤버십 종류 선택</h1>
-          <div>{{ JSON.stringify($store?.state?.deviceInfo) }}</div>
           <div class="warning-box">
             <img src="~assets/img/emoji/emoji_information.svg" alt="note" width="20px" height="20px" />
             <p>최대 1매까지 예매할 수 있습니다</p>

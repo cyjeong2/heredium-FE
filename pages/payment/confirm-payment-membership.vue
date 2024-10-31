@@ -1,5 +1,8 @@
 <template>
-  <div />
+  <div>
+    <h5>{{ $route.query?.['payment-type'] || 'TOSSPAYMENTS' }}</h5>
+    <p>{{ JSON.stringify($route.query) }}</p>
+  </div>
 </template>
 
 <script>
@@ -33,6 +36,8 @@ export default {
   created() {},
   mounted() {
     const paymentMethod = this.$route.query?.['payment-type'] || 'TOSSPAYMENTS';
+    console.log('🚀 ~ mounted ~ paymentMethod:', this.$route.query);
+    console.log('🚀 ~ mounted ~ paymentMethod:', paymentMethod);
     switch (paymentMethod) {
       case 'TOSSPAYMENTS':
         this.handleConfirmPaymentViaTossPay();
