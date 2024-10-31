@@ -6,7 +6,7 @@
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
       <div class="discount">
-        <div class="date">
+        <div v-if="!isSelection" class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
         </div>
@@ -29,6 +29,10 @@
           >
             QR코드
           </UButton>
+        </div>
+        <div v-if="isSelection" class="date">
+          <img src="~assets/img/icon/icon_discount_tag.svg" />
+          <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
         </div>
         <div v-if="detailCoupon.unused_coupons.length > 0" class="status active">
           <span>사용가능</span>
@@ -190,6 +194,7 @@ export default {
     display: flex;
     align-items: center;
     column-gap: 8px;
+    font-size: 1.2rem;
 
     .button {
       display: flex;
