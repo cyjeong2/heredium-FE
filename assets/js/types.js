@@ -342,7 +342,8 @@ export const MEMBERSHIP_DEFAULT = {
   price: 0,
   image_url: '',
   is_enabled: true,
-  coupons: [{ ...COUPON_DEFAULT }]
+  coupons: [{ ...COUPON_DEFAULT }],
+  is_register_membership_button_shown: true
 };
 
 export const CONTENT_TAG = {
