@@ -64,7 +64,7 @@
     </UBottomSheet>
   </section>
   <section v-else class="container">
-    <MembershipRegistrationUnavailable />
+    <div class="no-data">리스트가 없습니다.</div>
   </section>
 </template>
 
@@ -78,7 +78,6 @@ import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
-import MembershipRegistrationUnavailable from '~/components/user/page/membership/MembershipRegistrationUnavailable.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
 import tosspaymentsMixin from '~/store/tosspaymentsMixin';
@@ -92,8 +91,7 @@ export default {
     UNoticePolicy,
     UWarningDialog,
     UExistedMembershipDialog,
-    UBottomSheet,
-    MembershipRegistrationUnavailable
+    UBottomSheet
   },
   mixins: [imageMixin, userMixin, tosspaymentsMixin],
   props: {},
@@ -267,6 +265,19 @@ h2 {
   color: var(--color-u-grey-2);
   height: 1px;
   margin: 24px 0;
+}
+
+.no-data {
+  height: auto;
+  padding: 12rem 0;
+  border-top: 1px solid var(--color-black);
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 150%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rem;
 }
 
 .banner {
