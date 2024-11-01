@@ -1,21 +1,21 @@
 <template>
-  <UDialogModalError :message-error="warningMessage">
-    <template #image-slot>
-      <img src="~assets/img/icon/icon_error.svg" alt="" />
+  <UDialogModal :is-show="true">
+    <template #content>
+      {{ warningMessage }}
     </template>
     <template #modal-btn2>
       <UButton class="feedback-btn" @click="onClose()">확인</UButton>
     </template>
-  </UDialogModalError>
+  </UDialogModal>
 </template>
 
 <script>
 import UButton from '../../common/UButton.vue';
-import UDialogModalError from '../UDialogModalError.vue';
+import UDialogModal from '~/components/user/modal/UDialogModal';
 
 export default {
   name: 'UWarningDialog',
-  components: { UDialogModalError, UButton },
+  components: { UDialogModal, UButton },
   props: {
     warningMessage: {
       type: String,
