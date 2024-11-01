@@ -70,16 +70,13 @@ export default {
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
         returnUrl: `${window.location.origin}/ticketing/payment-gates-process?type=${originInfo.type}&id=${originInfo.id}&userType=${userType}`,
         fnError(error) {
-          // console.log('🚀 ~ fnError ~ 73 error:', error);
           if (failUrl) {
             window.location.replace(failUrl);
           } else {
             window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
           }
         },
-        fnSuccess(result) {
-          // console.log('🚀 ~ serverAuth ~ 81 fnSuccess', result);
-        }
+        fnSuccess(result) {}
       });
     },
     membershipPayment(uuid, amount) {
@@ -96,12 +93,9 @@ export default {
         goodsName: process.env.NICEPAY_PRODUCT_NAME,
         returnUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=NICEPAYMENTS`,
         fnError(error) {
-          // console.log('🚀 ~ fnError ~ error 99:', error);
           window.location.replace(`${window.location.origin}/payment/error?error=${error?.resultMsg || ''}`);
         },
-        fnSuccess(result) {
-          // console.log('🚀 ~ serverAuth ~ fnSuccess 103:', result);
-        }
+        fnSuccess(result) {}
       });
     }
   }
