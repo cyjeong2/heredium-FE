@@ -1,6 +1,10 @@
 <template>
   <div class="container">
-    <img src="~assets/img/icon/icon_error.svg" alt="" />
+    <picture>
+      <source srcset="~/assets/img/mobile/noresult.png" media="(max-width: 768px)" />
+      <source srcset="~/assets/img/pc/noresult.png" media="(min-width: 769px)" />
+      <img src="~/assets/img/mobile/noresult.png" alt="" />
+    </picture>
     <h3>결제 처리 중 오류가 발생했습니다. 다시 시도해 주시거나 고객 지원팀에 문의해 주세요.</h3>
     <p v-if="errorMessage">{{ errorMessage }}</p>
   </div>
