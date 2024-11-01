@@ -1,8 +1,5 @@
 <template>
   <UDialogModalError>
-    <template #image-slot>
-      <img src="~assets/img/icon/icon_error_registered.svg" alt="" />
-    </template>
     <template #content>
       유효기간 내에 <br />
       인당 1회 구매 가능합니다.
