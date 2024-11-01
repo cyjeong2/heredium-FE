@@ -111,7 +111,7 @@
         </div>
       </div>
       <div v-if="showAddButton && !disabled" class="right">
-        <SButton button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가하다 </SButton>
+        <SButton button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가 </SButton>
       </div>
     </div>
   </div>
