@@ -11,10 +11,10 @@
     <div class="membership-section-content membership-form-container">
       <form>
         <div class="membership-form-content">
-          <h1>멤버십 종류 선택</h1>
+          <h1>멤버십 종류</h1>
           <div class="warning-box">
             <img src="~assets/img/emoji/emoji_information.svg" alt="note" width="20px" height="20px" />
-            <p>최대 1매까지 예매할 수 있습니다</p>
+            <p class="warning-text">최대 1매까지 예매할 수 있습니다</p>
           </div>
 
           <div class="membership-radio-list">
@@ -170,7 +170,7 @@ export default {
       if (!this.isAgreeNoticePolicy) {
         this.dialogWarning = {
           open: true,
-          warningMessage: '관람 유의사항에 동의해주세요.'
+          warningMessage: '멤버십 가입 유의사항에 동의해주세요.'
         };
         this.isShowBottomSheet = false;
         return false;
@@ -412,6 +412,11 @@ h2 {
   }
   .contents .btn-submit {
     display: block;
+  }
+
+  .warning-text {
+    font-size: 1.6rem;
+    line-height: 2.4rem;
   }
 }
 </style>
