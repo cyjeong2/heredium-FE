@@ -1,10 +1,9 @@
 <template>
   <div class="agreement-item">
     <UCheckbox v-model="isChecked" />
-    <label>
+    <label class="agreement-label">
       멤버십 가입
-      <strong class="terms-strong" role="button" @click="handleViewTerm"> 유의사항 </strong>
-      에 동의합니다.
+      <strong class="terms-strong" role="button" @click="handleViewTerm"> 유의사항</strong>에 동의합니다.
     </label>
     <UTermModal :is-show="isShowTermsModal" term-target="notice" @close="closeTermModal" @agree="termAgree" />
   </div>
@@ -56,7 +55,7 @@ export default {
 <style scoped>
 .agreement-item {
   display: flex;
-  align-items: start;
+  align-items: center;
   gap: 8px;
 }
 .checkbox {
@@ -66,5 +65,10 @@ export default {
   font-weight: bold;
   cursor: pointer;
   color: var(--color-u-primary);
+  display: flex;
+}
+.agreement-label {
+  display: flex;
+  align-items: center;
 }
 </style>

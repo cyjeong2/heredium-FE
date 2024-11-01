@@ -415,8 +415,8 @@ h2 {
   }
 
   .warning-text {
-    font-size: 1.6rem;
-    line-height: 2.4rem;
+    font-size: 2rem;
+    line-height: 2.6rem;
   }
 }
 </style>
