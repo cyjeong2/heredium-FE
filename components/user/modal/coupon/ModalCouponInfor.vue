@@ -17,7 +17,8 @@
             <div class="status active">
               <span>사용가능</span>
             </div>
-            <div>
+            <div v-if="detailCoupon.unused_coupons[0].is_permanent">상시할인</div>
+            <div v-else>
               <span>{{ detailCoupon.unused_coupons.length }}</span
               >회남음
             </div>
