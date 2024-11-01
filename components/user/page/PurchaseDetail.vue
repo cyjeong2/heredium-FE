@@ -190,7 +190,7 @@
         </template>
         <template #etc>
           <UDialogModal no-scroll-lock :is-show="modal.isSave">
-            <template #content>환불되었어요.</template>
+            <template #content>정상적으로 환불되었습니다.</template>
             <template #modal-btn2>
               <UButton button-type="primary" @click="$router.push('/mypage/purchase/all')">확인</UButton>
             </template>
