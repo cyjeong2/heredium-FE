@@ -111,8 +111,6 @@ export default {
   },
   layout: 'admin/default',
   async asyncData({ $axios, store, redirect, params, query }) {
-    // console.log('🚀 ~ asyncData ~ params:', params);
-    // console.log('🚀 ~ asyncData ~ query:', query);
     const adminInfo = await store.getters['service/auth/getAdminUserInfo'];
     const auth = adminInfo.auth || adminInfo.role;
 

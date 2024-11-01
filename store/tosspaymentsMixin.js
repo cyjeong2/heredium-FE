@@ -8,8 +8,7 @@ export default {
     return {
       tossPayments: null,
       error: null,
-      payType: '',
-      urlSuccess: ''
+      paymentMethod: ''
     };
   },
   methods: {
@@ -97,9 +96,6 @@ export default {
 
       const userInfo = this.$store.getters['service/auth/getUserInfo'];
 
-      // console.log('this.deviceInfo', this.$store.state.deviceInfo);
-      // console.log('this.payType', this.payType);
-      this.urlSuccess = `${window.location.origin}/payment/confirm-payment-membership?payment-type=${this.payType}`;
       await this.tossPayments
         .requestPayment('카드', {
           amount,
@@ -108,12 +104,11 @@ export default {
           customerName: userInfo.name || '',
           customerEmail: userInfo.email || '',
           cardInstallmentPlan: 0,
-          successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=${this.payType}`,
+          successUrl: `${window.location.origin}/payment/confirm-payment-membership?payment-type=${this.paymentMethod}`,
           failUrl: `${window.location.origin}/membership/registration`
         })
         .catch((err) => {
           const errorString = String(err);
-          // console.log('🚀 ~ membershipPayment ~ errorString:', errorString);
           switch (errorString) {
             case 'Error: 결제가 취소되었습니다.':
               break;
@@ -125,21 +120,21 @@ export default {
         });
     },
     initPayments() {
-      let payType = 'TOSSPAYMENTS';
+      let paymentMethod = 'TOSSPAYMENTS';
       if (!this.tossPayments) {
         let clientKey = process.env.TOSSPAYMENTS_CLIENT_KEY;
         if (this.$store.state.deviceInfo.isApp) {
           if (this.$store.state.deviceInfo.isIOS) {
-            payType = 'TOSSPAYMENTS_IOS';
+            paymentMethod = 'TOSSPAYMENTS_IOS';
             clientKey = process.env.TOSSPAYMENTS_IOS_CLIENT_KEY;
           } else if (this.$store.state.deviceInfo.isAndroid) {
-            payType = 'TOSSPAYMENTS_ANDROID';
+            paymentMethod = 'TOSSPAYMENTS_ANDROID';
             clientKey = process.env.TOSSPAYMENTS_ANDROID_CLIENT_KEY;
           }
         }
-        this.payType = payType;
         this.tossPayments = window.TossPayments(clientKey);
       }
+      this.paymentMethod = paymentMethod;
     }
   }
 };
