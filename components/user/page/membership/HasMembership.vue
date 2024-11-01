@@ -1,8 +1,8 @@
 <template>
   <KeepAlive>
     <div class="center">
-      <div>
-        <img src="~assets/img/icon/icon_active_membership.svg" />
+      <div class="membership-image-box">
+        <img src="~assets/img/login_logo.png" />
       </div>
       <div class="content">
         <div class="center">
@@ -76,5 +76,12 @@ export default {
 
 .button {
   width: 100% !important;
+}
+.membership-image-box {
+  padding: 3rem 0;
+}
+img {
+  object-fit: contain;
+  max-width: 100%;
 }
 </style>
