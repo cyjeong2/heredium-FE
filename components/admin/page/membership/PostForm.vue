@@ -77,10 +77,11 @@
               <div class="grid-table-header">노출</div>
               <div class="grid-table-header">멤버십 이름</div>
               <div class="grid-table-header">가격</div>
+              <div class="grid-table-header">가입하기 버튼 활성화 여부</div>
               <div class="grid-table-header">행동</div>
               <!-- BODY -->
               <template v-for="(membership, membershipIndex) in detailData.memberships">
-                <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body">
+                <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body checkbox-cell">
                   <SCheckbox v-model="membership.is_enabled" />
                 </div>
                 <div :key="`membership_${membershipIndex}_name_edit`" class="grid-table-body membership-name">
@@ -101,6 +102,9 @@
                       <div class="currency">원</div>
                     </template>
                   </SFlexInputGrid>
+                </div>
+                <div :key="`membership_${membershipIndex}_active-register`" class="grid-table-body checkbox-cell">
+                  <SCheckbox v-model="membership.is_register_membership_button_shown" />
                 </div>
                 <div :key="`membership_${membershipIndex}_action`" class="grid-table-body membership-action">
                   <!-- <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i> -->
@@ -561,7 +565,7 @@ export default {
 
 .grid-table {
   display: grid;
-  grid-template-columns: 7rem 1fr 1fr 15rem;
+  grid-template-columns: 7rem 1fr 1fr 20rem 15rem;
   box-shadow: 0 0 0 1px var(--color-grey-2);
   overflow: hidden;
   margin-bottom: 2.75rem;
@@ -576,7 +580,13 @@ export default {
   }
   .create-membership,
   .benefit-container {
-    grid-column: span 4;
+    grid-column: span 5;
+  }
+  .checkbox-cell {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
   }
   .grid-table-header {
     color: var(--color-grey-4);

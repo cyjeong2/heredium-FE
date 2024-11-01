@@ -4,7 +4,14 @@
       <img :src="membershipImage" :alt="`${membership.name}-membership-image`" />
     </div>
 
-    <UButton class="register-membership" w-size="full" h-size="small" @click="toggleCheck">가입하기</UButton>
+    <UButton
+      class="register-membership"
+      w-size="full"
+      h-size="small"
+      :disabled="!membership?.is_register_membership_button_shown"
+      @click="toggleCheck"
+      >가입하기</UButton
+    >
   </div>
 </template>
 
