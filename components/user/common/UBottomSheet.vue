@@ -22,7 +22,7 @@ export default {
   },
   methods: {
     closeSheet() {
-      this.$emit('update:visible', false);
+      this.$emit('onclose', false);
     }
   }
 };
