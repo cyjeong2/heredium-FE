@@ -278,6 +278,7 @@ h2 {
   align-items: center;
   justify-content: center;
   margin-bottom: 12rem;
+  color: var(--color-u-grey-3);
 }
 
 .banner {
