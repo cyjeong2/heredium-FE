@@ -86,7 +86,7 @@ export default {
           }
         });
     },
-    async membershipPayment(uuid, amount) {
+    async membershipPayment(uuid, amount, membershipName) {
       this.initPayments();
       const invalidPaymentData = !uuid || !amount || !this.tossPayments;
       if (invalidPaymentData) {
@@ -100,7 +100,7 @@ export default {
         .requestPayment('카드', {
           amount,
           orderId: uuid,
-          orderName: 'Payment for register membership',
+          orderName: membershipName,
           customerName: userInfo.name || '',
           customerEmail: userInfo.email || '',
           cardInstallmentPlan: 0,

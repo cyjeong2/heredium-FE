@@ -191,6 +191,12 @@ export default {
       if (!this.membershipIdSelected) {
         return null;
       }
+      const membershipSelected = this.postDetail.memberships?.find(
+        (option) => option.membership_id === this.membershipIdSelected
+      );
+      if (!membershipSelected) {
+        return null;
+      }
 
       this.$axios
         .post('/user/membership/register', {
@@ -207,7 +213,7 @@ export default {
             alert('결제 오류');
             return null;
           }
-          this.membershipPayment(orderId, amount);
+          this.membershipPayment(orderId, amount, membershipSelected?.name);
         })
 
         .catch((err) => {
