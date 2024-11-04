@@ -2,7 +2,7 @@
   <div class="agreement-item">
     <UCheckbox v-model="isChecked" />
     <label class="agreement-label">
-      멤버십 가입
+      멤버십 가입&ensp;
       <strong class="terms-strong" role="button" @click="handleViewTerm"> 유의사항</strong>에 동의합니다.
     </label>
     <UTermModal :is-show="isShowTermsModal" term-target="notice" @close="closeTermModal" @agree="termAgree" />
