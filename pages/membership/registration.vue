@@ -63,7 +63,8 @@
       </UButton>
     </UBottomSheet>
   </section>
-  <section v-else class="container">
+  <section v-else class="container no-data-container">
+    <h1 class="title">멤버십</h1>
     <div class="no-data">리스트가 없습니다.</div>
   </section>
 </template>
@@ -273,6 +274,15 @@ h2 {
   margin: 24px 0;
 }
 
+.no-data-container .title {
+  margin: 3.2rem 0 6.4rem;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 100%;
+  margin-bottom: 1.6rem;
+  padding-bottom: 1.6rem;
+  border-bottom: none;
+}
 .no-data {
   height: auto;
   padding: 12rem 0;
@@ -401,6 +411,13 @@ h2 {
     font-size: 2.4rem;
     line-height: 150%;
     letter-spacing: -1px;
+  }
+
+  .no-data-container .title {
+    margin: 4.8rem 0 8.8rem 0;
+    font-weight: 700;
+    font-size: 4.2rem;
+    line-height: 150%;
   }
 
   .contents .banner {
