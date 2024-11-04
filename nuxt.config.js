@@ -116,5 +116,9 @@ export default {
         _: 'lodash'
       })
     ]
+  },
+  loading: {
+    color: 'black',
+    failedColor: 'black'
   }
 };
