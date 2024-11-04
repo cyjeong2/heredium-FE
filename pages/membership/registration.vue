@@ -39,7 +39,7 @@
     <section v-if="postImageNote" class="note membership-section-content">
       <img :src="postImageNote" alt="Heredium membership note" />
     </section>
-    <UBottomSheet :visible.sync="isShowBottomSheet">
+    <UBottomSheet :visible.sync="isVisibleBottomSheet">
       <div class="total-amount">
         <p>합계</p>
         <h5>
@@ -148,6 +148,12 @@ export default {
         }
       }
       return list;
+    },
+    isVisibleBottomSheet() {
+      if (this.dialogWarning?.open) {
+        return false;
+      }
+      return this.isShowBottomSheet;
     }
   },
   methods: {
@@ -171,7 +177,6 @@ export default {
           open: true,
           warningMessage: '멤버십 가입 유의사항에 동의해주세요.'
         };
-        this.isShowBottomSheet = false;
         return false;
       }
       if (!this.isAgreeRefundPolicy) {
@@ -179,7 +184,6 @@ export default {
           open: true,
           warningMessage: '환불 규정에 동의해주세요.'
         };
-        this.isShowBottomSheet = false;
         return false;
       }
       return true;
