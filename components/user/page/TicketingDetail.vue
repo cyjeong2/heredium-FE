@@ -180,7 +180,7 @@
                   </div>
                 </div>
                 <div v-if="coupon?.id" class="row-price">
-                  <div class="label">지불할 총 금액</div>
+                  <div class="label">결제금액</div>
                   <div class="cell-price">
                     <b>{{ paymentPrice.toLocaleString('en') }}</b
                     >원
