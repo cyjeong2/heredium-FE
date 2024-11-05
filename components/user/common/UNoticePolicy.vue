@@ -5,17 +5,15 @@
       멤버십 가입&ensp;
       <strong class="terms-strong" role="button" @click="handleViewTerm"> 유의사항</strong>에 동의합니다.
     </label>
-    <UTermModal :is-show="isShowTermsModal" term-target="notice" @close="closeTermModal" @agree="termAgree" />
   </div>
 </template>
 
 <script>
-import UTermModal from '../modal/UTermModal.vue';
 import UCheckbox from './UCheckbox.vue';
 
 export default {
   name: 'NoticePolicy',
-  components: { UTermModal, UCheckbox },
+  components: { UCheckbox },
   props: {
     modelValue: {
       type: Boolean,
@@ -23,9 +21,7 @@ export default {
     }
   },
   data() {
-    return {
-      isShowTermsModal: false
-    };
+    return {};
   },
   computed: {
     isChecked: {
@@ -39,14 +35,7 @@ export default {
   },
   methods: {
     handleViewTerm() {
-      this.isShowTermsModal = true;
-    },
-    closeTermModal() {
-      this.isShowTermsModal = false;
-    },
-    termAgree() {
-      this.$emit('update:modelValue', true);
-      this.closeTermModal();
+      this.$emit('open-term');
     }
   }
 };

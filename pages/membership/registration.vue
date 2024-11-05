@@ -52,8 +52,16 @@
       </div>
 
       <div class="agreement-list">
-        <UNoticePolicy :model-value="isAgreeNoticePolicy" @update:modelValue="isAgreeNoticePolicy = $event" />
-        <URefundPolicy :model-value="isAgreeRefundPolicy" @update:modelValue="isAgreeRefundPolicy = $event" />
+        <UNoticePolicy
+          :model-value="isAgreeNoticePolicy"
+          @update:modelValue="isAgreeNoticePolicy = $event"
+          @open-term="isShowNoticePolicy = true"
+        />
+        <URefundPolicy
+          :model-value="isAgreeRefundPolicy"
+          @update:modelValue="isAgreeRefundPolicy = $event"
+          @open-term="handleShowRefundPolicy"
+        />
       </div>
 
       <UButton
@@ -68,6 +76,19 @@
     </UBottomSheet>
     <UWarningDialog v-if="dialogWarning.open" :warning-message="dialogWarning.warningMessage" :on-close="closeDialog" />
     <UExistedMembershipDialog v-if="hasMembership" :on-confirm="goToMyMembership" />
+    <UTermModal
+      :is-show="isShowNoticePolicy"
+      term-target="notice"
+      @close="isShowNoticePolicy = false"
+      @agree="agreeNoticePolicy"
+    />
+    <URegisterModal
+      :is-show="isShowRefundPolicy && refundTermsContent"
+      term-target="REFUND"
+      :terms-data="refundTermsContent"
+      @close="isShowRefundPolicy = false"
+      @agree="agreeRefundPolicy"
+    />
   </div>
   <section v-else class="container no-data-container">
     <h1 class="title">멤버십</h1>
@@ -84,6 +105,8 @@ import UNoticePolicy from '~/components/user/common/UNoticePolicy.vue';
 import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
+import URegisterModal from '~/components/user/modal/URegisterModal.vue';
+import UTermModal from '~/components/user/modal/UTermModal.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
@@ -98,7 +121,9 @@ export default {
     UNoticePolicy,
     UWarningDialog,
     UExistedMembershipDialog,
-    UBottomSheet
+    UBottomSheet,
+    UTermModal,
+    URegisterModal
   },
   mixins: [imageMixin, userMixin, tosspaymentsMixin],
   props: {},
@@ -124,7 +149,10 @@ export default {
         warningMessage: null
       },
       hasMembership: false,
-      isShowBottomSheet: false
+      isShowBottomSheet: false,
+      isShowRefundPolicy: false,
+      refundTermsContent: null,
+      isShowNoticePolicy: false
     };
   },
   computed: {
@@ -156,7 +184,7 @@ export default {
       return list;
     },
     isVisibleBottomSheet() {
-      if (this.dialogWarning?.open) {
+      if (this.dialogWarning?.open || this.isShowNoticePolicy || this.isShowRefundPolicy) {
         return false;
       }
       return this.isShowBottomSheet;
@@ -250,6 +278,18 @@ export default {
       }
 
       this.isShowBottomSheet = true;
+    },
+    handleShowRefundPolicy(termsData) {
+      this.refundTermsContent = termsData;
+      this.isShowRefundPolicy = true;
+    },
+    agreeNoticePolicy() {
+      this.isAgreeNoticePolicy = true;
+      this.isShowNoticePolicy = false;
+    },
+    agreeRefundPolicy() {
+      this.isAgreeRefundPolicy = true;
+      this.isShowRefundPolicy = false;
     }
   }
 };
