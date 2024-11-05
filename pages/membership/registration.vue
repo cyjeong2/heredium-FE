@@ -9,7 +9,7 @@
       </section>
 
       <section class="container">
-        <div class="grid-content">
+        <div class="grid-content membership-content-editor">
           <h2>멤버십 소개</h2>
           <div v-html="postDetail.content_detail"></div>
         </div>
@@ -465,6 +465,10 @@ h2 {
   .grid-content > div {
     width: 65.9824%;
     margin-left: auto;
+  }
+
+  .membership-content-editor {
+    margin-top: 40px;
   }
 
   .contents .membership-form-container {
