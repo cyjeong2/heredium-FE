@@ -476,6 +476,9 @@ h2 {
   .membership-radio-list {
     grid-template-columns: 1fr 1fr;
   }
+  .membership-radio-list > div {
+    margin: unset;
+  }
   .contents .total-amount,
   .contents .agreement-list {
     display: flex;
