@@ -175,6 +175,9 @@
                 <div v-if="coupon?.id" class="row-price">
                   <div class="label">쿠폰</div>
                   <div class="cell-price">
+                    <button class="remove-coupon-button" @click="coupon = null">
+                      <i class="m umic-minus" />
+                    </button>
                     <b>{{ totalDiscount.toLocaleString('en') }}</b
                     >원
                   </div>
@@ -1082,6 +1085,13 @@ export default {
 
 .feedback-btn {
   width: 50%;
+}
+.remove-coupon-button {
+  margin-right: 1rem;
+  i {
+    font-weight: bold;
+    font-size: 2rem;
+  }
 }
 
 @media screen and (min-width: 769px) {
