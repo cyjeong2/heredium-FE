@@ -19,11 +19,6 @@
         <div class="grid-content top-border">
           <h2>멤버십 종류</h2>
           <div class="membership-form-content">
-            <div class="warning-box">
-              <img src="~assets/img/emoji/emoji_information.svg" alt="note" width="20px" height="20px" />
-              <p class="warning-text">최대 1매까지 예매할 수 있습니다</p>
-            </div>
-
             <div class="membership-radio-list">
               <MembershipOption
                 v-for="membership in postDetail.memberships"
@@ -39,8 +34,12 @@
       </section>
 
       <section v-if="postImageNote" class="note container">
-        <h2 class="top-border">문의</h2>
-        <img :src="postImageNote" alt="Heredium membership note" />
+        <div class="grid-content top-border">
+          <h2>문의사항</h2>
+          <div>
+            <img :src="postImageNote" alt="Heredium membership note" />
+          </div>
+        </div>
       </section>
     </section>
 
@@ -456,12 +455,12 @@ h2 {
 
   .grid-content {
     display: flex;
-    gap: 32px;
   }
   .grid-content > h2 {
     margin: 0;
     padding: 0;
     width: 34.0176%;
+    padding-right: 3.2rem;
   }
   .grid-content > div {
     width: 65.9824%;
