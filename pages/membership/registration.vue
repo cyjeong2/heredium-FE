@@ -1,45 +1,49 @@
 <template>
-  <section v-if="isDataReady && !!postDetail" class="contents container">
-    <section class="banner">
-      <img :src="postImageDetail" alt="Heredium membership image" />
-    </section>
-    <h1 class="membership-section-content">{{ postDetail.name }}</h1>
-    <section class="content-detail membership-section-content">
-      <div v-html="postDetail.content_detail"></div>
-    </section>
-    <!-- <UEventCardList class="membership-section-content membership-benefits" :event-list="eventList" /> -->
-    <div class="membership-section-content membership-form-container">
-      <form>
-        <div class="membership-form-content">
-          <h1>멤버십 종류</h1>
-          <div class="warning-box">
-            <img src="~assets/img/emoji/emoji_information.svg" alt="note" width="20px" height="20px" />
-            <p class="warning-text">최대 1매까지 예매할 수 있습니다</p>
-          </div>
+  <div v-if="isDataReady && !!postDetail">
+    <section class="contents">
+      <div class="container">
+        <h1>{{ postDetail.name }}</h1>
+      </div>
+      <section class="banner">
+        <img :src="postImageDetail" alt="Heredium membership image" />
+      </section>
 
-          <div class="membership-radio-list">
-            <MembershipOption
-              v-for="membership in postDetail.memberships"
-              :key="membership.membership_id"
-              :model-value="membershipIdSelected"
-              :membership="membership"
-              :change="openBottomSheet"
-            >
-            </MembershipOption>
+      <section class="container">
+        <div class="grid-content membership-content-editor">
+          <h2>멤버십 소개</h2>
+          <div v-html="postDetail.content_detail"></div>
+        </div>
+      </section>
+
+      <section class="container">
+        <div class="grid-content top-border">
+          <h2>멤버십 종류</h2>
+          <div class="membership-form-content">
+            <div class="membership-radio-list">
+              <MembershipOption
+                v-for="membership in postDetail.memberships"
+                :key="membership.membership_id"
+                :model-value="membershipIdSelected"
+                :membership="membership"
+                :change="openBottomSheet"
+              >
+              </MembershipOption>
+            </div>
           </div>
         </div>
-      </form>
-      <UWarningDialog
-        v-if="dialogWarning.open"
-        :warning-message="dialogWarning.warningMessage"
-        :on-close="closeDialog"
-      />
-      <UExistedMembershipDialog v-if="hasMembership" :on-confirm="goToMyMembership" />
-    </div>
-    <section v-if="postImageNote" class="note membership-section-content">
-      <img :src="postImageNote" alt="Heredium membership note" />
+      </section>
+
+      <section v-if="postImageNote" class="note container">
+        <div class="grid-content top-border">
+          <h2>문의사항</h2>
+          <div>
+            <img :src="postImageNote" alt="Heredium membership note" />
+          </div>
+        </div>
+      </section>
     </section>
-    <UBottomSheet :visible.sync="isShowBottomSheet">
+
+    <UBottomSheet :visible="isVisibleBottomSheet" @onclose="isShowBottomSheet = false">
       <div class="total-amount">
         <p>합계</p>
         <h5>
@@ -48,8 +52,16 @@
       </div>
 
       <div class="agreement-list">
-        <UNoticePolicy :model-value="isAgreeNoticePolicy" @update:modelValue="isAgreeNoticePolicy = $event" />
-        <URefundPolicy :model-value="isAgreeRefundPolicy" @update:modelValue="isAgreeRefundPolicy = $event" />
+        <UNoticePolicy
+          :model-value="isAgreeNoticePolicy"
+          @update:modelValue="isAgreeNoticePolicy = $event"
+          @open-term="isShowNoticePolicy = true"
+        />
+        <URefundPolicy
+          :model-value="isAgreeRefundPolicy"
+          @update:modelValue="isAgreeRefundPolicy = $event"
+          @open-term="handleShowRefundPolicy"
+        />
       </div>
 
       <UButton
@@ -62,8 +74,24 @@
         결제하기
       </UButton>
     </UBottomSheet>
-  </section>
-  <section v-else class="container">
+    <UWarningDialog v-if="dialogWarning.open" :warning-message="dialogWarning.warningMessage" :on-close="closeDialog" />
+    <UExistedMembershipDialog v-if="hasMembership" :on-confirm="goToMyMembership" />
+    <UTermModal
+      :is-show="isShowNoticePolicy"
+      term-target="notice"
+      @close="isShowNoticePolicy = false"
+      @agree="agreeNoticePolicy"
+    />
+    <URegisterModal
+      :is-show="isShowRefundPolicy && refundTermsContent"
+      term-target="REFUND"
+      :terms-data="refundTermsContent"
+      @close="isShowRefundPolicy = false"
+      @agree="agreeRefundPolicy"
+    />
+  </div>
+  <section v-else class="container no-data-container">
+    <h1 class="title">멤버십</h1>
     <div class="no-data">리스트가 없습니다.</div>
   </section>
 </template>
@@ -77,6 +105,8 @@ import UNoticePolicy from '~/components/user/common/UNoticePolicy.vue';
 import URefundPolicy from '~/components/user/common/URefundPolicy.vue';
 import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMembershipDialog.vue';
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
+import URegisterModal from '~/components/user/modal/URegisterModal.vue';
+import UTermModal from '~/components/user/modal/UTermModal.vue';
 import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
@@ -91,7 +121,9 @@ export default {
     UNoticePolicy,
     UWarningDialog,
     UExistedMembershipDialog,
-    UBottomSheet
+    UBottomSheet,
+    UTermModal,
+    URegisterModal
   },
   mixins: [imageMixin, userMixin, tosspaymentsMixin],
   props: {},
@@ -117,7 +149,10 @@ export default {
         warningMessage: null
       },
       hasMembership: false,
-      isShowBottomSheet: false
+      isShowBottomSheet: false,
+      isShowRefundPolicy: false,
+      refundTermsContent: null,
+      isShowNoticePolicy: false
     };
   },
   computed: {
@@ -147,6 +182,12 @@ export default {
         }
       }
       return list;
+    },
+    isVisibleBottomSheet() {
+      if (this.dialogWarning?.open || this.isShowNoticePolicy || this.isShowRefundPolicy) {
+        return false;
+      }
+      return this.isShowBottomSheet;
     }
   },
   methods: {
@@ -170,7 +211,6 @@ export default {
           open: true,
           warningMessage: '멤버십 가입 유의사항에 동의해주세요.'
         };
-        this.isShowBottomSheet = false;
         return false;
       }
       if (!this.isAgreeRefundPolicy) {
@@ -178,7 +218,6 @@ export default {
           open: true,
           warningMessage: '환불 규정에 동의해주세요.'
         };
-        this.isShowBottomSheet = false;
         return false;
       }
       return true;
@@ -189,6 +228,12 @@ export default {
         return null;
       }
       if (!this.membershipIdSelected) {
+        return null;
+      }
+      const membershipSelected = this.postDetail.memberships?.find(
+        (option) => option.membership_id === this.membershipIdSelected
+      );
+      if (!membershipSelected) {
         return null;
       }
 
@@ -207,7 +252,7 @@ export default {
             alert('결제 오류');
             return null;
           }
-          this.membershipPayment(orderId, amount);
+          this.membershipPayment(orderId, amount, membershipSelected?.name);
         })
 
         .catch((err) => {
@@ -233,6 +278,18 @@ export default {
       }
 
       this.isShowBottomSheet = true;
+    },
+    handleShowRefundPolicy(termsData) {
+      this.refundTermsContent = termsData;
+      this.isShowRefundPolicy = true;
+    },
+    agreeNoticePolicy() {
+      this.isAgreeNoticePolicy = true;
+      this.isShowNoticePolicy = false;
+    },
+    agreeRefundPolicy() {
+      this.isAgreeRefundPolicy = true;
+      this.isShowRefundPolicy = false;
     }
   }
 };
@@ -246,19 +303,25 @@ export default {
   padding: 0 !important;
 }
 h1 {
-  font-size: 2.8rem;
+  font-size: 2.4rem;
   font-weight: 700;
   line-height: 100%;
-  border-bottom: 1px solid var(--color-default);
-  padding-bottom: 20px;
+  margin-top: 3.2rem;
+  margin-bottom: 0;
   color: var(--color-default);
 }
 
 h2 {
-  font-size: 1.6rem;
+  margin-bottom: 2.8rem;
+  font-size: 2rem;
   font-weight: 700;
-  line-height: 2.4rem;
+  line-height: 100%;
   color: var(--color-default);
+}
+
+.top-border {
+  border-top: 1px solid var(--color-default);
+  padding-top: 2rem;
 }
 
 .gray-divider {
@@ -267,6 +330,15 @@ h2 {
   margin: 24px 0;
 }
 
+.no-data-container .title {
+  margin: 3.2rem 0 6.4rem;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 100%;
+  margin-bottom: 1.6rem;
+  padding-bottom: 1.6rem;
+  border-bottom: none;
+}
 .no-data {
   height: auto;
   padding: 12rem 0;
@@ -278,10 +350,11 @@ h2 {
   align-items: center;
   justify-content: center;
   margin-bottom: 12rem;
+  color: var(--color-u-grey-3);
 }
 
 .banner {
-  padding: 48px 20px 0 20px;
+  padding: 0;
   display: flex;
   justify-content: center;
 }
@@ -386,26 +459,56 @@ h2 {
     font-weight: 700;
     font-size: 4.2rem;
     line-height: 150%;
+    margin-top: 4.8rem;
+    margin-bottom: 2rem;
   }
 
   .contents h2 {
-    font-style: normal;
-    font-weight: 500;
-    font-size: 2.4rem;
+    margin-bottom: 2.8rem;
+    font-weight: 600;
+    font-size: 3.6rem;
     line-height: 150%;
-    letter-spacing: -1px;
+  }
+
+  .top-border {
+    padding-top: 3.2rem;
+  }
+
+  .no-data-container .title {
+    margin: 4.8rem 0 8.8rem 0;
+    font-weight: 700;
+    font-size: 4.2rem;
+    line-height: 150%;
   }
 
   .contents .banner {
     width: 100%;
-    flex: 1;
-    justify-content: start;
+    display: flex;
+    justify-content: center;
     align-items: start;
-    img {
-      width: 100%;
-      min-width: 100%;
-      max-width: 720px;
-    }
+  }
+  .contents .banner img {
+    max-height: 80rem;
+    width: 100%;
+    object-fit: contain;
+  }
+
+  .grid-content {
+    display: flex;
+  }
+  .grid-content > h2 {
+    margin: 0;
+    padding: 0;
+    width: 34.0176%;
+    padding-right: 3.2rem;
+  }
+  .grid-content > div {
+    width: 65.9824%;
+    margin-left: auto;
+  }
+
+  .membership-content-editor {
+    margin-top: 40px;
   }
 
   .contents .membership-form-container {
@@ -416,6 +519,9 @@ h2 {
   }
   .membership-radio-list {
     grid-template-columns: 1fr 1fr;
+  }
+  .membership-radio-list > div {
+    margin: unset;
   }
   .contents .total-amount,
   .contents .agreement-list {

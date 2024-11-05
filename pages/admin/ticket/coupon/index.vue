@@ -60,7 +60,7 @@
                 </th>
                 <th>NO</th>
                 <th>멤버십</th>
-                <th>아이디</th>
+                <th>계정</th>
                 <th>이름</th>
                 <th>연락처</th>
                 <th>최근로그인</th>
@@ -137,7 +137,7 @@
                 </th>
                 <th>NO</th>
                 <th>멤버십</th>
-                <th>아이디</th>
+                <th>계정</th>
                 <th>이름</th>
                 <th>연락처</th>
                 <th>최근로그인</th>

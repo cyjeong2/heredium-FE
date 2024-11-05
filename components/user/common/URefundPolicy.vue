@@ -4,24 +4,15 @@
     <label>
       <strong class="terms-strong" role="button" @click="handleViewTerms">환불 규정</strong>에 동의합니다.
     </label>
-
-    <URegisterModal
-      :is-show="isShowTermsModal"
-      :term-target="termTarget"
-      :terms-data="termsData"
-      @close="closeTermModal"
-      @agree="termAgree"
-    />
   </div>
 </template>
 
 <script>
-import URegisterModal from '../modal/URegisterModal.vue';
 import UCheckbox from './UCheckbox.vue';
 
 export default {
   name: 'RefundPolicy',
-  components: { URegisterModal, UCheckbox },
+  components: { UCheckbox },
   props: {
     modelValue: {
       type: Boolean,
@@ -30,9 +21,7 @@ export default {
   },
   data() {
     return {
-      termTarget: 'REFUND',
-      isShowTermsModal: false,
-      termsData: {}
+      termTarget: 'REFUND'
     };
   },
   computed: {
@@ -47,19 +36,12 @@ export default {
   },
   methods: {
     async handleViewTerms() {
-      this.termsData = await this.$axios.$get('/user/policies/posting', {
+      const termsData = await this.$axios.$get('/user/policies/posting', {
         params: {
           type: this.termTarget
         }
       });
-      this.isShowTermsModal = true;
-    },
-    closeTermModal() {
-      this.isShowTermsModal = false;
-    },
-    termAgree() {
-      this.$emit('update:modelValue', true);
-      this.closeTermModal();
+      this.$emit('open-term', termsData);
     }
   }
 };

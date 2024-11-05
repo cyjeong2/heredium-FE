@@ -9,7 +9,7 @@
           </nuxt-link>
           <NuxtLink class="tab" to="/mypage/info">내 정보 수정</NuxtLink>
         </div>
-        <div class="tabs grid col-xs-3">
+        <div class="tabs grid col-xs-3 mobile-sub-tab">
           <NuxtLink to="/mypage/purchase/all" class="tab">전시·프로그램</NuxtLink>
           <NuxtLink to="/mypage/purchase/coffee" class="tab">커피</NuxtLink>
           <NuxtLink to="/mypage/purchase/membership" class="tab">멤버십·쿠폰함</NuxtLink>
@@ -81,13 +81,16 @@ h1 {
     }
 
     .tab {
-      padding: 1.3rem 1.6rem;
+      padding: 8px;
       border: 0.1rem solid var(--color-grey-2);
-      font-size: 1.4rem;
+      font-size: 1.1rem;
       font-weight: 700;
       line-height: 1.4rem;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--color-grey-3);
+      text-align: center;
 
       &.nuxt-link-active {
         background-color: var(--color-u-primary);

@@ -77,8 +77,8 @@
               <div class="grid-table-header">노출</div>
               <div class="grid-table-header">멤버십 이름</div>
               <div class="grid-table-header">가격</div>
-              <div class="grid-table-header">가입하기 버튼 활성화 여부</div>
-              <div class="grid-table-header">행동</div>
+              <div class="grid-table-header">결제버튼 활성화</div>
+              <div class="grid-table-header">세부내용</div>
               <!-- BODY -->
               <template v-for="(membership, membershipIndex) in detailData.memberships">
                 <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body checkbox-cell">
