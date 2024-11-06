@@ -606,23 +606,12 @@ export default {
       this.syncCouponDataTime = Date.now();
     },
     handleSaveCouponIssuancePage() {
-      const storageData = {
-        couponData: this.couponData,
-        queryOptions: this.queryOptions,
-        tableData: this.tableData,
-        selectedData: this.selectedData,
-        exportParams: this.exportParams
-      };
-      setCouponIssuanceStorage(storageData);
+      setCouponIssuanceStorage(this.couponData);
     },
     getPageDataSaved() {
       const storageData = getCouponIssuanceStorage();
       if (!storageData) return false;
-      this.couponData = storageData.couponData;
-      this.queryOptions = storageData.queryOptions;
-      this.tableData = storageData.tableData;
-      this.selectedData = storageData.selectedData;
-      this.exportParams = storageData.exportParams;
+      this.couponData = storageData;
       return true;
     }
   }
