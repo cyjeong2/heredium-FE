@@ -328,9 +328,11 @@ export default {
   mounted() {
     const hasStorageData = this.getPageDataSaved();
     if (!hasStorageData) {
-      this.fetch();
       this.couponData = cloneDeep(COUPON_DEFAULT);
     }
+  },
+  created() {
+    this.fetch();
   },
   methods: {
     validateCouponItem(couponItem) {
@@ -411,7 +413,8 @@ export default {
           return false;
         }
       } else {
-        alert('쿠폰 정보를 모두 입력해 주세요.');
+        this.errorMsg = '쿠폰 정보를 모두 입력해 주세요.';
+        this.isShowErrorModal = true;
         this.feedback = feedback;
         return false;
       }
@@ -543,10 +546,8 @@ export default {
     isValidate() {
       let isValid = false;
       let msg = '';
-      if (this.queryOptions.excludeIds.length === 0) {
+      if (!this.selectedData?.userList?.length) {
         msg = '계정를 선택해 주세요.';
-      } else if (this.queryOptions.excludeIds.length > 500) {
-        msg = '초대권은 한번에 최대 500명에게 발급 가능합니다.';
       } else {
         isValid = true;
       }
@@ -559,13 +560,15 @@ export default {
       return isValid;
     },
     async handleOpenModalConfirm() {
+      if (!this.isValidate()) {
+        return;
+      }
       const isAddedCoupon = await this.handleAddCoupon();
       if (!isAddedCoupon) {
         return;
       }
-      if (this.isValidate()) {
-        this.isConfirmSave = true;
-      }
+
+      this.isConfirmSave = true;
     },
     async issuedTicket() {
       this.isConfirmPending = true;
