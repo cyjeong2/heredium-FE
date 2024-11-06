@@ -30,7 +30,8 @@
             readonly
             @click="showPopover(togglePopover)"
           />
-          <i class="ic-today" />
+          <i v-if="showCleanIcon && filledDatePicker" class="ic-close" @click="onClean" />
+          <i v-else class="ic-today" />
         </div>
       </template>
       <template #header-left-button>
@@ -82,6 +83,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    showCleanIcon: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
@@ -92,6 +98,11 @@ export default {
         title: 'YYYY-MM'
       }
     };
+  },
+  computed: {
+    filledDatePicker() {
+      return !this.readonly && this.value;
+    }
   },
   created() {
     let width = 14.4;
@@ -131,6 +142,9 @@ export default {
 
       this.$emit('input', formatDate);
       this.$emit('change');
+    },
+    onClean() {
+      this.onSelected(null);
     }
   }
 };
@@ -166,7 +180,8 @@ export default {
     }
   }
 
-  i.ic-today {
+  i.ic-today,
+  i.ic-close {
     position: absolute;
     width: 2.4rem;
     color: var(--color-black);
@@ -175,6 +190,10 @@ export default {
     top: 50%;
     right: 0.8rem;
     transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  i.ic-today {
     pointer-events: none;
   }
 

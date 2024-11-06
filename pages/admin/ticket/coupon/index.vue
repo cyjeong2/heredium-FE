@@ -5,6 +5,7 @@
       <h3 class="mb-16">쿠폰 설정</h3>
       <div class="setting-coupon">
         <CouponEditor
+          v-if="couponData"
           :coupon="couponData"
           :is-issuance="true"
           :error="feedback"
@@ -12,7 +13,7 @@
           @update-coupon="(e) => handleUpdateCoupon(e)"
         />
         <div class="box-button">
-          <SButton button-type="primary" @click="handleAddCoupon()">저장</SButton>
+          <SButton button-type="primary" @click="handleSaveCouponIssuancePage">저장</SButton>
           <SButton @click="resetCoupon">초기화</SButton>
         </div>
       </div>
@@ -22,9 +23,9 @@
       <div class="search mb-24">
         <div class="mb-24">
           <SDropdown v-model="queryOptions.searchDateType" :option-list="dateOptionList" class="mr-16" />
-          <SDatepicker v-model="queryOptions.signUpDateFrom" :max="queryOptions.signUpDateTo" />
+          <SDatepicker v-model="queryOptions.signUpDateFrom" :max="queryOptions.signUpDateTo" :show-clean-icon="true" />
           <span class="ml-8 mr-8">~</span>
-          <SDatepicker v-model="queryOptions.signUpDateTo" :min="queryOptions.signUpDateFrom" />
+          <SDatepicker v-model="queryOptions.signUpDateTo" :min="queryOptions.signUpDateFrom" :show-clean-icon="true" />
         </div>
         <div class="mb-24">
           <label>상태</label>
@@ -72,14 +73,14 @@
               <tr v-if="!data || !data[0]">
                 <td colspan="9"><div>리스트가 없습니다.</div></td>
               </tr>
-              <tr v-for="(item, index) in data" :key="item.id" @click="item.isChecked = !item.isChecked">
+              <tr v-for="(item, index) in data" :key="item.id">
                 <td>
                   <div>
-                    <SCheckbox v-model="item.isChecked" />
+                    <SCheckbox v-model="item.isChecked" @click="item.isChecked = !item.isChecked" />
                   </div>
                 </td>
                 <td>
-                  <div>{{ tableData.startCount - index }}</div>
+                  <div>{{ exportParams.page * exportParams.size + index + 1 }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.membershipName }}</div>
@@ -149,14 +150,14 @@
               <tr v-if="!data || !data[0]">
                 <td colspan="9"><div>리스트가 없습니다.</div></td>
               </tr>
-              <tr v-for="item in data" :key="item.id" @click="onSelectedCheck(item.id)">
+              <tr v-for="(item, index) in data" :key="item.id">
                 <td>
                   <div>
-                    <SCheckbox v-model="item.isChecked" />
+                    <SCheckbox v-model="item.isChecked" @click="onSelectedCheck(item.id)" />
                   </div>
                 </td>
                 <td>
-                  <div>{{ item.index }}</div>
+                  <div>{{ selectedData.tablePage * selectedData.pageSize + index + 1 }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.membershipName }}</div>
@@ -186,9 +187,7 @@
       </SPagination>
     </div>
     <div class="bottom">
-      <SButton button-type="primary" :disabled="isConfirmPending || !couponUsingId" @click="handleOpenModalConfirm"
-        >발급</SButton
-      >
+      <SButton button-type="primary" :disabled="isConfirmPending" @click="handleOpenModalConfirm">발급</SButton>
     </div>
     <SDialogModal :is-show="isShowErrorModal" @close="isShowErrorModal = false">
       <template #content>{{ errorMsg }}</template>
@@ -228,6 +227,7 @@ import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import { API_ERROR } from '~/utils/message';
 import { COUPON_DEFAULT } from '~/assets/js/types';
 import { downloadMixin } from '~/mixins/donloadMixin';
+import { getCouponIssuanceStorage, setCouponIssuanceStorage } from '~/utils/storage';
 
 const INIT_GET_ACCOUNT_PARAMS = {
   page: 0,
@@ -261,7 +261,7 @@ export default {
   layout: 'admin/default',
   data() {
     return {
-      couponData: {},
+      couponData: null,
       syncCouponDataTime: 0,
       couponUsingId: null,
       feedback: {},
@@ -327,10 +327,11 @@ export default {
     }
   },
   mounted() {
-    this.fetch();
-  },
-  created() {
-    this.couponData = cloneDeep(COUPON_DEFAULT);
+    const hasStorageData = this.getPageDataSaved();
+    if (!hasStorageData) {
+      this.fetch();
+      this.couponData = cloneDeep(COUPON_DEFAULT);
+    }
   },
   methods: {
     validateCouponItem(couponItem) {
@@ -405,11 +406,15 @@ export default {
           this.couponUsingId = response?.data;
           this.feedback = {};
           this.couponData = cloneDeep(COUPON_DEFAULT);
+          return true;
         } catch (error) {
           alert(API_ERROR);
+          return false;
         }
       } else {
+        alert('쿠폰 정보를 모두 입력해 주세요.');
         this.feedback = feedback;
+        return false;
       }
     },
     async fetch() {
@@ -554,7 +559,11 @@ export default {
 
       return isValid;
     },
-    handleOpenModalConfirm() {
+    async handleOpenModalConfirm() {
+      const isAddedCoupon = await this.handleAddCoupon();
+      if (!isAddedCoupon) {
+        return;
+      }
       if (this.isValidate()) {
         this.isConfirmSave = true;
       }
@@ -596,6 +605,24 @@ export default {
     resetCoupon() {
       this.couponData = cloneDeep(COUPON_DEFAULT);
       this.syncCouponDataTime = Date.now();
+    },
+    handleSaveCouponIssuancePage() {
+      const storageData = {
+        couponData: this.couponData,
+        queryOptions: this.queryOptions,
+        tableData: this.tableData,
+        selectedData: this.selectedData
+      };
+      setCouponIssuanceStorage(storageData);
+    },
+    getPageDataSaved() {
+      const storageData = getCouponIssuanceStorage();
+      if (!storageData) return false;
+      this.couponData = storageData.couponData;
+      this.queryOptions = storageData.queryOptions;
+      this.tableData = storageData.tableData;
+      this.selectedData = storageData.selectedData;
+      return true;
     }
   }
 };
