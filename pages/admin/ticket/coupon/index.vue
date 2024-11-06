@@ -113,7 +113,6 @@
       <div class="title-menu">
         <div class="left">
           <h3>선택 계정 리스트</h3>
-          <span class="ml-8">({{ selectedData.userList.length }}/{{ selectedData.maxCount }})</span>
         </div>
         <div class="right">
           <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser(true)">전체 삭제</SButton>
@@ -611,7 +610,8 @@ export default {
         couponData: this.couponData,
         queryOptions: this.queryOptions,
         tableData: this.tableData,
-        selectedData: this.selectedData
+        selectedData: this.selectedData,
+        exportParams: this.exportParams
       };
       setCouponIssuanceStorage(storageData);
     },
@@ -622,6 +622,7 @@ export default {
       this.queryOptions = storageData.queryOptions;
       this.tableData = storageData.tableData;
       this.selectedData = storageData.selectedData;
+      this.exportParams = storageData.exportParams;
       return true;
     }
   }
