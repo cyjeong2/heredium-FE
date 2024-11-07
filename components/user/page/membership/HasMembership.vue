@@ -2,7 +2,7 @@
   <KeepAlive>
     <div class="center">
       <div class="membership-image-box">
-        <img src="~assets/img/login_logo.png" />
+        <img src="~assets/img/membership-logo-icon.png" />
       </div>
       <div class="content">
         <div class="center">
@@ -76,9 +76,6 @@ export default {
 
 .button {
   width: 100% !important;
-}
-.membership-image-box {
-  padding: 3rem 0;
 }
 img {
   object-fit: contain;
