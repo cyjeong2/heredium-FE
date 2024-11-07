@@ -117,6 +117,14 @@
         <div class="right">
           <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser(true)">전체 삭제</SButton>
           <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser()">삭제</SButton>
+          <input
+            ref="accountFile"
+            type="file"
+            accept=".xlsx, .XLSX"
+            class="is-blind"
+            @change="uploadAccountFile($event)"
+          />
+          <SButton button-type="transport-b" class="mr-8" @click="$refs.accountFile.click()">엑셀 파일 업로드</SButton>
           <SDownloadExcelTemplate
             button-type="transport-b"
             class="mr-16"
@@ -225,7 +233,7 @@ import SSearchBar from '~/components/admin/commons/SSearchBar';
 import SDropdown from '~/components/admin/commons/SDropdown';
 import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SCheckbox from '~/components/admin/commons/SCheckbox';
-import { threeCommaNum } from '~/assets/js/commons';
+import { fileValid, threeCommaNum } from '~/assets/js/commons';
 import SPagination from '~/components/admin/commons/SPagination';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
@@ -582,8 +590,9 @@ export default {
       this.isConfirmPending = true;
       if (this.isValidate()) {
         try {
+          const accountIds = this.selectedData.userList.map((item) => item.id);
           await this.$axios.$post('/admin/coupons/assign', {
-            account_ids: this.queryOptions.excludeIds,
+            account_ids: accountIds,
             coupon_id: this.couponUsingId
           });
 
@@ -624,6 +633,53 @@ export default {
       if (!storageData) return false;
       this.couponData = storageData;
       return true;
+    },
+    async uploadAccountFile(e) {
+      const file = e.target.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      const maxSize = 5 * 1024 * 1024;
+      const extension = e.target.accept.split(',');
+      const isValid = fileValid.check(e.target.files[0], maxSize, extension) !== null;
+
+      if (!isValid) {
+        this.isFileError = true;
+        return null;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await this.$axios.$post(`/admin/accounts/coupon-issuance/upload`, formData);
+        if (!Array.isArray(res)) {
+          return;
+        }
+        for (const account of res) {
+          if (this.selectedData.userList.some((item) => item.id === account.id)) {
+            continue;
+          }
+          this.selectedData.userList.push(account);
+          this.queryOptions.excludeIds.push(account.id);
+        }
+        this.fetch();
+      } catch (error) {
+        const errorMessage = error.response.data?.MESSAGE || '';
+        switch (errorMessage) {
+          case 'INVALID_EXCEL_FILE':
+            alert('xlsx 파일을 선택해주세요.');
+            break;
+          case 'INVALID_EXCEL_COLUMNS':
+            alert('업로드된 엑셀 파일의 열이 지정된 템플릿과 일치하지 않습니다.');
+            break;
+          default:
+            alert(API_ERROR);
+            break;
+        }
+      }
+      e.target.value = null;
+      e.target.files = null;
     }
   }
 };
