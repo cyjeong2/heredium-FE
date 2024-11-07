@@ -13,17 +13,10 @@
             <CouponCard
               v-for="item in availableCouponsList"
               :key="`coupon-${item.id}-${item.unused_coupons?.length}`"
-              class="coupon-card"
               :detail-coupon="item"
               @refresh-coupon-list="refreshCouponList"
             />
-
-            <CouponCardDisabled
-              v-for="(item, index) in usedCouponsList"
-              :key="index"
-              class="coupon-card"
-              :detail-coupon="item"
-            />
+            <CouponCardDisabled v-for="(item, index) in usedCouponsList" :key="index" :detail-coupon="item" />
           </div>
         </div>
       </div>

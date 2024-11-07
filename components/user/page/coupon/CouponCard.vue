@@ -1,17 +1,22 @@
 <template>
-  <div v-if="!isExpired" :class="{ checked: isChecked }" @click="toggleCheck">
+  <div
+    v-if="showCoupon"
+    :class="{ checked: isChecked, 'full-width': isSelection }"
+    class="coupon-card"
+    @click="toggleCheck"
+  >
     <div class="img-wrap">
       <img :src="couponImageSrc" />
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
       <div class="discount">
-        <div v-if="!isSelection" class="date">
+        <!-- <div v-if="!isSelection" class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
-        </div>
+        </div> -->
         <div class="date">
-          <img src="~assets/img/icon/icon_calender.svg" />
+          사용기간:
           <span>{{
             getFormattedDate(
               detailCoupon.unused_coupons[0].delivered_date,
@@ -20,35 +25,43 @@
           }}</span>
         </div>
       </div>
+      <div>
+        <div class="date">
+          사용여부:
+          <span v-if="detailCoupon.unused_coupons.length > 0">사용가능</span>
+          <span v-else>사용완료</span>
+        </div>
+      </div>
       <div class="coupon-remaining">
         <div v-if="!isSelection" class="button">
           <UButton
             class="reservation-btn"
-            :disabled="isExpired || detailCoupon.unused_coupons.length === 0"
+            w-size="100"
+            :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
             @click="handleOpenModal"
           >
             QR코드
           </UButton>
         </div>
-        <div v-if="isSelection" class="date">
+        <!-- <div v-if="isSelection" class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
-        </div>
-        <div v-if="detailCoupon.unused_coupons.length > 0" class="status active">
+        </div> -->
+        <!-- <div v-if="detailCoupon.unused_coupons.length > 0" class="status active">
           <span>사용가능</span>
         </div>
         <div v-else class="status deactive">
           <span>사용완료</span>
-        </div>
-        <div>
+        </div> -->
+        <!-- <div>
           <span>{{
             detailCoupon.unused_coupons[0].is_permanent ? '상시할인' : `${detailCoupon.unused_coupons.length}회남음`
           }}</span>
-        </div>
+        </div> -->
       </div>
       <modal-coupon-infor :detail-coupon="detailCoupon" :open="openModalQr" @close="handleCloseModal" />
     </div>
-    <div v-if="isSelection">
+    <div v-if="isSelection" class="select-box">
       <input type="radio" class="hidden-radio" :value="detailCoupon.id" @change="handleChange" />
       <div class="circle" :class="{ active: isChecked }"></div>
     </div>
@@ -104,6 +117,25 @@ export default {
     },
     isChecked() {
       return this.modelValue === this.value;
+    },
+    isCouponAwaitingStart() {
+      const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
+      if (!deliveredDate) return true;
+      const today = this.$dayjs().startOf('day');
+      const startDate = this.$dayjs(deliveredDate, 'YYYY-MM-DD HH:mm:ss', true);
+      if (!startDate.isValid()) {
+        return true;
+      }
+      return today.isBefore(startDate);
+    },
+    showCoupon() {
+      if (this.isExpired) {
+        return false;
+      }
+      if (this.isSelection && this.isCouponAwaitingStart) {
+        return false;
+      }
+      return true;
     }
   },
   created() {
@@ -148,8 +180,8 @@ export default {
     }
 
     .img-wrap {
-      height: 10.4rem;
-      width: 10rem;
+      height: 12rem;
+      width: 12rem;
 
       > img {
         width: 100%;
@@ -197,13 +229,13 @@ export default {
     font-size: 1.2rem;
 
     .button {
-      display: flex;
-      align-items: center;
+      display: block;
+      width: 100%;
     }
 
     .reservation-btn {
       min-width: 83px !important;
-      height: 22px;
+      height: 32px;
       font-size: 1.4rem;
       font-weight: 500;
     }
@@ -289,5 +321,20 @@ export default {
   background-color: var(--color-u-primary);
   border-radius: 50%;
   transform: translate(-50%, -50%);
+}
+.select-box {
+  flex: 1;
+  display: flex;
+  justify-content: end;
+}
+
+.full-width {
+  max-width: unset !important;
+}
+
+@media screen and (min-width: 769px) {
+  .coupon-card {
+    max-width: 400px;
+  }
 }
 </style>

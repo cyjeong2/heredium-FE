@@ -6,7 +6,6 @@
         <coupon-card
           v-for="item in data"
           :key="`coupon-${item.id}-${item.unused_coupons?.length}`"
-          class="coupon-card"
           :detail-coupon="item"
           :is-selection="isSelection"
           :value="item.id"
