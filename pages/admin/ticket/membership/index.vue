@@ -38,7 +38,6 @@
               </th>
               <th>NO</th>
               <th>멤버십</th>
-              <th>제목</th>
               <th>상태</th>
               <th>결제일시</th>
               <th>시작일시</th>
@@ -65,9 +64,6 @@
               </td>
               <td>
                 <div class="text-left">{{ item?.membership_name }}</div>
-              </td>
-              <td>
-                <div class="text-left">{{ item?.title }}</div>
               </td>
               <td>
                 <div>{{ item?.payment_status }}</div>
