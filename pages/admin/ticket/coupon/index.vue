@@ -86,7 +86,7 @@
                   <div class="text-left">{{ item.membershipName }}</div>
                 </td>
                 <td>
-                  <div>{{ item.id }}</div>
+                  <div>{{ item.email }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.name }}</div>
@@ -168,7 +168,7 @@
                   <div class="text-left">{{ item.membershipName }}</div>
                 </td>
                 <td>
-                  <div>{{ item.id }}</div>
+                  <div>{{ item.email }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.name }}</div>
@@ -735,22 +735,22 @@ export default {
       width: 6%;
     }
     &:nth-of-type(3) {
-      width: 15%;
+      width: 13%;
     }
     &:nth-of-type(4) {
-      width: 6%;
+      width: 14%;
     }
     &:nth-of-type(5) {
       width: 9%;
     }
     &:nth-of-type(6) {
-      width: 12%;
+      width: 10%;
     }
     &:nth-of-type(7) {
       width: 12%;
     }
     &:nth-of-type(8) {
-      width: 10%;
+      width: 6%;
     }
     &:last-of-type {
       width: 15%;
