@@ -2,7 +2,7 @@
   <div>
     <div class="representative-img" :style="{ zoom }">
       <label class="upload-img" @click.stop>
-        <img v-if="imageSrc" :src="imageUri" alt="테스트" />
+        <img v-if="imageSrc" :src="imageUri" alt="테스트" :style="{ objectFit }" />
         <span v-if="!imageSrc" class="file-info">
           <i class="ic-plus mb-28"></i>
           <span class="h4 mb-17 text-center">이미지를 등록해주세요.</span>
@@ -63,6 +63,10 @@ export default {
           ['PROJECT_THUMBNAIL', 'EVENT_THUMBNAIL', 'PROJECT_DETAIL_IMAGE', 'SMALL'].includes(value)
         );
       }
+    },
+    objectFit: {
+      type: String,
+      default: 'contain',
     }
   },
   data() {
