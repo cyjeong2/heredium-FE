@@ -5,6 +5,7 @@
         <SImageUploadRepresentative
           v-model="membershipImage"
           :zoom="0.9"
+          :object-fit="'cover'"
           type="PROJECT_DETAIL_IMAGE"
           :image-src="membershipImage"
           :class="{ 'is-error': isSubmitted && !membershipImage }"
