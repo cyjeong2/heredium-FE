@@ -116,7 +116,13 @@
         </div>
         <div class="right">
           <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser(true)">전체 삭제</SButton>
-          <SButton button-type="transport-b" class="mr-16" @click="removeSelectedUser()">삭제</SButton>
+          <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser()">삭제</SButton>
+          <SDownloadExcelTemplate
+            button-type="transport-b"
+            class="mr-16"
+            file-name="coupon_issuance_template"
+            url="/file/template/coupon-issuance/download"
+          />
           <SDropdown v-model="selectedData.pageSize" :option-list="optionList" @change="onSelectSizeChange"
             >리스트 수:</SDropdown
           >
@@ -227,6 +233,7 @@ import { API_ERROR } from '~/utils/message';
 import { COUPON_DEFAULT } from '~/assets/js/types';
 import { downloadMixin } from '~/mixins/donloadMixin';
 import { getCouponIssuanceStorage, setCouponIssuanceStorage } from '~/utils/storage';
+import SDownloadExcelTemplate from '~/components/admin/commons/SDownloadExcelTemplate.vue';
 
 const INIT_GET_ACCOUNT_PARAMS = {
   page: 0,
@@ -254,7 +261,8 @@ export default {
     SPageable,
     SButton,
     SSearchBar,
-    CouponEditor
+    CouponEditor,
+    SDownloadExcelTemplate
   },
   mixins: [downloadMixin],
   layout: 'admin/default',
