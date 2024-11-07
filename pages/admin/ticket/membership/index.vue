@@ -51,7 +51,7 @@
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
-              <td colspan="14"><div>리스트가 없습니다.</div></td>
+              <td colspan="13"><div>리스트가 없습니다.</div></td>
             </tr>
             <tr v-for="(item, index) in data" :key="item.id">
               <td>
