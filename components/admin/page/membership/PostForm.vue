@@ -110,7 +110,10 @@
                   <!-- <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i> -->
                   <div
                     class="collapse-icon"
-                    :class="{ expose: membershipIndexExpanded === membershipIndex }"
+                    :class="{
+                      expose:
+                        membershipIndexExpanded === membershipIndex || membershipIndexExpanded === membership.temp_id
+                    }"
                     @click="toggleExposeCoupon(membershipIndex)"
                   >
                     <i class="ic-arrow-next"></i>
@@ -119,8 +122,8 @@
                 <!-- BENEFIT -->
                 <CouponEditor
                   v-for="(coupon, couponIndex) in membership.coupons"
-                  v-show="membershipIndexExpanded === membershipIndex"
-                  :key="`membership_${membershipIndex}_coupon_${couponIndex}`"
+                  v-show="membershipIndexExpanded === membershipIndex || membershipIndexExpanded === membership.temp_id"
+                  :key="`membership_${membership.temp_id || membershipIndex}_coupon_${couponIndex}`"
                   :coupon="coupon"
                   :show-add-button="couponIndex === membership.coupons.length - 1"
                   :error="feedback?.memberships?.[membershipIndex]?.coupons?.[couponIndex]"
@@ -300,14 +303,16 @@ export default {
 
     handlePushMembershipOption(e) {
       const newMembership = cloneDeep(MEMBERSHIP_DEFAULT);
+      const tempId = Date.now();
       newMembership.name = e.name;
       newMembership.price = e.price;
       newMembership.image_url = e.image_url;
+      newMembership.temp_id = tempId;
+
       if (Array.isArray(this.detailData?.memberships)) {
-        this.detailData.memberships.push(newMembership);
+        this.detailData.memberships.unshift(newMembership);
       }
-      const indexNewMembership = this.detailData.memberships.length - 1;
-      this.membershipIndexExpanded = indexNewMembership;
+      this.membershipIndexExpanded = tempId;
     },
 
     toggleExposeCoupon(membershipIndex) {
@@ -458,7 +463,21 @@ export default {
       this.handleRegistrationPost();
     },
     async handleRegistrationPost() {
-      this.detailData = { ...this.detailData, additional_info: {}, events: null };
+      this.detailData = {
+        ...this.detailData,
+        additional_info: {},
+        events: null,
+        memberships: this.detailData.memberships.map((item) => {
+          const membership = cloneDeep(item);
+          if ('temp_id' in membership) {
+            delete membership.temp_id;
+          }
+          return {
+            ...membership
+          };
+        })
+      };
+
       try {
         if (this.mode === 'create') {
           await this.$axios.post('/admin/posts', this.detailData);
