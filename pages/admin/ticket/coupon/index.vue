@@ -138,7 +138,7 @@
       </div>
       <SPagination
         :table-wrap-class="'admin-table-wrap'"
-        :table-data="selectedUserList"
+        :table-data="selectedData.userList"
         :table-option="{ currentPage: selectedData.tablePage, pageSize: selectedData.pageSize }"
         @onPageChange="onPageChange"
       >
@@ -318,37 +318,11 @@ export default {
     };
   },
 
-  computed: {
-    selectedUserList() {
-      const searchText = this.searchSelectText;
-      let userList = this.selectedData.userList;
-
-      if (searchText) {
-        userList = userList.filter(
-          (user) => user.email.includes(searchText) || user.name.includes(searchText) || user.phone.includes(searchText)
-        );
-      }
-
-      return userList.map((user, index) => ({
-        ...user,
-        index: index + 1
-      }));
-    }
-  },
   watch: {
     'tableData.content': {
       deep: true,
       handler(newValue) {
         this.isCheckedAll = newValue.length > 0 ? newValue.every((item) => item.isChecked) : false;
-      }
-    },
-    selectedUserList: {
-      deep: true,
-      handler(newValue) {
-        const startIndex = this.selectedData.pageSize * this.selectedData.tablePage;
-        const targetList = newValue.slice(startIndex, this.selectedData.pageSize);
-
-        this.selectedData.isCheckedAll = targetList.length > 0 ? targetList.every((item) => item.isChecked) : false;
       }
     }
   },
@@ -716,6 +690,9 @@ export default {
       e.target.files = null;
     },
     isEqualCouponSaved() {
+      if (!this.couponSaved || !this.couponData) {
+        return false;
+      }
       const couponSaved = cloneDeep(this.couponSaved);
       delete couponSaved.coupon_id;
       const currentCoupon = cloneDeep(this.couponData);
