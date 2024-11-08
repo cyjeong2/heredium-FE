@@ -80,7 +80,7 @@
               <div class="grid-table-header">결제버튼 활성화</div>
               <div class="grid-table-header">세부내용</div>
               <!-- BODY -->
-              <template v-for="(membership, membershipIndex) in detailData.memberships">
+              <template v-for="(membership, membershipIndex) in memberships">
                 <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body checkbox-cell">
                   <SCheckbox v-model="membership.is_enabled" />
                 </div>
@@ -123,7 +123,7 @@
                 <CouponEditor
                   v-for="(coupon, couponIndex) in membership.coupons"
                   v-show="membershipIndexExpanded === membershipIndex || membershipIndexExpanded === membership.temp_id"
-                  :key="`membership_${membership.temp_id || membershipIndex}_coupon_${coupon.temp_id || couponIndex}`"
+                  :key="`membership_${membership.temp_id || membership.id || membershipIndex}_coupon_${coupon.temp_id || couponIndex}`"
                   :coupon="coupon"
                   :show-add-button="couponIndex === membership.coupons.length - 1"
                   :show-delete-button="!membership.id && !validateCouponItem(coupon)"
@@ -275,6 +275,11 @@ export default {
       isConfirmPending: false,
       isEdit: true
     };
+  },
+  computed: {
+    memberships() {
+      return this.detailData.memberships.filter(item => !item.is_deleted)
+    }
   },
   created() {
     this.detailData = this.postDetail;
