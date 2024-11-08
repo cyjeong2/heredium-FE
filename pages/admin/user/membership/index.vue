@@ -32,7 +32,7 @@
             <tr>
               <th>No</th>
               <th>멤버십 구분</th>
-              <th>아이디</th>
+              <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
               <th>결제일시</th>
@@ -55,7 +55,7 @@
                 <div class="text-left">{{ item.membership_name }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item.account_id }}</div>
+                <div class="text-left">{{ item.email }}</div>
               </td>
               <td>
                 <div class="text-left">{{ item.name }}</div>

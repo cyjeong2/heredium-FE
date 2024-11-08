@@ -76,7 +76,7 @@
     </div>
     <div class="info-table mb-24">
       <div class="row">
-        <label>아이디</label>
+        <label>계정</label>
         <div>
           <div>{{ detailData.email }}</div>
         </div>
