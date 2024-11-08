@@ -166,7 +166,7 @@
               <tr v-for="(item, index) in data" :key="item.id">
                 <td>
                   <div>
-                    <SCheckbox v-model="item.isChecked" @click="onSelectedCheck(item.id)" />
+                    <SCheckbox v-model="item.isChecked" />
                   </div>
                 </td>
                 <td>
@@ -220,12 +220,19 @@
         <SButton button-type="primary" @click="issuedTicket()">확인</SButton>
       </template>
     </SDialogModal>
+    <UploadAccountIssuance
+      v-if="uploadResult"
+      :success-cases="uploadResult.success_cases"
+      :failed-cases="uploadResult.failed_cases"
+      @close="uploadResult = null"
+    />
   </div>
 </template>
 
 <script>
 import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import STitle from '~/components/admin/commons/STitle';
 import SPageable from '~/components/admin/commons/SPageable';
 import SButton from '~/components/admin/commons/SButton';
@@ -242,6 +249,7 @@ import { COUPON_DEFAULT } from '~/assets/js/types';
 import { downloadMixin } from '~/mixins/donloadMixin';
 import { getCouponIssuanceStorage, setCouponIssuanceStorage } from '~/utils/storage';
 import SDownloadExcelTemplate from '~/components/admin/commons/SDownloadExcelTemplate.vue';
+import UploadAccountIssuance from '~/components/admin/modal/UploadAccountIssuance.vue';
 
 const INIT_GET_ACCOUNT_PARAMS = {
   page: 0,
@@ -270,7 +278,8 @@ export default {
     SButton,
     SSearchBar,
     CouponEditor,
-    SDownloadExcelTemplate
+    SDownloadExcelTemplate,
+    UploadAccountIssuance
   },
   mixins: [downloadMixin],
   layout: 'admin/default',
@@ -279,6 +288,7 @@ export default {
       couponData: null,
       syncCouponDataTime: 0,
       couponUsingId: null,
+      couponSaved: null,
       feedback: {},
       dateOptionList: [{ value: 'CREATED_DATE', label: '생성일시' }],
       queryOptions: INIT_GET_ACCOUNT_PARAMS,
@@ -303,7 +313,8 @@ export default {
       isShowErrorModal: false,
       isShowDoneModal: false,
       isConfirmPending: false,
-      isConfirmSave: false
+      isConfirmSave: false,
+      uploadResult: null
     };
   },
 
@@ -342,8 +353,10 @@ export default {
     }
   },
   mounted() {
-    const hasStorageData = this.getPageDataSaved();
-    if (!hasStorageData) {
+    const couponIdStored = getCouponIssuanceStorage();
+    if (couponIdStored) {
+      this.getPageDataSaved(couponIdStored);
+    } else {
       this.couponData = cloneDeep(COUPON_DEFAULT);
     }
   },
@@ -422,8 +435,7 @@ export default {
           const response = await this.$axios.post('/admin/coupons/non-membership', payload);
           this.couponUsingId = response?.data;
           this.feedback = {};
-          this.couponData = cloneDeep(COUPON_DEFAULT);
-          return true;
+          return response?.data;
         } catch (error) {
           alert(API_ERROR);
           return false;
@@ -514,22 +526,17 @@ export default {
       this.fetch();
     },
     removeSelectedUser(isAll) {
-      const selectedUserList = [...this.selectedData.userList].filter((user) => user.isChecked);
-
       if (isAll) {
         this.queryOptions.excludeIds = [];
         this.updateExportParams();
         this.selectedData.userList = [];
       } else {
-        selectedUserList.forEach((user) => {
-          const { id } = user;
-          const excludeTargetIndex = this.queryOptions.excludeIds.findIndex((item) => item.id === id);
-          const selectedTargetIndex = this.selectedData.userList.findIndex((item) => item.id === id);
+        const selectedUserRemain = [...this.selectedData.userList].filter((user) => !user.isChecked);
+        console.log('🚀 ~ removeSelectedUser ~ selectedUserRemain:', selectedUserRemain);
 
-          this.queryOptions.excludeIds.splice(excludeTargetIndex, 1);
-          this.updateExportParams();
-          this.selectedData.userList.splice(selectedTargetIndex, 1);
-        });
+        this.selectedData.userList = selectedUserRemain;
+        this.queryOptions.excludeIds = selectedUserRemain.map((item) => item.id);
+        this.updateExportParams();
       }
       this.selectedData.tablePage = 0;
       this.fetch();
@@ -579,9 +586,12 @@ export default {
       if (!this.isValidate()) {
         return;
       }
-      const isAddedCoupon = await this.handleAddCoupon();
-      if (!isAddedCoupon) {
-        return;
+      // IF COUPON IS EDITED THEN CALL API SAVE COUPON
+      if (!this.isEqualCouponSaved()) {
+        const isAddedCoupon = !!(await this.handleAddCoupon());
+        if (!isAddedCoupon) {
+          return;
+        }
       }
 
       this.isConfirmSave = true;
@@ -625,14 +635,35 @@ export default {
       this.couponData = cloneDeep(COUPON_DEFAULT);
       this.syncCouponDataTime = Date.now();
     },
-    handleSaveCouponIssuancePage() {
-      setCouponIssuanceStorage(this.couponData);
+    async handleSaveCouponIssuancePage() {
+      if (this.isEqualCouponSaved()) {
+        return;
+      }
+      const couponId = await this.handleAddCoupon();
+      if (couponId) {
+        setCouponIssuanceStorage(couponId);
+      }
     },
-    getPageDataSaved() {
-      const storageData = getCouponIssuanceStorage();
-      if (!storageData) return false;
-      this.couponData = storageData;
-      return true;
+    async getPageDataSaved(couponIdStored) {
+      if (!couponIdStored) return false;
+      // TODO: get coupon data
+      this.couponUsingId = couponIdStored;
+      try {
+        const couponResponse = await this.$axios.get(`/admin/coupons/${couponIdStored}`);
+        const couponData = couponResponse?.data;
+        if (!couponData) {
+          return false;
+        }
+
+        couponData.start_date = this.$dayjs(couponData.start_date).format('YYYY-MM-DD');
+        couponData.end_date = this.$dayjs(couponData.end_date).format('YYYY-MM-DD');
+        this.couponData = couponData;
+        this.couponSaved = couponData;
+
+        return true;
+      } catch (error) {
+        return false;
+      }
     },
     async uploadAccountFile(e) {
       const file = e.target.files?.[0];
@@ -653,10 +684,13 @@ export default {
         const formData = new FormData();
         formData.append('file', file);
         const res = await this.$axios.$post(`/admin/accounts/coupon-issuance/upload`, formData);
-        if (!Array.isArray(res)) {
+        console.log(res);
+        this.uploadResult = cloneDeep(res);
+        const successCases = res.success_cases || [];
+        if (!Array.isArray(successCases)) {
           return;
         }
-        for (const account of res) {
+        for (const account of successCases) {
           if (this.selectedData.userList.some((item) => item.id === account.id)) {
             continue;
           }
@@ -680,6 +714,13 @@ export default {
       }
       e.target.value = null;
       e.target.files = null;
+    },
+    isEqualCouponSaved() {
+      const couponSaved = cloneDeep(this.couponSaved);
+      delete couponSaved.coupon_id;
+      const currentCoupon = cloneDeep(this.couponData);
+      delete currentCoupon.coupon_id;
+      return isEqual(couponSaved, currentCoupon);
     }
   }
 };

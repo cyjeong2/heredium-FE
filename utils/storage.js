@@ -8,16 +8,16 @@ export function getCouponIssuanceStorage() {
     if (!stringData) {
       return null;
     }
-    return JSON.parse(stringData);
+    return Number(stringData);
   } catch (error) {
     return null;
   }
 }
 
-export function setCouponIssuanceStorage(payload) {
+export function setCouponIssuanceStorage(couponId) {
   try {
-    if (payload) {
-      localStorage.setItem(localStorageKeyName.couponIssuance, JSON.stringify(payload));
+    if (couponId) {
+      localStorage.setItem(localStorageKeyName.couponIssuance, String(couponId));
       return true;
     }
   } catch (error) {
