@@ -75,7 +75,7 @@
                   <SCheckbox v-model="isCheckedAll" @input="setCheckedAll" />
                 </th>
                 <th>NO</th>
-                <th>아이디</th>
+                <th>계정</th>
                 <th>이름</th>
                 <th>연락처</th>
                 <th>가입일시</th>
@@ -168,7 +168,7 @@
                   <SCheckbox v-model="selectedData.isCheckedAll" @input="setSelectedCheckedAll" />
                 </th>
                 <th>NO</th>
-                <th>아이디</th>
+                <th>계정</th>
                 <th>이름</th>
                 <th>연락처</th>
                 <th>가입일시</th>
