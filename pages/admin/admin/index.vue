@@ -10,7 +10,7 @@
           <thead>
             <tr>
               <th>NO</th>
-              <th>아이디</th>
+              <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
               <th>등록일시</th>
