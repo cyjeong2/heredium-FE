@@ -123,14 +123,27 @@
                 <CouponEditor
                   v-for="(coupon, couponIndex) in membership.coupons"
                   v-show="membershipIndexExpanded === membershipIndex || membershipIndexExpanded === membership.temp_id"
-                  :key="`membership_${membership.temp_id || membershipIndex}_coupon_${couponIndex}`"
+                  :key="`membership_${membership.temp_id || membershipIndex}_coupon_${coupon.temp_id || couponIndex}`"
                   :coupon="coupon"
                   :show-add-button="couponIndex === membership.coupons.length - 1"
+                  :show-delete-button="!membership.id && !validateCouponItem(coupon)"
                   :error="feedback?.memberships?.[membershipIndex]?.coupons?.[couponIndex]"
                   :validate-before-add-new-coupon="true"
                   @add-coupon="handleAddCoupon(membershipIndex)"
                   @update-coupon="(e) => handleUpdateCoupon(e, membershipIndex, couponIndex)"
+                  @delete-coupon="() => handleDeleteCoupon(membership, couponIndex)"
                 />
+
+                <div
+                  v-if="membershipIndexExpanded === membership.temp_id || membershipIndexExpanded === membershipIndex"
+                  :key="`membership_${membershipIndex}_delete`"
+                  class="grid-table-body delete-membership"
+                >
+                  <SButton @click="handleDeleteMemberShip(membership)">
+                    <i class="ic-trash"></i>
+                    멤버십 삭제
+                  </SButton>
+                </div>
               </template>
             </div>
           </div>
@@ -336,7 +349,12 @@ export default {
     },
 
     handleAddCoupon(membershipIndex) {
-      this.detailData.memberships[membershipIndex].coupons.push(cloneDeep(COUPON_DEFAULT));
+      this.detailData.memberships[membershipIndex].coupons.push(
+        cloneDeep({
+          ...COUPON_DEFAULT,
+          temp_id: Date.now()
+        })
+      );
     },
 
     handleUpdateCoupon(newCouponData, membershipIndex, couponIndex) {
@@ -431,6 +449,7 @@ export default {
       feedbackError.memberships = [];
       for (let membershipIndex = 0; membershipIndex < memberships.length; membershipIndex++) {
         const membershipItem = memberships[membershipIndex];
+        if (memberships.is_deleted) continue;
         const membershipFeedback = this.validateMembershipItem(membershipItem);
         feedbackError.memberships[membershipIndex] = membershipFeedback;
       }
@@ -473,7 +492,8 @@ export default {
             delete membership.temp_id;
           }
           return {
-            ...membership
+            ...membership,
+            coupons: item.coupons.map(({ ...coupon }) => coupon)
           };
         })
       };
@@ -500,6 +520,29 @@ export default {
         }
       }
       this.detailData.memberships.splice(index, 1);
+    },
+    handleDeleteMemberShip(membership) {
+      const cloneMemberships = cloneDeep(this.detailData.memberships);
+      if (!membership.id) {
+        this.detailData.memberships = cloneMemberships.filter((item) => item.id);
+        return;
+      }
+      this.detailData.memberships = cloneMemberships.map((item) => ({
+        ...item,
+        is_deleted: membership.id === item.id ? true : item.is_deleted
+      }));
+    },
+    handleDeleteCoupon(membership, couponIndex) {
+      if (membership.id) return;
+      const cloneMemberships = cloneDeep(this.detailData.memberships);
+      const newMembership = cloneDeep(membership);
+
+      newMembership.coupons.splice(couponIndex, 1);
+
+      this.detailData.memberships = cloneMemberships.map((item) => ({
+        ...item,
+        coupons: item.temp_id === membership.temp_id ? newMembership.coupons : item.coupons
+      }));
     }
   }
 };
@@ -598,7 +641,8 @@ export default {
     min-height: 4.5rem;
   }
   .create-membership,
-  .benefit-container {
+  .benefit-container,
+  .delete-membership {
     grid-column: span 5;
   }
   .checkbox-cell {
@@ -646,6 +690,11 @@ export default {
     }
     & > .collapse-icon > i {
       cursor: pointer;
+    }
+  }
+  .delete-membership {
+    button {
+      width: 100%;
     }
   }
 }
