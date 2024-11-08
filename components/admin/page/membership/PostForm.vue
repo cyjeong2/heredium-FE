@@ -527,27 +527,26 @@ export default {
       this.detailData.memberships.splice(index, 1);
     },
     handleDeleteMemberShip(membership) {
+      this.membershipIndexExpanded = null;
       const cloneMemberships = cloneDeep(this.detailData.memberships);
       if (!membership.id) {
-        this.detailData.memberships = cloneMemberships.filter((item) => item.id);
+        this.detailData.memberships = cloneMemberships.filter((item) => !item.temp_id || item.temp_id !== membership.temp_id);
         return;
       }
-      this.detailData.memberships = cloneMemberships.map((item) => ({
-        ...item,
-        is_deleted: membership.id === item.id ? true : item.is_deleted
-      }));
+
+      const indexOfCurrentMembership = cloneMemberships.findIndex(item => item.id === membership.id);
+      cloneMemberships[indexOfCurrentMembership].is_deleted = true;
+      this.detailData.memberships = cloneMemberships;
     },
     handleDeleteCoupon(membership, couponIndex) {
       if (membership.id) return;
       const cloneMemberships = cloneDeep(this.detailData.memberships);
       const newMembership = cloneDeep(membership);
-
       newMembership.coupons.splice(couponIndex, 1);
 
-      this.detailData.memberships = cloneMemberships.map((item) => ({
-        ...item,
-        coupons: item.temp_id === membership.temp_id ? newMembership.coupons : item.coupons
-      }));
+      const indexOfCurrentMembership = cloneMemberships.findIndex(item => item.id === membership.id);
+      cloneMemberships[indexOfCurrentMembership] = newMembership
+      this.detailData.memberships = cloneMemberships;
     }
   }
 };
