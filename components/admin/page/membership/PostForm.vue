@@ -174,7 +174,7 @@
         <SButton @click="modal.isReset = false">취소</SButton>
       </template>
       <template #modal-btn2>
-        <SButton button-type="primary" @click="reloadPage">확인</SButton>
+        <SButton button-type="primary" @click="handleReset">확인</SButton>
       </template>
     </SDialogModal>
     <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
@@ -277,8 +277,25 @@ export default {
     }
   },
   methods: {
-    reloadPage() {
-      window.location.replace(window.location.href);
+    async handleReset () {
+      const defaultData = {
+        ...POST_DETAIL,
+        memberships: this.detailData.memberships
+          .filter((item) => item.id)
+          .map((item) => ({
+            ...item,
+            is_deleted: true
+          }))
+      };
+
+      try {
+        await this.$axios.put('/admin/posts', defaultData);
+
+        this.modal = Object.assign(this.modal, { isReset: false, isSave: true });
+      } catch (error) {
+        alert(API_ERROR);
+        this.modal.isReset = false;
+      }
     },
     toKoreaCurrency,
     reload() {
