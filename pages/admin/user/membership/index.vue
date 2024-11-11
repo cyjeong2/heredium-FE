@@ -25,7 +25,7 @@
       >
     </div>
 
-    <SPageable :table-data="tableData" @getTableData="onChangePage(page)">
+    <SPageable :table-data="tableData" @getTableData="onChangePage">
       <template #data="{ data }">
         <table class="admin-table">
           <thead>
@@ -49,7 +49,7 @@
             </tr>
             <tr v-for="(item, index) in data" :key="item.id">
               <td>
-                <div>{{ tableData.startCount - index }}</div>
+                <div>{{ tableData.startCount + index + 1 }}</div>
               </td>
               <td>
                 <div class="text-left">{{ item.membership_name }}</div>
@@ -132,7 +132,7 @@ export default {
       ],
       dateOptionList: [{ value: 'CREATED_DATE', label: '가입일시' }],
       pageSizeList: [...PAGE_SIZE_OPTIONS],
-      tableData: []
+      tableData: null
     };
   },
   async fetch() {
@@ -157,7 +157,7 @@ export default {
           signUpDateTo
         }
       });
-      this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+      this.tableData.startCount = this.tableData.number * this.tableData.size;
       this.queryOptionsSaved = cloneDeep(this.queryOptions);
     } catch (error) {
       alert(API_ERROR);
@@ -179,9 +179,9 @@ export default {
         this.$fetch();
       }
     },
-    onSelectSizeChange(size) {
+    onSelectSizeChange() {
       if (!this.$fetchState.pending) {
-        this.queryOptions.size = size;
+        this.queryOptions.page = 0;
         this.$fetch();
       }
     },
