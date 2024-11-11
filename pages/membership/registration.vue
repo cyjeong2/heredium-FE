@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isDataReady && !!postDetail">
+  <div v-if="isDataReady && !!postDetail && !isHiddenPage">
     <section class="contents">
       <div class="container">
         <h1 class="title" :class="{ 'mb-2rem': postDetail.sub_title }">{{ postDetail.name }}</h1>
@@ -193,12 +193,24 @@ export default {
     },
     isDisabledRegistration() {
       let isDisabled = false;
-      if (this.postDetail.open_date) {
+      if (this.postDetail?.open_date) {
         const today = this.$dayjs();
         const openDate = this.$dayjs(this.postDetail.open_date, 'YYYY-MM-DD', true);
         isDisabled = today.isBefore(openDate);
       }
       return isDisabled;
+    },
+    isHiddenPage() {
+      if (!this.postDetail) {
+        return true;
+      }
+      const today = this.$dayjs();
+      const startDateRegistration = this.$dayjs(this.postDetail.start_date, 'YYYY-MM-DD', true).startOf('day');
+      const endDateRegistration = this.$dayjs(this.postDetail.end_date, 'YYYY-MM-DD', true).endOf('day');
+      if (today.isBefore(startDateRegistration) || today.isAfter(endDateRegistration)) {
+        return true;
+      }
+      return false;
     }
   },
   methods: {
