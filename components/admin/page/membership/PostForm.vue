@@ -126,7 +126,7 @@
                   :key="`membership_${membership.temp_id || membership.id || membershipIndex}_coupon_${coupon.temp_id || couponIndex}`"
                   :coupon="coupon"
                   :show-add-button="couponIndex === membership.coupons.length - 1"
-                  :show-delete-button="!membership.id && !validateCouponItem(coupon)"
+                  :show-delete-button="!coupon.id && membership.coupons.length > 1"
                   :error="feedback?.memberships?.[membershipIndex]?.coupons?.[couponIndex]"
                   :validate-before-add-new-coupon="true"
                   @add-coupon="handleAddCoupon(membershipIndex)"
@@ -539,7 +539,7 @@ export default {
       this.detailData.memberships = cloneMemberships;
     },
     handleDeleteCoupon(membership, couponIndex) {
-      if (membership.id) return;
+      if (membership.coupons[couponIndex]?.id) return;
       const cloneMemberships = cloneDeep(this.detailData.memberships);
       const newMembership = cloneDeep(membership);
       newMembership.coupons.splice(couponIndex, 1);
@@ -697,6 +697,7 @@ export default {
     }
   }
   .delete-membership {
+    margin-top: -1px;
     button {
       width: 100%;
     }
