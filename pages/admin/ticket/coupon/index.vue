@@ -403,11 +403,13 @@ export default {
         : '';
 
       const payload = { ...this.couponData, start_date: startDate, end_date: endDate, period_in_days: null };
+      if (payload.coupon_id) {
+        delete payload.coupon_id;
+      }
 
       if (isEmpty(feedback)) {
         try {
           const response = await this.$axios.post('/admin/coupons/non-membership', payload);
-          this.couponUsingId = response?.data;
           this.feedback = {};
           return response?.data;
         } catch (error) {
@@ -613,9 +615,15 @@ export default {
       if (this.isEqualCouponSaved()) {
         return;
       }
-      const couponId = await this.handleAddCoupon();
-      if (couponId) {
-        setCouponIssuanceStorage(couponId);
+      const couponSaved = await this.handleAddCoupon();
+      if (couponSaved) {
+        setCouponIssuanceStorage(couponSaved.coupon_id);
+        this.couponUsingId = couponSaved.coupon_id;
+        couponSaved.start_date = this.$dayjs(couponSaved.start_date).format('YYYY-MM-DD');
+        couponSaved.end_date = this.$dayjs(couponSaved.end_date).format('YYYY-MM-DD');
+        this.couponData = cloneDeep(couponSaved);
+        this.couponSaved = cloneDeep(couponSaved);
+        this.syncCouponDataTime = Date.now();
       }
     },
     async getPageDataSaved(couponIdStored) {
@@ -631,8 +639,8 @@ export default {
 
         couponData.start_date = this.$dayjs(couponData.start_date).format('YYYY-MM-DD');
         couponData.end_date = this.$dayjs(couponData.end_date).format('YYYY-MM-DD');
-        this.couponData = couponData;
-        this.couponSaved = couponData;
+        this.couponData = cloneDeep(couponData);
+        this.couponSaved = cloneDeep(couponData);
 
         return true;
       } catch (error) {
