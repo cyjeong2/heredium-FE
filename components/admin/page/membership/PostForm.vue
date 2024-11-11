@@ -26,6 +26,12 @@
           </div>
         </div>
         <div class="row">
+          <label>세부 설명</label>
+          <div class="has-feedback">
+            <SInput v-model="detailData.sub_title" maxlength="100" w-size="xx-large" />
+          </div>
+        </div>
+        <div class="row">
           <label>게시물 등록 기간 / 오픈일</label>
           <div>
             <SDatepicker
@@ -38,6 +44,17 @@
             <SDatepicker
               v-model="detailData.end_date"
               :class="{ 'is-error': feedback?.end_date }"
+              :min="detailData.start_date"
+              w-size="xx-large"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <label>오픈일 지정</label>
+          <div>
+            <SDatepicker
+              v-model="detailData.open_date"
+              :class="{ 'is-error': feedback?.open_date }"
               :min="detailData.start_date"
               w-size="xx-large"
             />
@@ -407,14 +424,21 @@ export default {
       if (!thumbnail || !thumbnail.large || !thumbnail.medium || !thumbnail.small) {
         feedbackError.thumbnailUrl = true;
       }
-      const startDate = this.detailData.start_date;
-      if (!startDate || !this.$dayjs(startDate, 'YYYY-MM-DD', true).isValid()) {
+      const startDate = this.detailData.start_date && this.$dayjs(this.detailData.start_date, 'YYYY-MM-DD', true);
+      if (!startDate || !startDate.isValid()) {
         feedbackError.start_date = true;
       }
-      const endDate = this.detailData.end_date;
-      if (!endDate || !this.$dayjs(endDate, 'YYYY-MM-DD', true).isValid()) {
+      const endDate = this.detailData.end_date && this.$dayjs(this.detailData.end_date, 'YYYY-MM-DD', true);
+      if (!endDate || !endDate.isValid()) {
         feedbackError.end_date = true;
       }
+      const openDate = this.detailData.open_date && this.$dayjs(this.detailData.open_date, 'YYYY-MM-DD', true);
+      if (!openDate || !openDate.isValid()) {
+        feedbackError.open_date = true;
+      } else if (startDate && openDate.isBefore(startDate)) {
+        feedbackError.open_date = true;
+      }
+
       if (!this.detailData.content_detail) {
         feedbackError.contentDetail = true;
       }
