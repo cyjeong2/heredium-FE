@@ -2,7 +2,8 @@
   <div v-if="isDataReady && !!postDetail">
     <section class="contents">
       <div class="container">
-        <h1>{{ postDetail.name }}</h1>
+        <h1 class="title" :class="{ 'mb-2rem': postDetail.sub_title }">{{ postDetail.name }}</h1>
+        <h2 v-if="postDetail.sub_title" class="sub-title">{{ postDetail.sub_title }}</h2>
       </div>
       <section class="banner">
         <img :src="postImageDetail" alt="Heredium membership image" />
@@ -26,6 +27,7 @@
                 :model-value="membershipIdSelected"
                 :membership="membership"
                 :change="openBottomSheet"
+                :disable-registration="isDisabledRegistration"
               >
               </MembershipOption>
             </div>
@@ -188,6 +190,15 @@ export default {
         return false;
       }
       return this.isShowBottomSheet;
+    },
+    isDisabledRegistration() {
+      let isDisabled = false;
+      if (this.postDetail.open_date) {
+        const today = this.$dayjs();
+        const openDate = this.$dayjs(this.postDetail.open_date, 'YYYY-MM-DD', true);
+        isDisabled = today.isBefore(openDate);
+      }
+      return isDisabled;
     }
   },
   methods: {
@@ -302,6 +313,11 @@ export default {
   grid-template-columns: 1fr;
   padding: 0 !important;
 }
+
+.mb-2rem {
+  margin-bottom: 2rem;
+}
+
 h1 {
   font-size: 2.4rem;
   font-weight: 700;
@@ -317,6 +333,10 @@ h2 {
   font-weight: 700;
   line-height: 100%;
   color: var(--color-default);
+}
+
+.sub-title {
+  margin-bottom: 0;
 }
 
 .top-border {
@@ -460,6 +480,10 @@ h2 {
     font-size: 4.2rem;
     line-height: 150%;
     margin-top: 4.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .contents .sub-title {
     margin-bottom: 2rem;
   }
 
