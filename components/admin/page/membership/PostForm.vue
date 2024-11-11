@@ -25,21 +25,6 @@
             />
           </div>
         </div>
-        <!-- <div class="row">
-          <label>내용(선택) </label>
-          <div>
-            <div>
-              <EventTypeSelection
-                v-for="(event, index) in detailData.events"
-                :key="index"
-                :event="event"
-                @update-event="(e) => handleUpdateEvent(e, index)"
-                @delete-event="handleDeleteEvent(index)"
-              />
-            </div>
-            <SButton button-type="primary" w-size="medium" @click="handleAddEvent"> Add </SButton>
-          </div>
-        </div> -->
         <div class="row">
           <label>게시물 등록 기간 / 오픈일</label>
           <div>
@@ -80,14 +65,14 @@
               <div class="grid-table-header">결제버튼 활성화</div>
               <div class="grid-table-header">세부내용</div>
               <!-- BODY -->
-              <template v-for="(membership, membershipIndex) in detailData.memberships">
-                <div :key="`membership_${membershipIndex}_checkbox`" class="grid-table-body checkbox-cell">
+              <template v-for="(membership, membershipIndex) in memberships">
+                <div :key="`${membership.tempId}_checkbox`" class="grid-table-body checkbox-cell">
                   <SCheckbox v-model="membership.is_enabled" />
                 </div>
-                <div :key="`membership_${membershipIndex}_name_edit`" class="grid-table-body membership-name">
+                <div :key="`${membership.tempId}_name_edit`" class="grid-table-body membership-name">
                   <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
                 </div>
-                <div :key="`membership_${membershipIndex}_price_edit`" class="grid-table-body">
+                <div :key="`${membership.tempId}_price_edit`" class="grid-table-body">
                   <SFlexInputGrid>
                     <template #input>
                       <SInput
@@ -103,16 +88,14 @@
                     </template>
                   </SFlexInputGrid>
                 </div>
-                <div :key="`membership_${membershipIndex}_active-register`" class="grid-table-body checkbox-cell">
+                <div :key="`${membership.tempId}_active-register`" class="grid-table-body checkbox-cell">
                   <SCheckbox v-model="membership.is_register_membership_button_shown" />
                 </div>
-                <div :key="`membership_${membershipIndex}_action`" class="grid-table-body membership-action">
-                  <!-- <i class="ic-trash" @click="handleDeleteMembershipOption(membershipIndex)"></i> -->
+                <div :key="`${membership.tempId}_action`" class="grid-table-body membership-action">
                   <div
                     class="collapse-icon"
                     :class="{
-                      expose:
-                        membershipIndexExpanded === membershipIndex || membershipIndexExpanded === membership.temp_id
+                      expose: membershipIndexExpanded === membershipIndex
                     }"
                     @click="toggleExposeCoupon(membershipIndex)"
                   >
@@ -122,15 +105,28 @@
                 <!-- BENEFIT -->
                 <CouponEditor
                   v-for="(coupon, couponIndex) in membership.coupons"
-                  v-show="membershipIndexExpanded === membershipIndex || membershipIndexExpanded === membership.temp_id"
-                  :key="`membership_${membership.temp_id || membershipIndex}_coupon_${couponIndex}`"
+                  v-show="membershipIndexExpanded === membershipIndex"
+                  :key="`${membership.tempId}_coupon_${coupon.tempId}`"
                   :coupon="coupon"
                   :show-add-button="couponIndex === membership.coupons.length - 1"
+                  :show-delete-button="!coupon.id && membership.coupons.length > 1"
                   :error="feedback?.memberships?.[membershipIndex]?.coupons?.[couponIndex]"
                   :validate-before-add-new-coupon="true"
                   @add-coupon="handleAddCoupon(membershipIndex)"
                   @update-coupon="(e) => handleUpdateCoupon(e, membershipIndex, couponIndex)"
+                  @delete-coupon="() => handleDeleteCoupon(membershipIndex, couponIndex)"
                 />
+
+                <div
+                  v-if="membershipIndexExpanded === membershipIndex"
+                  :key="`${membership.tempId}_delete`"
+                  class="grid-table-body delete-membership"
+                >
+                  <SButton @click="handleDeleteMemberShip(membershipIndex)">
+                    <i class="ic-trash"></i>
+                    멤버십 삭제
+                  </SButton>
+                </div>
               </template>
             </div>
           </div>
@@ -204,7 +200,7 @@ import SInput from '~/components/admin/commons/SInput';
 import SToggle from '~/components/admin/commons/SToggle';
 import SummernoteEditor from '~/components/admin/commons/Summernote';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
-import { COUPON_DEFAULT, EVENT_DEFAULT, MEMBERSHIP_DEFAULT, POST_DETAIL } from '~/assets/js/types';
+import { COUPON_DEFAULT, MEMBERSHIP_DEFAULT, POST_DETAIL } from '~/assets/js/types';
 import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
 import SImageUploadRepresentative from '~/components/admin/commons/SImageUploadRepresentative.vue';
 import { imageMixin } from '~/mixins/imageMixin';
@@ -263,18 +259,25 @@ export default {
       isEdit: true
     };
   },
+  computed: {
+    memberships() {
+      return this.detailData.memberships.filter((item) => !item.is_deleted);
+    }
+  },
   created() {
-    this.detailData = this.postDetail;
+    const detailData = this.postDetail;
     this.isEdit = this.mode === 'edit';
     if (this.isEdit) {
-      const events = Object.entries(this.detailData.additional_info)
-        .filter(([_, quantity]) => quantity !== null)
-        .map(([eventType, quantity]) => ({
-          eventType,
-          quantity
-        }));
-      this.detailData = { ...this.postDetail, events };
+      detailData.memberships = detailData.memberships.map((membership) => {
+        const coupons = membership.coupons;
+        return {
+          ...membership,
+          tempId: membership.id,
+          coupons: coupons.map((coupon) => Object.assign(coupon, { tempId: coupon.id }))
+        };
+      });
     }
+    this.detailData = detailData;
   },
   methods: {
     reloadPage() {
@@ -307,12 +310,12 @@ export default {
       newMembership.name = e.name;
       newMembership.price = e.price;
       newMembership.image_url = e.image_url;
-      newMembership.temp_id = tempId;
+      newMembership.tempId = tempId;
 
       if (Array.isArray(this.detailData?.memberships)) {
-        this.detailData.memberships.unshift(newMembership);
+        this.detailData.memberships.push(newMembership);
       }
-      this.membershipIndexExpanded = tempId;
+      this.membershipIndexExpanded = this.detailData.memberships.length - 1;
     },
 
     toggleExposeCoupon(membershipIndex) {
@@ -323,20 +326,13 @@ export default {
       this.membershipIndexExpanded = membershipIndex;
     },
 
-    handleAddEvent() {
-      this.detailData.events.push(cloneDeep(EVENT_DEFAULT));
-    },
-
-    handleDeleteEvent(index) {
-      this.detailData.events.splice(index, 1);
-    },
-
-    handleUpdateEvent(newEventData, eventIndex) {
-      this.detailData.events[eventIndex] = cloneDeep(newEventData);
-    },
-
     handleAddCoupon(membershipIndex) {
-      this.detailData.memberships[membershipIndex].coupons.push(cloneDeep(COUPON_DEFAULT));
+      this.detailData.memberships[membershipIndex].coupons.push(
+        cloneDeep({
+          ...COUPON_DEFAULT,
+          tempId: Date.now()
+        })
+      );
     },
 
     handleUpdateCoupon(newCouponData, membershipIndex, couponIndex) {
@@ -431,6 +427,7 @@ export default {
       feedbackError.memberships = [];
       for (let membershipIndex = 0; membershipIndex < memberships.length; membershipIndex++) {
         const membershipItem = memberships[membershipIndex];
+        if (memberships.is_deleted) continue;
         const membershipFeedback = this.validateMembershipItem(membershipItem);
         feedbackError.memberships[membershipIndex] = membershipFeedback;
       }
@@ -463,26 +460,25 @@ export default {
       this.handleRegistrationPost();
     },
     async handleRegistrationPost() {
-      this.detailData = {
-        ...this.detailData,
-        additional_info: {},
-        events: null,
-        memberships: this.detailData.memberships.map((item) => {
-          const membership = cloneDeep(item);
-          if ('temp_id' in membership) {
-            delete membership.temp_id;
+      const detailData = { ...this.detailData, additional_info: {}, events: null };
+      // Delete tempId in membershipOption
+      for (const membershipOption of detailData.memberships) {
+        if (membershipOption.tempId) {
+          delete membershipOption.tempId;
+        }
+        // Delete tempId in coupon
+        for (const coupon of membershipOption.coupons) {
+          if (coupon.tempId) {
+            delete coupon.tempId;
           }
-          return {
-            ...membership
-          };
-        })
-      };
+        }
+      }
 
       try {
         if (this.mode === 'create') {
-          await this.$axios.post('/admin/posts', this.detailData);
+          await this.$axios.post('/admin/posts', detailData);
         } else {
-          await this.$axios.put('/admin/posts', this.detailData);
+          await this.$axios.put('/admin/posts', detailData);
         }
         this.modal = Object.assign(this.modal, { isConfirmSave: false, isSave: true });
       } catch (error) {
@@ -490,16 +486,34 @@ export default {
         this.modal.isConfirmSave = false;
       }
     },
-    handleDeleteMembershipOption(index) {
-      if (typeof this.membershipIndexExpanded === 'number') {
-        if (this.membershipIndexExpanded === index) {
-          this.membershipIndexExpanded = null;
-        }
-        if (this.membershipIndexExpanded > index) {
-          this.membershipIndexExpanded = this.membershipIndexExpanded - 1;
-        }
+    handleDeleteMemberShip(membershipIndex) {
+      const cloneMemberships = cloneDeep(this.detailData.memberships);
+      const membership = cloneMemberships[membershipIndex];
+
+      if (!membership.id) {
+        cloneMemberships.splice(membershipIndex, 1);
+      } else {
+        membership.is_deleted = true;
       }
-      this.detailData.memberships.splice(index, 1);
+
+      this.detailData.memberships = cloneMemberships;
+
+      if (this.membershipIndexExpanded === membershipIndex) {
+        this.membershipIndexExpanded = null;
+      }
+      if (this.membershipIndexExpanded > membershipIndex) {
+        this.membershipIndexExpanded = this.membershipIndexExpanded - 1;
+      }
+    },
+    handleDeleteCoupon(membershipIndex, couponIndex) {
+      const membershipOption = this.detailData.memberships[membershipIndex];
+      const hasCouponId = membershipOption.coupons[couponIndex]?.id;
+      const isLastCoupon = membershipOption.coupons.length <= 1;
+      if (hasCouponId || isLastCoupon) return;
+
+      const newCouponList = cloneDeep(membershipOption.coupons);
+      newCouponList.splice(couponIndex, 1);
+      membershipOption.coupons = newCouponList;
     }
   }
 };
@@ -598,7 +612,8 @@ export default {
     min-height: 4.5rem;
   }
   .create-membership,
-  .benefit-container {
+  .benefit-container,
+  .delete-membership {
     grid-column: span 5;
   }
   .checkbox-cell {
@@ -646,6 +661,12 @@ export default {
     }
     & > .collapse-icon > i {
       cursor: pointer;
+    }
+  }
+  .delete-membership {
+    margin-top: -1px;
+    button {
+      width: 100%;
     }
   }
 }
