@@ -110,8 +110,9 @@
           </s-flex-input-grid>
         </div>
       </div>
-      <div v-if="showAddButton && !disabled" class="right">
-        <SButton button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가 </SButton>
+      <div v-if="!disabled" class="right">
+        <SButton v-if="showDeleteButton" button-type="standard" w-size="medium" @click="handleDeleteCoupon">삭제</SButton>
+        <SButton v-if="showAddButton" button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가 </SButton>
       </div>
     </div>
   </div>
@@ -155,6 +156,11 @@ export default {
       default: undefined
     },
     showAddButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    showDeleteButton: {
       type: Boolean,
       required: false,
       default: false
@@ -233,7 +239,10 @@ export default {
       }
 
       this.feedbackError = feedbackError;
-    }
+    },
+    handleDeleteCoupon() {
+      this.$emit('delete-coupon');
+    },
   }
 };
 </script>
@@ -284,6 +293,10 @@ export default {
   .right {
     display: flex;
     justify-content: end;
+
+    :last-child {
+      margin-left: 8px;
+    }
   }
   .must {
     color: var(--color-blue);
