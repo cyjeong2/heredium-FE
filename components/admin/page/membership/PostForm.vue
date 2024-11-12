@@ -507,7 +507,10 @@ export default {
       this.handleRegistrationPost();
     },
     async handleRegistrationPost() {
-      const detailData = { ...this.detailData, additional_info: {}, events: null };
+      const detailData = cloneDeep(this.detailData);
+      detailData.additional_info = {};
+      detailData.events = null;
+
       // Delete tempId in membershipOption
       for (const membershipOption of detailData.memberships) {
         if (membershipOption.tempId) {
@@ -534,23 +537,23 @@ export default {
       }
     },
     handleDeleteMemberShip(membershipIndex) {
+      if (this.membershipIndexExpanded === membershipIndex) {
+        this.membershipIndexExpanded = null;
+      }
+
       const cloneMemberships = cloneDeep(this.detailData.memberships);
       const membership = cloneMemberships[membershipIndex];
 
       if (!membership.id) {
         cloneMemberships.splice(membershipIndex, 1);
+        if (typeof this.membershipIndexExpanded === 'number' && this.membershipIndexExpanded > membershipIndex) {
+          this.membershipIndexExpanded = this.membershipIndexExpanded - 1;
+        }
       } else {
         membership.is_deleted = true;
       }
 
       this.detailData.memberships = cloneMemberships;
-
-      if (this.membershipIndexExpanded === membershipIndex) {
-        this.membershipIndexExpanded = null;
-      }
-      if (this.membershipIndexExpanded > membershipIndex) {
-        this.membershipIndexExpanded = this.membershipIndexExpanded - 1;
-      }
     },
     handleDeleteCoupon(membershipIndex, couponIndex) {
       const membershipOption = this.detailData.memberships[membershipIndex];
