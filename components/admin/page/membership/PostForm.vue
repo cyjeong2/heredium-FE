@@ -187,7 +187,7 @@
         <SButton @click="modal.isReset = false">취소</SButton>
       </template>
       <template #modal-btn2>
-        <SButton button-type="primary" @click="reloadPage">확인</SButton>
+        <SButton button-type="primary" @click="resetPost">확인</SButton>
       </template>
     </SDialogModal>
     <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
@@ -297,8 +297,16 @@ export default {
     this.detailData = detailData;
   },
   methods: {
-    reloadPage() {
-      window.location.replace(window.location.href);
+    resetPost() {
+      const oldMembershipOption = cloneDeep(this.detailData.memberships);
+      this.detailData = cloneDeep(POST_DETAIL);
+      let newMembershipOption = oldMembershipOption.filter((membershipOption) => membershipOption.id);
+      newMembershipOption = newMembershipOption.map((membershipOption) =>
+        Object.assign(membershipOption, { is_deleted: true })
+      );
+      this.detailData.memberships = newMembershipOption;
+      this.feedback = {};
+      this.modal.isReset = false;
     },
     toKoreaCurrency,
     reload() {
@@ -308,7 +316,7 @@ export default {
       this.detailData.thumbnail_urls = e.resizeImage;
     },
     removeThumbnail() {
-      this.detailData.thumbnail_urls = { ...POST_DETAIL.thumbnail_url };
+      this.detailData.thumbnail_urls = { ...POST_DETAIL.thumbnail_urls };
     },
 
     updateNoteImage(e) {
