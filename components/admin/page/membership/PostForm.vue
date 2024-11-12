@@ -82,14 +82,22 @@
               <div class="grid-table-header">결제버튼 활성화</div>
               <div class="grid-table-header">세부내용</div>
               <!-- BODY -->
-              <template v-for="(membership, membershipIndex) in memberships">
-                <div :key="`${membership.tempId}_checkbox`" class="grid-table-body checkbox-cell">
+              <template v-for="(membership, membershipIndex) in detailData.memberships">
+                <div
+                  v-show="!membership.is_deleted"
+                  :key="`${membership.tempId}_checkbox`"
+                  class="grid-table-body checkbox-cell"
+                >
                   <SCheckbox v-model="membership.is_enabled" />
                 </div>
-                <div :key="`${membership.tempId}_name_edit`" class="grid-table-body membership-name">
+                <div
+                  v-show="!membership.is_deleted"
+                  :key="`${membership.tempId}_name_edit`"
+                  class="grid-table-body membership-name"
+                >
                   <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
                 </div>
-                <div :key="`${membership.tempId}_price_edit`" class="grid-table-body">
+                <div v-show="!membership.is_deleted" :key="`${membership.tempId}_price_edit`" class="grid-table-body">
                   <SFlexInputGrid>
                     <template #input>
                       <SInput
@@ -105,10 +113,18 @@
                     </template>
                   </SFlexInputGrid>
                 </div>
-                <div :key="`${membership.tempId}_active-register`" class="grid-table-body checkbox-cell">
+                <div
+                  v-show="!membership.is_deleted"
+                  :key="`${membership.tempId}_active-register`"
+                  class="grid-table-body checkbox-cell"
+                >
                   <SCheckbox v-model="membership.is_register_membership_button_shown" />
                 </div>
-                <div :key="`${membership.tempId}_action`" class="grid-table-body membership-action">
+                <div
+                  v-show="!membership.is_deleted"
+                  :key="`${membership.tempId}_action`"
+                  class="grid-table-body membership-action"
+                >
                   <div
                     class="collapse-icon"
                     :class="{
@@ -276,11 +292,6 @@ export default {
       isEdit: true
     };
   },
-  computed: {
-    memberships() {
-      return this.detailData.memberships.filter((item) => !item.is_deleted);
-    }
-  },
   created() {
     const detailData = this.postDetail;
     this.isEdit = this.mode === 'edit';
@@ -395,6 +406,10 @@ export default {
     },
 
     validateMembershipItem(membershipItem) {
+      if (membershipItem.is_deleted) {
+        return null;
+      }
+
       let feedback = { coupons: [] };
       const coupons = membershipItem.coupons || [];
 
