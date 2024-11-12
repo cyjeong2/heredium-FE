@@ -334,7 +334,8 @@ export const COUPON_DEFAULT = {
   number_of_uses: 1,
   is_permanent: false,
   start_date: '',
-  end_date: ''
+  end_date: '',
+  tempId: Date.now()
 };
 
 export const MEMBERSHIP_DEFAULT = {
@@ -343,7 +344,8 @@ export const MEMBERSHIP_DEFAULT = {
   image_url: '',
   is_enabled: true,
   coupons: [{ ...COUPON_DEFAULT }],
-  is_register_membership_button_shown: true
+  is_register_membership_button_shown: true,
+  tempId: Date.now()
 };
 
 export const CONTENT_TAG = {
