@@ -323,7 +323,7 @@ export default {
   display: grid;
   row-gap: 40px;
   grid-template-columns: 1fr;
-  padding: 0 !important;
+  padding: 0 0 20px 0 !important;
 }
 
 .mb-2rem {
