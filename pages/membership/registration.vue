@@ -2,8 +2,8 @@
   <div v-if="isDataReady && !!postDetail && !isHiddenPage">
     <section class="contents">
       <div class="container">
-        <h1 class="title" :class="{ 'mb-2rem': postDetail.sub_title }">{{ postDetail.name }}</h1>
-        <h2 v-if="postDetail.sub_title" class="sub-title">{{ postDetail.sub_title }}</h2>
+        <h1 class="title" :class="{ 'mb-12': postDetail.sub_title }">{{ postDetail.name }}</h1>
+        <h3 v-if="postDetail.sub_title" class="sub-title">{{ postDetail.sub_title }}</h3>
       </div>
       <section class="banner">
         <img :src="postImageDetail" alt="Heredium membership image" />
@@ -323,11 +323,11 @@ export default {
   display: grid;
   row-gap: 40px;
   grid-template-columns: 1fr;
-  padding: 0 !important;
+  padding: 0 0 20px 0 !important;
 }
 
-.mb-2rem {
-  margin-bottom: 2rem;
+.mb-12 {
+  margin-bottom: 12px;
 }
 
 h1 {
@@ -349,6 +349,10 @@ h2 {
 
 .sub-title {
   margin-bottom: 0;
+  font-weight: 500;
+  font-size: 1.6rem;
+  line-height: 160%;
+  margin-bottom: 2.8rem;
 }
 
 .top-border {
@@ -496,7 +500,11 @@ h2 {
   }
 
   .contents .sub-title {
+    font-weight: 500;
+    font-size: 2.4rem;
+    line-height: 150%;
     margin-bottom: 2rem;
+    margin-bottom: 7.7rem;
   }
 
   .contents h2 {
