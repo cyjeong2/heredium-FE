@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="coupon-card">
     <div class="img-wrap">
       <img :src="couponImageSrc" />
     </div>
