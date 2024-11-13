@@ -5,6 +5,7 @@
       <h3 class="mb-16">쿠폰 설정</h3>
       <div class="setting-coupon">
         <CouponEditor
+          v-if="couponData"
           :coupon="couponData"
           :is-issuance="true"
           :error="feedback"
@@ -12,7 +13,7 @@
           @update-coupon="(e) => handleUpdateCoupon(e)"
         />
         <div class="box-button">
-          <SButton button-type="primary" @click="handleAddCoupon()">저장</SButton>
+          <SButton button-type="primary" @click="handleSaveCouponIssuancePage">저장</SButton>
           <SButton @click="resetCoupon">초기화</SButton>
         </div>
       </div>
@@ -22,9 +23,9 @@
       <div class="search mb-24">
         <div class="mb-24">
           <SDropdown v-model="queryOptions.searchDateType" :option-list="dateOptionList" class="mr-16" />
-          <SDatepicker v-model="queryOptions.signUpDateFrom" :max="queryOptions.signUpDateTo" />
+          <SDatepicker v-model="queryOptions.signUpDateFrom" :max="queryOptions.signUpDateTo" :show-clean-icon="true" />
           <span class="ml-8 mr-8">~</span>
-          <SDatepicker v-model="queryOptions.signUpDateTo" :min="queryOptions.signUpDateFrom" />
+          <SDatepicker v-model="queryOptions.signUpDateTo" :min="queryOptions.signUpDateFrom" :show-clean-icon="true" />
         </div>
         <div class="mb-24">
           <label>상태</label>
@@ -72,20 +73,20 @@
               <tr v-if="!data || !data[0]">
                 <td colspan="9"><div>리스트가 없습니다.</div></td>
               </tr>
-              <tr v-for="(item, index) in data" :key="item.id" @click="item.isChecked = !item.isChecked">
+              <tr v-for="(item, index) in data" :key="item.id">
                 <td>
                   <div>
-                    <SCheckbox v-model="item.isChecked" />
+                    <SCheckbox v-model="item.isChecked" @click="item.isChecked = !item.isChecked" />
                   </div>
                 </td>
                 <td>
-                  <div>{{ tableData.startCount - index }}</div>
+                  <div>{{ exportParams.page * exportParams.size + index + 1 }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.membershipName }}</div>
                 </td>
                 <td>
-                  <div>{{ item.id }}</div>
+                  <div>{{ item.email }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.name }}</div>
@@ -112,11 +113,24 @@
       <div class="title-menu">
         <div class="left">
           <h3>선택 계정 리스트</h3>
-          <span class="ml-8">({{ selectedData.userList.length }}/{{ selectedData.maxCount }})</span>
         </div>
         <div class="right">
           <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser(true)">전체 삭제</SButton>
-          <SButton button-type="transport-b" class="mr-16" @click="removeSelectedUser()">삭제</SButton>
+          <SButton button-type="transport-b" class="mr-8" @click="removeSelectedUser()">삭제</SButton>
+          <input
+            ref="accountFile"
+            type="file"
+            accept=".xlsx, .XLSX"
+            class="is-blind"
+            @change="uploadAccountFile($event)"
+          />
+          <SButton button-type="transport-b" class="mr-8" @click="$refs.accountFile.click()">엑셀 파일 업로드</SButton>
+          <SDownloadExcelTemplate
+            button-type="transport-b"
+            class="mr-16"
+            file-name="coupon_issuance_template"
+            url="/file/template/coupon-issuance/download"
+          />
           <SDropdown v-model="selectedData.pageSize" :option-list="optionList" @change="onSelectSizeChange"
             >리스트 수:</SDropdown
           >
@@ -124,7 +138,7 @@
       </div>
       <SPagination
         :table-wrap-class="'admin-table-wrap'"
-        :table-data="selectedUserList"
+        :table-data="selectedData.userList"
         :table-option="{ currentPage: selectedData.tablePage, pageSize: selectedData.pageSize }"
         @onPageChange="onPageChange"
       >
@@ -149,20 +163,20 @@
               <tr v-if="!data || !data[0]">
                 <td colspan="9"><div>리스트가 없습니다.</div></td>
               </tr>
-              <tr v-for="item in data" :key="item.id" @click="onSelectedCheck(item.id)">
+              <tr v-for="(item, index) in data" :key="item.id">
                 <td>
                   <div>
                     <SCheckbox v-model="item.isChecked" />
                   </div>
                 </td>
                 <td>
-                  <div>{{ item.index }}</div>
+                  <div>{{ selectedData.tablePage * selectedData.pageSize + index + 1 }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.membershipName }}</div>
                 </td>
                 <td>
-                  <div>{{ item.id }}</div>
+                  <div>{{ item.email }}</div>
                 </td>
                 <td>
                   <div class="text-left">{{ item.name }}</div>
@@ -186,9 +200,7 @@
       </SPagination>
     </div>
     <div class="bottom">
-      <SButton button-type="primary" :disabled="isConfirmPending || !couponUsingId" @click="handleOpenModalConfirm"
-        >발급</SButton
-      >
+      <SButton button-type="primary" :disabled="isConfirmPending" @click="handleOpenModalConfirm">발급</SButton>
     </div>
     <SDialogModal :is-show="isShowErrorModal" @close="isShowErrorModal = false">
       <template #content>{{ errorMsg }}</template>
@@ -208,12 +220,19 @@
         <SButton button-type="primary" @click="issuedTicket()">확인</SButton>
       </template>
     </SDialogModal>
+    <UploadAccountIssuance
+      v-if="uploadResult"
+      :success-cases="uploadResult.success_cases"
+      :failed-cases="uploadResult.failed_cases"
+      @close="uploadResult = null"
+    />
   </div>
 </template>
 
 <script>
 import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 import STitle from '~/components/admin/commons/STitle';
 import SPageable from '~/components/admin/commons/SPageable';
 import SButton from '~/components/admin/commons/SButton';
@@ -221,13 +240,16 @@ import SSearchBar from '~/components/admin/commons/SSearchBar';
 import SDropdown from '~/components/admin/commons/SDropdown';
 import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SCheckbox from '~/components/admin/commons/SCheckbox';
-import { threeCommaNum } from '~/assets/js/commons';
+import { fileValid, threeCommaNum } from '~/assets/js/commons';
 import SPagination from '~/components/admin/commons/SPagination';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import { API_ERROR } from '~/utils/message';
 import { COUPON_DEFAULT } from '~/assets/js/types';
 import { downloadMixin } from '~/mixins/donloadMixin';
+import { getCouponIssuanceStorage, setCouponIssuanceStorage } from '~/utils/storage';
+import SDownloadExcelTemplate from '~/components/admin/commons/SDownloadExcelTemplate.vue';
+import UploadAccountIssuance from '~/components/admin/modal/UploadAccountIssuance.vue';
 
 const INIT_GET_ACCOUNT_PARAMS = {
   page: 0,
@@ -255,15 +277,18 @@ export default {
     SPageable,
     SButton,
     SSearchBar,
-    CouponEditor
+    CouponEditor,
+    SDownloadExcelTemplate,
+    UploadAccountIssuance
   },
   mixins: [downloadMixin],
   layout: 'admin/default',
   data() {
     return {
-      couponData: {},
+      couponData: null,
       syncCouponDataTime: 0,
       couponUsingId: null,
+      couponSaved: null,
       feedback: {},
       dateOptionList: [{ value: 'CREATED_DATE', label: '생성일시' }],
       queryOptions: INIT_GET_ACCOUNT_PARAMS,
@@ -288,49 +313,29 @@ export default {
       isShowErrorModal: false,
       isShowDoneModal: false,
       isConfirmPending: false,
-      isConfirmSave: false
+      isConfirmSave: false,
+      uploadResult: null
     };
   },
 
-  computed: {
-    selectedUserList() {
-      const searchText = this.searchSelectText;
-      let userList = this.selectedData.userList;
-
-      if (searchText) {
-        userList = userList.filter(
-          (user) => user.email.includes(searchText) || user.name.includes(searchText) || user.phone.includes(searchText)
-        );
-      }
-
-      return userList.map((user, index) => ({
-        ...user,
-        index: index + 1
-      }));
-    }
-  },
   watch: {
     'tableData.content': {
       deep: true,
       handler(newValue) {
         this.isCheckedAll = newValue.length > 0 ? newValue.every((item) => item.isChecked) : false;
       }
-    },
-    selectedUserList: {
-      deep: true,
-      handler(newValue) {
-        const startIndex = this.selectedData.pageSize * this.selectedData.tablePage;
-        const targetList = newValue.slice(startIndex, this.selectedData.pageSize);
-
-        this.selectedData.isCheckedAll = targetList.length > 0 ? targetList.every((item) => item.isChecked) : false;
-      }
     }
   },
   mounted() {
-    this.fetch();
+    const couponIdStored = getCouponIssuanceStorage();
+    if (couponIdStored) {
+      this.getPageDataSaved(couponIdStored);
+    } else {
+      this.couponData = cloneDeep(COUPON_DEFAULT);
+    }
   },
   created() {
-    this.couponData = cloneDeep(COUPON_DEFAULT);
+    this.fetch();
   },
   methods: {
     validateCouponItem(couponItem) {
@@ -398,18 +403,24 @@ export default {
         : '';
 
       const payload = { ...this.couponData, start_date: startDate, end_date: endDate, period_in_days: null };
+      if (payload.coupon_id) {
+        delete payload.coupon_id;
+      }
 
       if (isEmpty(feedback)) {
         try {
           const response = await this.$axios.post('/admin/coupons/non-membership', payload);
-          this.couponUsingId = response?.data;
           this.feedback = {};
-          this.couponData = cloneDeep(COUPON_DEFAULT);
+          return response?.data;
         } catch (error) {
           alert(API_ERROR);
+          return false;
         }
       } else {
+        this.errorMsg = '쿠폰 정보를 모두 입력해 주세요.';
+        this.isShowErrorModal = true;
         this.feedback = feedback;
+        return false;
       }
     },
     async fetch() {
@@ -491,22 +502,17 @@ export default {
       this.fetch();
     },
     removeSelectedUser(isAll) {
-      const selectedUserList = [...this.selectedData.userList].filter((user) => user.isChecked);
-
       if (isAll) {
         this.queryOptions.excludeIds = [];
         this.updateExportParams();
         this.selectedData.userList = [];
       } else {
-        selectedUserList.forEach((user) => {
-          const { id } = user;
-          const excludeTargetIndex = this.queryOptions.excludeIds.findIndex((item) => item.id === id);
-          const selectedTargetIndex = this.selectedData.userList.findIndex((item) => item.id === id);
+        const selectedUserRemain = [...this.selectedData.userList].filter((user) => !user.isChecked);
+        console.log('🚀 ~ removeSelectedUser ~ selectedUserRemain:', selectedUserRemain);
 
-          this.queryOptions.excludeIds.splice(excludeTargetIndex, 1);
-          this.updateExportParams();
-          this.selectedData.userList.splice(selectedTargetIndex, 1);
-        });
+        this.selectedData.userList = selectedUserRemain;
+        this.queryOptions.excludeIds = selectedUserRemain.map((item) => item.id);
+        this.updateExportParams();
       }
       this.selectedData.tablePage = 0;
       this.fetch();
@@ -539,10 +545,8 @@ export default {
     isValidate() {
       let isValid = false;
       let msg = '';
-      if (this.queryOptions.excludeIds.length === 0) {
+      if (!this.selectedData?.userList?.length) {
         msg = '계정를 선택해 주세요.';
-      } else if (this.queryOptions.excludeIds.length > 500) {
-        msg = '초대권은 한번에 최대 500명에게 발급 가능합니다.';
       } else {
         isValid = true;
       }
@@ -554,17 +558,27 @@ export default {
 
       return isValid;
     },
-    handleOpenModalConfirm() {
-      if (this.isValidate()) {
-        this.isConfirmSave = true;
+    async handleOpenModalConfirm() {
+      if (!this.isValidate()) {
+        return;
       }
+      // IF COUPON IS EDITED THEN CALL API SAVE COUPON
+      if (!this.isEqualCouponSaved()) {
+        const isAddedCoupon = !!(await this.handleAddCoupon());
+        if (!isAddedCoupon) {
+          return;
+        }
+      }
+
+      this.isConfirmSave = true;
     },
     async issuedTicket() {
       this.isConfirmPending = true;
       if (this.isValidate()) {
         try {
+          const accountIds = this.selectedData.userList.map((item) => item.id);
           await this.$axios.$post('/admin/coupons/assign', {
-            account_ids: this.queryOptions.excludeIds,
+            account_ids: accountIds,
             coupon_id: this.couponUsingId
           });
 
@@ -596,6 +610,102 @@ export default {
     resetCoupon() {
       this.couponData = cloneDeep(COUPON_DEFAULT);
       this.syncCouponDataTime = Date.now();
+    },
+    async handleSaveCouponIssuancePage() {
+      if (this.isEqualCouponSaved()) {
+        return;
+      }
+      const couponSaved = await this.handleAddCoupon();
+      if (couponSaved) {
+        setCouponIssuanceStorage(couponSaved.coupon_id);
+        this.couponUsingId = couponSaved.coupon_id;
+        couponSaved.start_date = this.$dayjs(couponSaved.start_date).format('YYYY-MM-DD');
+        couponSaved.end_date = this.$dayjs(couponSaved.end_date).format('YYYY-MM-DD');
+        this.couponData = cloneDeep(couponSaved);
+        this.couponSaved = cloneDeep(couponSaved);
+        this.syncCouponDataTime = Date.now();
+      }
+    },
+    async getPageDataSaved(couponIdStored) {
+      if (!couponIdStored) return false;
+      // TODO: get coupon data
+      this.couponUsingId = couponIdStored;
+      try {
+        const couponResponse = await this.$axios.get(`/admin/coupons/${couponIdStored}`);
+        const couponData = couponResponse?.data;
+        if (!couponData) {
+          return false;
+        }
+
+        couponData.start_date = this.$dayjs(couponData.start_date).format('YYYY-MM-DD');
+        couponData.end_date = this.$dayjs(couponData.end_date).format('YYYY-MM-DD');
+        this.couponData = cloneDeep(couponData);
+        this.couponSaved = cloneDeep(couponData);
+
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
+    async uploadAccountFile(e) {
+      const file = e.target.files?.[0];
+      if (!file) {
+        return;
+      }
+
+      const maxSize = 5 * 1024 * 1024;
+      const extension = e.target.accept.split(',');
+      const isValid = fileValid.check(e.target.files[0], maxSize, extension) !== null;
+
+      if (!isValid) {
+        this.isFileError = true;
+        return null;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await this.$axios.$post(`/admin/accounts/coupon-issuance/upload`, formData);
+        console.log(res);
+        this.uploadResult = cloneDeep(res);
+        const successCases = res.success_cases || [];
+        if (!Array.isArray(successCases)) {
+          return;
+        }
+        for (const account of successCases) {
+          if (this.selectedData.userList.some((item) => item.id === account.id)) {
+            continue;
+          }
+          this.selectedData.userList.push(account);
+          this.queryOptions.excludeIds.push(account.id);
+        }
+        this.fetch();
+      } catch (error) {
+        const errorMessage = error.response.data?.MESSAGE || '';
+        switch (errorMessage) {
+          case 'INVALID_EXCEL_FILE':
+            alert('xlsx 파일을 선택해주세요.');
+            break;
+          case 'INVALID_EXCEL_COLUMNS':
+            alert('업로드된 엑셀 파일의 열이 지정된 템플릿과 일치하지 않습니다.');
+            break;
+          default:
+            alert(API_ERROR);
+            break;
+        }
+      }
+      e.target.value = null;
+      e.target.files = null;
+    },
+    isEqualCouponSaved() {
+      if (!this.couponSaved || !this.couponData) {
+        return false;
+      }
+      const couponSaved = cloneDeep(this.couponSaved);
+      delete couponSaved.coupon_id;
+      const currentCoupon = cloneDeep(this.couponData);
+      delete currentCoupon.coupon_id;
+      return isEqual(couponSaved, currentCoupon);
     }
   }
 };
@@ -707,22 +817,22 @@ export default {
       width: 6%;
     }
     &:nth-of-type(3) {
-      width: 15%;
+      width: 13%;
     }
     &:nth-of-type(4) {
-      width: 6%;
+      width: 14%;
     }
     &:nth-of-type(5) {
       width: 9%;
     }
     &:nth-of-type(6) {
-      width: 12%;
+      width: 10%;
     }
     &:nth-of-type(7) {
       width: 12%;
     }
     &:nth-of-type(8) {
-      width: 10%;
+      width: 6%;
     }
     &:last-of-type {
       width: 15%;

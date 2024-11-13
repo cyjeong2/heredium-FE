@@ -1,8 +1,9 @@
 <template>
-  <div v-if="isDataReady && !!postDetail">
+  <div v-if="isDataReady && !!postDetail && !isHiddenPage">
     <section class="contents">
       <div class="container">
-        <h1>{{ postDetail.name }}</h1>
+        <h1 class="title" :class="{ 'mb-12': postDetail.sub_title }">{{ postDetail.name }}</h1>
+        <h3 v-if="postDetail.sub_title" class="sub-title">{{ postDetail.sub_title }}</h3>
       </div>
       <section class="banner">
         <img :src="postImageDetail" alt="Heredium membership image" />
@@ -26,6 +27,7 @@
                 :model-value="membershipIdSelected"
                 :membership="membership"
                 :change="openBottomSheet"
+                :disable-registration="isDisabledRegistration"
               >
               </MembershipOption>
             </div>
@@ -188,6 +190,27 @@ export default {
         return false;
       }
       return this.isShowBottomSheet;
+    },
+    isDisabledRegistration() {
+      let isDisabled = false;
+      if (this.postDetail?.open_date) {
+        const today = this.$dayjs();
+        const openDate = this.$dayjs(this.postDetail.open_date, 'YYYY-MM-DD', true);
+        isDisabled = today.isBefore(openDate);
+      }
+      return isDisabled;
+    },
+    isHiddenPage() {
+      if (!this.postDetail) {
+        return true;
+      }
+      const today = this.$dayjs();
+      const startDateRegistration = this.$dayjs(this.postDetail.start_date, 'YYYY-MM-DD', true).startOf('day');
+      const endDateRegistration = this.$dayjs(this.postDetail.end_date, 'YYYY-MM-DD', true).endOf('day');
+      if (today.isBefore(startDateRegistration) || today.isAfter(endDateRegistration)) {
+        return true;
+      }
+      return false;
     }
   },
   methods: {
@@ -300,8 +323,13 @@ export default {
   display: grid;
   row-gap: 40px;
   grid-template-columns: 1fr;
-  padding: 0 !important;
+  padding: 0 0 20px 0 !important;
 }
+
+.mb-12 {
+  margin-bottom: 12px;
+}
+
 h1 {
   font-size: 2.4rem;
   font-weight: 700;
@@ -317,6 +345,14 @@ h2 {
   font-weight: 700;
   line-height: 100%;
   color: var(--color-default);
+}
+
+.sub-title {
+  margin-bottom: 0;
+  font-weight: 500;
+  font-size: 1.6rem;
+  line-height: 160%;
+  margin-bottom: 2.8rem;
 }
 
 .top-border {
@@ -461,6 +497,14 @@ h2 {
     line-height: 150%;
     margin-top: 4.8rem;
     margin-bottom: 2rem;
+  }
+
+  .contents .sub-title {
+    font-weight: 500;
+    font-size: 2.4rem;
+    line-height: 150%;
+    margin-bottom: 2rem;
+    margin-bottom: 7.7rem;
   }
 
   .contents h2 {

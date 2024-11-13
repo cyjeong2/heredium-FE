@@ -7,22 +7,21 @@
       <p class="name">{{ detailCoupon.name }}</p>
       <div class="discount">
         <div class="date">
-          <img src="~assets/img/icon/icon_discount_tag.svg" />
-          <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
-        </div>
-        <div class="date">
-          <img src="~assets/img/icon/icon_calender.svg" />
+          사용기간:
           <span>{{
             getFormattedDate(detailCoupon.used_coupons[0].delivered_date, detailCoupon.used_coupons[0].expiration_date)
           }}</span>
         </div>
       </div>
+      <div>
+        <div class="date">
+          사용여부:
+          <span>사용완료</span>
+        </div>
+      </div>
       <div class="coupon-remaining">
         <div class="button">
-          <UButton class="reservation-btn" disabled> QR코드 </UButton>
-        </div>
-        <div class="status deactive">
-          <span>사용완료</span>
+          <UButton class="reservation-btn" w-size="100" disabled> QR코드 </UButton>
         </div>
       </div>
     </div>
@@ -77,8 +76,8 @@ export default {
     }
 
     .img-wrap {
-      height: 10.4rem;
-      width: 10rem;
+      height: 12rem;
+      width: 12rem;
 
       > img {
         width: 100%;
@@ -119,13 +118,13 @@ export default {
     column-gap: 8px;
 
     .button {
-      display: flex;
-      align-items: center;
+      display: block;
+      width: 100%;
     }
 
     .reservation-btn {
       min-width: 83px !important;
-      height: 22px;
+      height: 32px;
       font-size: 1.4rem;
       font-weight: 500;
     }
@@ -168,6 +167,12 @@ export default {
 
   .button {
     width: 100% !important;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .coupon-card {
+    max-width: 400px;
   }
 }
 </style>

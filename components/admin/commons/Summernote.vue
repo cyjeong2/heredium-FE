@@ -51,6 +51,13 @@ export default {
       isFileError: false
     };
   },
+  watch: {
+    value(newValue) {
+      if (newValue !== this.content) {
+        this.$refs.summerNote.setNewContent(newValue);
+      }
+    }
+  },
   created() {
     this.content = this.value ? this.value : '';
   },

@@ -8,7 +8,7 @@
       class="register-membership"
       w-size="full"
       h-size="small"
-      :disabled="!membership?.is_register_membership_button_shown"
+      :disabled="disableRegistration || !membership?.is_register_membership_button_shown"
       @click="toggleCheck"
       >가입하기</UButton
     >
@@ -38,6 +38,11 @@ export default {
     change: {
       type: Function,
       required: true
+    },
+    disableRegistration: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
