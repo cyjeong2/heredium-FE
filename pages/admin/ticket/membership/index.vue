@@ -47,6 +47,7 @@
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
+              <th>행동</th>
             </tr>
           </thead>
           <tbody>
@@ -98,6 +99,16 @@
               <td>
                 <div>{{ item?.phone }}</div>
               </td>
+              <td>
+                <div class="refund-btn">
+                  <SButton @click="refundingItem = { ...item, used: 2 }">
+                    <div class="wrap-icon">
+                      <img alt="refund" src="~assets/img/refund-icon.svg" />
+                    </div>
+                    환불하다
+                  </SButton>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -109,6 +120,21 @@
       @close="modal.isShowCreateCouponCompany = false"
     ></CouponCorporate>
     <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
+
+    <SDialogModal :is-show="refundingItem !== null" @close="refundingItem = null">
+      <template #content>
+        <div v-if="refundingItem.used">
+          쿠폰 {{refundingItem.used}}개를 사용하셨습니다.
+        </div>
+        환불을 진행하시겠습니까?
+      </template>
+      <template #modal-btn1>
+        <SButton @click="refundingItem = null">취소</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="handleRefund">확인</SButton>
+      </template>
+    </SDialogModal>
   </div>
 </template>
 
@@ -125,6 +151,7 @@ import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
 import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
+import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
 
 export default {
   name: 'MembershipTicketPage',
@@ -138,7 +165,8 @@ export default {
     SButton,
     SSearchBar,
     CouponCorporate,
-    UploadCorporateUser
+    UploadCorporateUser,
+    SDialogModal
   },
   layout: 'admin/default',
   data() {
@@ -162,6 +190,7 @@ export default {
       },
       tableData: null,
       isCheckedAll: false,
+      refundingItem: null,
       modal: {
         isShowCreateCouponCompany: false,
         isUploadData: false
@@ -280,6 +309,9 @@ export default {
       }
       this.queryOptions.page = 0;
       this.fetch();
+    },
+    handleRefund() {
+      console.log('refund')
     }
   }
 };
@@ -352,16 +384,32 @@ export default {
       width: 8%;
     }
     &:nth-of-type(11) {
-      width: 17%;
+      width: 10%;
     }
     &:nth-of-type(12) {
-      width: 9%;
+      width: 12%;
     }
     &:nth-of-type(13) {
       width: 5%;
     }
+    &:nth-of-type(14) {
+      width: 10%;
+    }
     &:last-of-type {
-      width: 15%;
+      width: 10%;
+    }
+  }
+
+  .refund-btn {
+    display: flex;
+    justify-content: center;
+  }
+
+  .wrap-icon {
+    margin-right: 4px;
+    > img {
+      width: 16px;
+      object-fit: contain;
     }
   }
 }
