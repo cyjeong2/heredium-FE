@@ -70,17 +70,32 @@
               </td>
               <td>
                 <div>
-                  {{ item?.payment_date && $dayjs(item?.payment_date).format('YYYY-MM-DD  HH:mm') }}
+                  <p>
+                    {{ item?.payment_date && $dayjs(item?.payment_date).format('YYYY-MM-DD') }}
+                  </p>
+                  <p>
+                    {{ item?.payment_date && $dayjs(item?.payment_date).format('HH:mm') }}
+                  </p>
                 </div>
               </td>
               <td>
                 <div>
-                  {{ item?.start_date && $dayjs(item?.start_date).format('YYYY-MM-DD  HH:mm') }}
+                  <p>
+                    {{ item?.start_date && $dayjs(item?.start_date).format('YYYY-MM-DD') }}
+                  </p>
+                  <p>
+                    {{ item?.start_date && $dayjs(item?.start_date).format('HH:mm') }}
+                  </p>
                 </div>
               </td>
               <td>
                 <div>
-                  {{ item?.end_date && $dayjs(item?.end_date).format('YYYY-MM-DD  HH:mm') }}
+                  <p>
+                    {{ item?.end_date && $dayjs(item?.end_date).format('YYYY-MM-DD') }}
+                  </p>
+                  <p>
+                    {{ item?.end_date && $dayjs(item?.end_date).format('HH:mm') }}
+                  </p>
                 </div>
               </td>
               <td>
