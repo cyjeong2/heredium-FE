@@ -52,13 +52,13 @@
                 <div>{{ tableData.startCount + index + 1 }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item.membership_name }}</div>
+                <div>{{ item.membership_name }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item.email }}</div>
+                <div>{{ item.email }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item.name }}</div>
+                <div>{{ item.name }}</div>
               </td>
               <td>
                 <div>{{ item.phone }}</div>

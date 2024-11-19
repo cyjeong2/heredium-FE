@@ -89,7 +89,7 @@
                   <div>{{ item.email }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.name }}</div>
+                  <div>{{ item.name }}</div>
                 </td>
                 <td>
                   <div>{{ item.phone }}</div>
@@ -98,7 +98,7 @@
                   <div>{{ item.lastLoginDate }}</div>
                 </td>
                 <td>
-                  <div class="text-right">{{ item.numberOfEntries }}</div>
+                  <div>{{ item.numberOfEntries }}</div>
                 </td>
                 <td>
                   <div>{{ item.createdDate }}</div>
@@ -179,7 +179,7 @@
                   <div>{{ item.email }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.name }}</div>
+                  <div>{{ item.name }}</div>
                 </td>
                 <td>
                   <div>{{ item.phone }}</div>
@@ -188,7 +188,7 @@
                   <div>{{ item.lastLoginDate }}</div>
                 </td>
                 <td>
-                  <div class="text-right">{{ item.numberOfEntries }}</div>
+                  <div>{{ item.numberOfEntries }}</div>
                 </td>
                 <td>
                   <div>{{ item.createdDate }}</div>

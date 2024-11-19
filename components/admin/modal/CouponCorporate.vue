@@ -4,7 +4,7 @@
     <template #content>
       <div class="content">
         <div class="field-group">
-          <label class="mr-24"> 법인 회원 이름 </label>
+          <label class="mr-24"> 법인 항목 추가 </label>
           <SInput
             v-model="companyName"
             w-size="large"
