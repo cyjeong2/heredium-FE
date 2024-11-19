@@ -1,10 +1,10 @@
 <template>
   <SModal :is-show="true" width="1200px" @close="onclose">
-    <template #title>법인회원 등록</template>
+    <template #title>법인 항목 추가</template>
     <template #content>
       <div class="content">
         <div class="field-group">
-          <label class="mr-24"> 법인 항목 추가 </label>
+          <label class="mr-24"> 법인 회원 이름 </label>
           <SInput
             v-model="companyName"
             w-size="large"
