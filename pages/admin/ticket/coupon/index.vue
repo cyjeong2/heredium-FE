@@ -128,7 +128,7 @@
           <SDownloadExcelTemplate
             button-type="transport-b"
             class="mr-16"
-            file-name="coupon_issuance_template"
+            file-name="쿠폰 발급"
             url="/file/template/coupon-issuance/download"
           />
           <SDropdown v-model="selectedData.pageSize" :option-list="optionList" @change="onSelectSizeChange"
@@ -604,7 +604,7 @@ export default {
       params.signUpDateTo = params.signUpDateTo ? this.$dayjs(params.signUpDateTo).format('YYYY-MM-DD 23:59:59') : '';
       delete params.page;
       delete params.size;
-      params.fileName = `Export filter account in coupon issue page ${this.$dayjs().format('YYYY-MM-DD HH:mm:ss')}`;
+      params.fileName = '계정리스트';
       this.downloadExcel(params.fileName, '/admin/accounts/with-membership/excel', params);
     },
     resetCoupon() {

@@ -19,7 +19,7 @@ export const downloadMixin = {
             const link = document.createElement('a');
 
             link.href = href;
-            link.setAttribute('download', `${fileName}.XLSX`);
+            link.setAttribute('download', `${fileName}.xlsx`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
