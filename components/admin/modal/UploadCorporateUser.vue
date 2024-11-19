@@ -1,7 +1,7 @@
 <template>
   <div>
     <SModal :is-show="true" width="600px" @close="onclose">
-      <template #title>업로드하다</template>
+      <template #title>업로드</template>
       <template #content>
         <div v-if="!result">
           <div class="field-group">
