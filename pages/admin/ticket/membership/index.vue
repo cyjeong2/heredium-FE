@@ -185,7 +185,7 @@ export default {
       return threeCommaNum(num);
     },
     downloadTemplateExcel() {
-      const fileName = 'company_upload_membership_template';
+      const fileName = '법인 회원 업로드';
 
       this.$axios
         .$get('file/template/company-membership/download', {
@@ -197,7 +197,7 @@ export default {
           const link = document.createElement('a');
 
           link.href = href;
-          link.setAttribute('download', `${fileName}.XLSX`);
+          link.setAttribute('download', `${fileName}.xlsx`);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
