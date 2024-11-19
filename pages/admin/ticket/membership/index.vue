@@ -63,7 +63,7 @@
                 <div>{{ tableData.startCount - index }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item?.membership_name }}</div>
+                <div>{{ item?.membership_name }}</div>
               </td>
               <td>
                 <div>{{ item?.payment_status }}</div>
