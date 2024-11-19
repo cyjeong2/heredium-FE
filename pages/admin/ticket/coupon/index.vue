@@ -95,13 +95,27 @@
                   <div>{{ item.phone }}</div>
                 </td>
                 <td>
-                  <div>{{ item.lastLoginDate }}</div>
+                  <div>
+                    <p>
+                      {{ item?.lastLoginDate && $dayjs(item?.lastLoginDate).format('YYYY-MM-DD') }}
+                    </p>
+                    <p>
+                      {{ item?.lastLoginDate && $dayjs(item?.lastLoginDate).format('HH:mm:ss') }}
+                    </p>
+                  </div>
                 </td>
                 <td>
                   <div>{{ item.numberOfEntries }}</div>
                 </td>
                 <td>
-                  <div>{{ item.createdDate }}</div>
+                  <div>
+                    <p>
+                      {{ item?.createdDate && $dayjs(item?.createdDate).format('YYYY-MM-DD') }}
+                    </p>
+                    <p>
+                      {{ item?.createdDate && $dayjs(item?.createdDate).format('HH:mm:ss') }}
+                    </p>
+                  </div>
                 </td>
               </tr>
             </tbody>
