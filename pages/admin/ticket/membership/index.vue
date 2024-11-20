@@ -101,12 +101,7 @@
               </td>
               <td>
                 <div class="refund-btn">
-                  <SButton @click="refundingItem = { ...item, used: 2 }">
-                    <div class="wrap-icon">
-                      <img alt="refund" src="~assets/img/refund-icon.svg" />
-                    </div>
-                    환불하다
-                  </SButton>
+                  <SButton @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
             </tr>
@@ -121,11 +116,9 @@
     ></CouponCorporate>
     <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
 
-    <SDialogModal :is-show="refundingItem !== null" @close="refundingItem = null">
+    <SDialogModal :is-show="refundingItem" @close="refundingItem = null">
       <template #content>
-        <div v-if="refundingItem.used">
-          쿠폰 {{refundingItem.used}}개를 사용하셨습니다.
-        </div>
+        <div v-if="refundingItem.number_of_coupons">쿠폰 {{ refundingItem.number_of_coupons }}개를 사용하셨습니다.</div>
         환불을 진행하시겠습니까?
       </template>
       <template #modal-btn1>
@@ -152,6 +145,7 @@ import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
 import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
+import { API_ERROR } from '~/utils/message';
 
 export default {
   name: 'MembershipTicketPage',
@@ -310,8 +304,16 @@ export default {
       this.queryOptions.page = 0;
       this.fetch();
     },
-    handleRefund() {
-      console.log('refund')
+    async handleRefund() {
+      if (!this.refundingItem) {
+        return;
+      }
+      try {
+        await this.$axios.post(`/admin/memberships/${this.refundingItem.account_id}/refund`);
+        this.fetch();
+      } catch (error) {
+        alert(API_ERROR);
+      }
     }
   }
 };
