@@ -100,7 +100,7 @@
                 <div>{{ item?.phone }}</div>
               </td>
               <td>
-                <div class="refund-btn">
+                <div v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE'" class="refund-btn">
                   <SButton @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
