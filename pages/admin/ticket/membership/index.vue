@@ -160,7 +160,6 @@ import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
 import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
-import { API_ERROR } from '~/utils/message';
 
 export default {
   name: 'MembershipTicketPage',
@@ -327,7 +326,7 @@ export default {
         await this.$axios.post(`/admin/memberships/${this.refundingItem.account_id}/refund`);
         this.fetch();
       } catch (error) {
-        alert(API_ERROR);
+        alert('환불 오류');
       }
     }
   }
