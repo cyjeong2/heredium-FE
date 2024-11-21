@@ -397,7 +397,8 @@ export default {
       width: 10%;
     }
     &:nth-of-type(9) {
-      width: 7%;
+      width: 100px;
+      min-width: 7%;
     }
     &:nth-of-type(10) {
       width: 8%;
