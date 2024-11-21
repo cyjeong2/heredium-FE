@@ -326,8 +326,10 @@ export default {
       try {
         await this.$axios.post(`/admin/memberships/${this.refundingItem.account_id}/refund`);
         this.fetch();
+        this.refundingItem = null;
       } catch (error) {
         alert('환불 오류.');
+        this.refundingItem = null;
       }
     }
   }
