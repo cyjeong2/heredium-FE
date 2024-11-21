@@ -1,7 +1,7 @@
 <template>
   <div>
     <SModal :is-show="true" width="600px" @close="onclose">
-      <template #title>업로드하다</template>
+      <template #title>업로드</template>
       <template #content>
         <div v-if="!result">
           <div class="field-group">
@@ -34,7 +34,17 @@
             <SButton v-if="!fileName" @click="$refs.accountFile.click()">파일 첨부</SButton>
             <SButton v-else @click="removeFile">삭제</SButton>
           </div>
+
+          <div v-if="invalidFileContent" class="validate-container">
+            <div class="result-box">
+              <h3 class="failed-cases">실패한: {{ invalidFileContent.length }}</h3>
+              <ol class="result-list failed-list">
+                <li v-for="(item, index) in invalidFileContent" :key="index">{{ index + 1 }}. {{ item }}</li>
+              </ol>
+            </div>
+          </div>
         </div>
+
         <div v-else class="result-container">
           <div class="result-total">
             <h2 class="success-cases mr-24">성공: {{ result?.success_cases?.length }}</h2>
@@ -55,7 +65,11 @@
         </div>
       </template>
       <template v-if="!result" #modal-btn1>
-        <SButton button-type="primary" @click="handleSubmit">확인</SButton>
+        <SButton v-if="!invalidFileContent" button-type="primary" @click="handleSubmit">확인</SButton>
+        <SButton v-if="invalidFileContent" @click="removeFile">재업로드</SButton>
+      </template>
+      <template v-if="invalidFileContent && !result" #modal-btn2>
+        <SButton button-type="primary" @click="handleSubmit">계속</SButton>
       </template>
     </SModal>
     <SDialogModal :is-show="isFileError" @close="isFileError = false">
@@ -68,8 +82,6 @@
 </template>
 
 <script>
-// import cloneDeep from 'lodash/cloneDeep';
-// import isEmpty from 'lodash/isEmpty';
 import SModal from './SModal.vue';
 import SInput from '~/components/admin/commons/SInput';
 import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
@@ -95,7 +107,8 @@ export default {
       feedback: {},
       isSubmitted: false,
       isFileError: false,
-      result: null
+      result: null,
+      invalidFileContent: null
     };
   },
   async fetch() {
@@ -118,21 +131,41 @@ export default {
         const maxSize = 5 * 1024 * 1024;
         const extension = e.target.accept.split(',');
         const isValid = fileValid.check(e.target.files[0], maxSize, extension) !== null;
-
         if (!isValid) {
           this.isFileError = true;
           return null;
         }
         this.fileName = fileName;
+        this.validateFileContent(file);
       }
     },
     removeFile() {
+      this.invalidFileContent = null;
       this.fileName = '';
+      this.feedback = {};
+      if (this.$refs.accountFile?.value) {
+        this.$refs.accountFile.value = null;
+        this.$refs.accountFile.files = null;
+      }
     },
     getFile() {
       const fileInputRef = this.$refs?.accountFile;
       const file = fileInputRef?.files && fileInputRef.files?.[0];
       return file;
+    },
+    async validateFileContent(file) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        await this.$axios.$post('/admin/companies/membership-registrations/validate', formData);
+      } catch (error) {
+        const errorList = error.response.data;
+        if (Array.isArray(errorList)) {
+          this.invalidFileContent = errorList;
+          return;
+        }
+        this.handleErrorUploadFile(error);
+      }
     },
     checkValidFile() {
       if (!this.fileName) {
@@ -178,18 +211,21 @@ export default {
         );
         this.result = res;
       } catch (error) {
-        const errorMessage = error.response.data?.MESSAGE || '';
-        switch (errorMessage) {
-          case 'INVALID_EXCEL_FILE':
-            alert('xlsx 파일을 선택해주세요.');
-            break;
-          case 'INVALID_EXCEL_COLUMNS':
-            alert('업로드된 엑셀 파일의 열이 지정된 템플릿과 일치하지 않습니다.');
-            break;
-          default:
-            alert(API_ERROR);
-            break;
-        }
+        this.handleErrorUploadFile(error);
+      }
+    },
+    handleErrorUploadFile(error) {
+      const errorMessage = error.response.data?.MESSAGE || '';
+      switch (errorMessage) {
+        case 'INVALID_EXCEL_FILE':
+          alert('xlsx 파일을 선택해주세요.');
+          break;
+        case 'INVALID_EXCEL_COLUMNS':
+          alert('업로드된 엑셀 파일의 열이 지정된 템플릿과 일치하지 않습니다.');
+          break;
+        default:
+          alert(API_ERROR);
+          break;
       }
     }
   }
@@ -213,6 +249,11 @@ export default {
   align-items: start;
 }
 
+.validate-container {
+  text-align: start;
+  max-height: 50vh;
+  overflow-y: auto;
+}
 .result-container {
   text-align: start;
   max-height: 80vh;

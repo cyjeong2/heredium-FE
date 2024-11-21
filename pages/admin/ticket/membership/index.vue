@@ -47,6 +47,7 @@
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
+              <th>행동</th>
             </tr>
           </thead>
           <tbody>
@@ -63,24 +64,39 @@
                 <div>{{ tableData.startCount - index }}</div>
               </td>
               <td>
-                <div class="text-left">{{ item?.membership_name }}</div>
+                <div>{{ item?.membership_name }}</div>
               </td>
               <td>
                 <div>{{ item?.payment_status }}</div>
               </td>
               <td>
                 <div>
-                  {{ item?.payment_date && $dayjs(item?.payment_date).format('YYYY-MM-DD  HH:mm') }}
+                  <p>
+                    {{ item?.payment_date && $dayjs(item?.payment_date).format('YYYY-MM-DD') }}
+                  </p>
+                  <p>
+                    {{ item?.payment_date && $dayjs(item?.payment_date).format('HH:mm') }}
+                  </p>
                 </div>
               </td>
               <td>
                 <div>
-                  {{ item?.start_date && $dayjs(item?.start_date).format('YYYY-MM-DD  HH:mm') }}
+                  <p>
+                    {{ item?.start_date && $dayjs(item?.start_date).format('YYYY-MM-DD') }}
+                  </p>
+                  <p>
+                    {{ item?.start_date && $dayjs(item?.start_date).format('HH:mm') }}
+                  </p>
                 </div>
               </td>
               <td>
                 <div>
-                  {{ item?.end_date && $dayjs(item?.end_date).format('YYYY-MM-DD  HH:mm') }}
+                  <p>
+                    {{ item?.end_date && $dayjs(item?.end_date).format('YYYY-MM-DD') }}
+                  </p>
+                  <p>
+                    {{ item?.end_date && $dayjs(item?.end_date).format('HH:mm') }}
+                  </p>
                 </div>
               </td>
               <td>
@@ -98,6 +114,11 @@
               <td>
                 <div>{{ item?.phone }}</div>
               </td>
+              <td>
+                <div v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE'" class="refund-btn">
+                  <SButton @click="refundingItem = item"> 환불하다 </SButton>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -109,6 +130,19 @@
       @close="modal.isShowCreateCouponCompany = false"
     ></CouponCorporate>
     <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
+
+    <SDialogModal :is-show="refundingItem" @close="refundingItem = null">
+      <template #content>
+        <div v-if="refundingItem.number_of_coupons">쿠폰 {{ refundingItem.number_of_coupons }}개를 사용하셨습니다.</div>
+        환불을 진행하시겠습니까?
+      </template>
+      <template #modal-btn1>
+        <SButton @click="refundingItem = null">취소</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="handleRefund">확인</SButton>
+      </template>
+    </SDialogModal>
   </div>
 </template>
 
@@ -125,6 +159,7 @@ import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
 import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
+import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
 
 export default {
   name: 'MembershipTicketPage',
@@ -138,7 +173,8 @@ export default {
     SButton,
     SSearchBar,
     CouponCorporate,
-    UploadCorporateUser
+    UploadCorporateUser,
+    SDialogModal
   },
   layout: 'admin/default',
   data() {
@@ -162,6 +198,7 @@ export default {
       },
       tableData: null,
       isCheckedAll: false,
+      refundingItem: null,
       modal: {
         isShowCreateCouponCompany: false,
         isUploadData: false
@@ -185,7 +222,7 @@ export default {
       return threeCommaNum(num);
     },
     downloadTemplateExcel() {
-      const fileName = 'company_upload_membership_template';
+      const fileName = '법인 회원 업로드';
 
       this.$axios
         .$get('file/template/company-membership/download', {
@@ -197,7 +234,7 @@ export default {
           const link = document.createElement('a');
 
           link.href = href;
-          link.setAttribute('download', `${fileName}.XLSX`);
+          link.setAttribute('download', `${fileName}.xlsx`);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -205,12 +242,11 @@ export default {
         });
     },
     downloadExcel() {
-      const paymentDateFrom = this.queryOptions.paymentDateFrom
-        ? this.$dayjs(this.queryOptions.paymentDateFrom).format('YYYY-MM-DD 00:00:00')
+      const query = this.$route.query;
+      const paymentDateFrom = query.paymentDateFrom
+        ? this.$dayjs(query.paymentDateFrom).format('YYYY-MM-DD 00:00:00')
         : '';
-      const paymentDateTo = this.queryOptions.paymentDateTo
-        ? this.$dayjs(this.queryOptions.paymentDateTo).format('YYYY-MM-DD 23:59:59')
-        : '';
+      const paymentDateTo = query.paymentDateTo ? this.$dayjs(query.paymentDateTo).format('YYYY-MM-DD 23:59:59') : '';
       const fileName = '계정 목록';
 
       this.$axios
@@ -218,7 +254,9 @@ export default {
           method: 'GET',
           responseType: 'blob',
           params: {
-            ...this.queryOptions,
+            searchDateType: query.searchDateType,
+            paymentStatus: query.paymentStatus,
+            text: query.text,
             paymentDateFrom,
             paymentDateTo,
             fileName
@@ -229,7 +267,7 @@ export default {
           const link = document.createElement('a');
 
           link.href = href;
-          link.setAttribute('download', `${fileName}.XLSX`);
+          link.setAttribute('download', `${fileName}.xlsx`);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -280,6 +318,19 @@ export default {
       }
       this.queryOptions.page = 0;
       this.fetch();
+    },
+    async handleRefund() {
+      if (!this.refundingItem) {
+        return;
+      }
+      try {
+        await this.$axios.post(`/admin/memberships/${this.refundingItem.account_id}/refund`);
+        this.fetch();
+        this.refundingItem = null;
+      } catch (error) {
+        alert('환불 오류.');
+        this.refundingItem = null;
+      }
     }
   }
 };
@@ -352,16 +403,32 @@ export default {
       width: 8%;
     }
     &:nth-of-type(11) {
-      width: 17%;
+      width: 10%;
     }
     &:nth-of-type(12) {
-      width: 9%;
+      width: 12%;
     }
     &:nth-of-type(13) {
       width: 5%;
     }
+    &:nth-of-type(14) {
+      width: 10%;
+    }
     &:last-of-type {
-      width: 15%;
+      width: 10%;
+    }
+  }
+
+  .refund-btn {
+    display: flex;
+    justify-content: center;
+  }
+
+  .wrap-icon {
+    margin-right: 4px;
+    > img {
+      width: 16px;
+      object-fit: contain;
     }
   }
 }

@@ -89,19 +89,33 @@
                   <div>{{ item.email }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.name }}</div>
+                  <div>{{ item.name }}</div>
                 </td>
                 <td>
                   <div>{{ item.phone }}</div>
                 </td>
                 <td>
-                  <div>{{ item.lastLoginDate }}</div>
+                  <div>
+                    <p>
+                      {{ item?.lastLoginDate && $dayjs(item?.lastLoginDate).format('YYYY-MM-DD') }}
+                    </p>
+                    <p>
+                      {{ item?.lastLoginDate && $dayjs(item?.lastLoginDate).format('HH:mm:ss') }}
+                    </p>
+                  </div>
                 </td>
                 <td>
-                  <div class="text-right">{{ item.numberOfEntries }}</div>
+                  <div>{{ item.numberOfEntries }}</div>
                 </td>
                 <td>
-                  <div>{{ item.createdDate }}</div>
+                  <div>
+                    <p>
+                      {{ item?.createdDate && $dayjs(item?.createdDate).format('YYYY-MM-DD') }}
+                    </p>
+                    <p>
+                      {{ item?.createdDate && $dayjs(item?.createdDate).format('HH:mm:ss') }}
+                    </p>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -128,7 +142,7 @@
           <SDownloadExcelTemplate
             button-type="transport-b"
             class="mr-16"
-            file-name="coupon_issuance_template"
+            file-name="쿠폰 발급"
             url="/file/template/coupon-issuance/download"
           />
           <SDropdown v-model="selectedData.pageSize" :option-list="optionList" @change="onSelectSizeChange"
@@ -179,7 +193,7 @@
                   <div>{{ item.email }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.name }}</div>
+                  <div>{{ item.name }}</div>
                 </td>
                 <td>
                   <div>{{ item.phone }}</div>
@@ -188,7 +202,7 @@
                   <div>{{ item.lastLoginDate }}</div>
                 </td>
                 <td>
-                  <div class="text-right">{{ item.numberOfEntries }}</div>
+                  <div>{{ item.numberOfEntries }}</div>
                 </td>
                 <td>
                   <div>{{ item.createdDate }}</div>
@@ -604,7 +618,7 @@ export default {
       params.signUpDateTo = params.signUpDateTo ? this.$dayjs(params.signUpDateTo).format('YYYY-MM-DD 23:59:59') : '';
       delete params.page;
       delete params.size;
-      params.fileName = `Export filter account in coupon issue page ${this.$dayjs().format('YYYY-MM-DD HH:mm:ss')}`;
+      params.fileName = '계정리스트';
       this.downloadExcel(params.fileName, '/admin/accounts/with-membership/excel', params);
     },
     resetCoupon() {

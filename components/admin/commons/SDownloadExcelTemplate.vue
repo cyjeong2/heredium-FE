@@ -42,7 +42,7 @@ export default {
           const link = document.createElement('a');
 
           link.href = href;
-          link.setAttribute('download', `${this.fileName}.XLSX`);
+          link.setAttribute('download', `${this.fileName}.xlsx`);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);

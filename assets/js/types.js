@@ -80,8 +80,8 @@ export const TICKET_STATE_TYPE = Object.freeze({
 });
 
 export const TICKET_MEMBERSHIP_STATE_TYPE = Object.freeze({
-  COMPLETED: '결제 완료',
-  REFUND: '회원 환불',
+  COMPLETED: '가입 완료',
+  REFUND: '환불 완료',
   EXPIRED: '기간 만료'
 });
 
