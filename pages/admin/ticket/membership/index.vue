@@ -242,12 +242,11 @@ export default {
         });
     },
     downloadExcel() {
-      const paymentDateFrom = this.queryOptions.paymentDateFrom
-        ? this.$dayjs(this.queryOptions.paymentDateFrom).format('YYYY-MM-DD 00:00:00')
+      const query = this.$route.query;
+      const paymentDateFrom = query.paymentDateFrom
+        ? this.$dayjs(query.paymentDateFrom).format('YYYY-MM-DD 00:00:00')
         : '';
-      const paymentDateTo = this.queryOptions.paymentDateTo
-        ? this.$dayjs(this.queryOptions.paymentDateTo).format('YYYY-MM-DD 23:59:59')
-        : '';
+      const paymentDateTo = query.paymentDateTo ? this.$dayjs(query.paymentDateTo).format('YYYY-MM-DD 23:59:59') : '';
       const fileName = '계정 목록';
 
       this.$axios
@@ -255,7 +254,9 @@ export default {
           method: 'GET',
           responseType: 'blob',
           params: {
-            ...this.queryOptions,
+            searchDateType: query.searchDateType,
+            paymentStatus: query.paymentStatus,
+            text: query.text,
             paymentDateFrom,
             paymentDateTo,
             fileName
