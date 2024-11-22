@@ -30,7 +30,6 @@
         <div class="mb-24">
           <label>상태</label>
           <SCheckbox v-model="queryOptions.hasNumberOfEntries">입장횟수</SCheckbox>
-          <SCheckbox v-model="queryOptions.alreadyLoginedBefore">최근 로그인</SCheckbox>
           <SCheckbox v-model="queryOptions.hasMembership">멤버십</SCheckbox>
           <SCheckbox v-model="queryOptions.alreadyDeliveredAdminSiteCoupon">쿠폰 발급 여부</SCheckbox>
         </div>
