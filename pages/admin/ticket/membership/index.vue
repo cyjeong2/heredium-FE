@@ -115,7 +115,10 @@
                 <div>{{ item?.phone }}</div>
               </td>
               <td>
-                <div v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE'" class="refund-btn">
+                <div
+                  v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE' && item.payment_status === '가입 완료'"
+                  class="refund-btn"
+                >
                   <SButton @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
@@ -137,10 +140,10 @@
         환불을 진행하시겠습니까?
       </template>
       <template #modal-btn1>
-        <SButton @click="refundingItem = null">취소</SButton>
+        <SButton :disabled="inRefundProcessing" @click="refundingItem = null">취소</SButton>
       </template>
       <template #modal-btn2>
-        <SButton button-type="primary" @click="handleRefund">확인</SButton>
+        <SButton button-type="primary" :disabled="inRefundProcessing" @click="handleRefund">확인</SButton>
       </template>
     </SDialogModal>
   </div>
@@ -199,6 +202,7 @@ export default {
       tableData: null,
       isCheckedAll: false,
       refundingItem: null,
+      inRefundProcessing: false,
       modal: {
         isShowCreateCouponCompany: false,
         isUploadData: false
@@ -324,12 +328,15 @@ export default {
         return;
       }
       try {
+        this.inRefundProcessing = true;
         await this.$axios.post(`/admin/memberships/${this.refundingItem.account_id}/refund`);
         this.fetch();
         this.refundingItem = null;
+        this.inRefundProcessing = false;
       } catch (error) {
         alert('환불 오류.');
         this.refundingItem = null;
+        this.inRefundProcessing = false;
       }
     }
   }

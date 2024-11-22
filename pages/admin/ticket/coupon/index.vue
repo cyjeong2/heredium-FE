@@ -521,7 +521,6 @@ export default {
         this.selectedData.userList = [];
       } else {
         const selectedUserRemain = [...this.selectedData.userList].filter((user) => !user.isChecked);
-        console.log('🚀 ~ removeSelectedUser ~ selectedUserRemain:', selectedUserRemain);
 
         this.selectedData.userList = selectedUserRemain;
         this.queryOptions.excludeIds = selectedUserRemain.map((item) => item.id);
