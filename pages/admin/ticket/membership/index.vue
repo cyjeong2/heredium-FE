@@ -334,7 +334,7 @@ export default {
         this.refundingItem = null;
         this.inRefundProcessing = false;
       } catch (error) {
-        alert('환불 오류.');
+        alert(error?.response?.data?.BODY || '환불 오류.');
         this.refundingItem = null;
         this.inRefundProcessing = false;
       }
