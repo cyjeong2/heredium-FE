@@ -379,7 +379,7 @@ export default {
       width: 6%;
     }
     &:nth-of-type(3) {
-      width: 15%;
+      width: 26rem;
     }
     &:nth-of-type(4) {
       width: 16%;

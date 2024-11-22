@@ -30,7 +30,6 @@
         <div class="mb-24">
           <label>상태</label>
           <SCheckbox v-model="queryOptions.hasNumberOfEntries">입장횟수</SCheckbox>
-          <SCheckbox v-model="queryOptions.alreadyLoginedBefore">최근 로그인</SCheckbox>
           <SCheckbox v-model="queryOptions.hasMembership">멤버십</SCheckbox>
           <SCheckbox v-model="queryOptions.alreadyDeliveredAdminSiteCoupon">쿠폰 발급 여부</SCheckbox>
         </div>
@@ -83,7 +82,7 @@
                   <div>{{ exportParams.page * exportParams.size + index + 1 }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.membershipName }}</div>
+                  <div class="text-left membership-column">{{ item.membershipName }}</div>
                 </td>
                 <td>
                   <div>{{ item.email }}</div>
@@ -823,6 +822,9 @@ export default {
 }
 
 .admin-table {
+  .membership-column {
+    width: 26rem !important;
+  }
   th {
     &:first-of-type {
       width: 4%;
