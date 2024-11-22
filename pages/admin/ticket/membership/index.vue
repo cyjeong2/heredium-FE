@@ -329,12 +329,12 @@ export default {
       }
       try {
         this.inRefundProcessing = true;
-        await this.$axios.post(`/admin/memberships/${this.refundingItem.account_id}/refund`);
+        await this.$axios.post(`/admin/memberships/${this.refundingItem.membership_registration_id}/refund`);
         this.fetch();
         this.refundingItem = null;
         this.inRefundProcessing = false;
       } catch (error) {
-        alert('환불 오류.');
+        alert(error?.response?.data?.BODY || '환불 오류.');
         this.refundingItem = null;
         this.inRefundProcessing = false;
       }
