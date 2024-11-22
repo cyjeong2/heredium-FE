@@ -134,7 +134,7 @@
     ></CouponCorporate>
     <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
 
-    <SDialogModal :is-show="refundingItem" @close="refundingItem = null">
+    <SDialogModal :is-show="!!refundingItem" @close="refundingItem = null">
       <template #content>
         <div v-if="refundingItem.number_of_coupons">쿠폰 {{ refundingItem.number_of_coupons }}개를 사용하셨습니다.</div>
         환불을 진행하시겠습니까?
