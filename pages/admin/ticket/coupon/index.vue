@@ -228,7 +228,7 @@
       </template>
     </SDialogModal>
     <SDialogModal :is-show="isConfirmSave" @close="isConfirmSave = false">
-      <template #content>변경 사항을 저장하시겠습니까?</template>
+      <template #content>쿠폰 발송을 하시겠습니까?</template>
       <template #modal-btn1>
         <SButton button-type="primary" @click="issuedTicket()">확인</SButton>
       </template>
@@ -559,7 +559,7 @@ export default {
       let isValid = false;
       let msg = '';
       if (!this.selectedData?.userList?.length) {
-        msg = '계정를 선택해 주세요.';
+        msg = '계정을 선택해 주세요.';
       } else {
         isValid = true;
       }
