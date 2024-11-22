@@ -30,7 +30,6 @@
         <div class="mb-24">
           <label>상태</label>
           <SCheckbox v-model="queryOptions.hasNumberOfEntries">입장횟수</SCheckbox>
-          <SCheckbox v-model="queryOptions.alreadyLoginedBefore">최근 로그인</SCheckbox>
           <SCheckbox v-model="queryOptions.hasMembership">멤버십</SCheckbox>
           <SCheckbox v-model="queryOptions.alreadyDeliveredAdminSiteCoupon">쿠폰 발급 여부</SCheckbox>
         </div>
@@ -83,7 +82,7 @@
                   <div>{{ exportParams.page * exportParams.size + index + 1 }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.membershipName }}</div>
+                  <div class="text-left membership-column">{{ item.membershipName }}</div>
                 </td>
                 <td>
                   <div>{{ item.email }}</div>
@@ -229,7 +228,7 @@
       </template>
     </SDialogModal>
     <SDialogModal :is-show="isConfirmSave" @close="isConfirmSave = false">
-      <template #content>변경 사항을 저장하시겠습니까?</template>
+      <template #content>쿠폰 발송을 하시겠습니까?</template>
       <template #modal-btn1>
         <SButton button-type="primary" @click="issuedTicket()">확인</SButton>
       </template>
@@ -522,7 +521,6 @@ export default {
         this.selectedData.userList = [];
       } else {
         const selectedUserRemain = [...this.selectedData.userList].filter((user) => !user.isChecked);
-        console.log('🚀 ~ removeSelectedUser ~ selectedUserRemain:', selectedUserRemain);
 
         this.selectedData.userList = selectedUserRemain;
         this.queryOptions.excludeIds = selectedUserRemain.map((item) => item.id);
@@ -560,7 +558,7 @@ export default {
       let isValid = false;
       let msg = '';
       if (!this.selectedData?.userList?.length) {
-        msg = '계정를 선택해 주세요.';
+        msg = '계정을 선택해 주세요.';
       } else {
         isValid = true;
       }
@@ -823,6 +821,9 @@ export default {
 }
 
 .admin-table {
+  .membership-column {
+    width: 26rem !important;
+  }
   th {
     &:first-of-type {
       width: 4%;
