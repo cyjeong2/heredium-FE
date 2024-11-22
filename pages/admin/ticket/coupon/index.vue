@@ -83,7 +83,7 @@
                   <div>{{ exportParams.page * exportParams.size + index + 1 }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.membershipName }}</div>
+                  <div class="text-left membership-column">{{ item.membershipName }}</div>
                 </td>
                 <td>
                   <div>{{ item.email }}</div>
@@ -823,6 +823,9 @@ export default {
 }
 
 .admin-table {
+  .membership-column {
+    width: 26rem !important;
+  }
   th {
     &:first-of-type {
       width: 4%;

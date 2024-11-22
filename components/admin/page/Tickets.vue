@@ -59,7 +59,7 @@
               <th v-if="pageType !== 'invitation'">회차</th>
               <th>구매 수</th>
               <th v-if="pageType !== 'group' && pageType !== 'invitation'">금액</th>
-              <th>멤버십</th>
+              <th class="membership-column">멤버십</th>
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
@@ -436,6 +436,9 @@ export default {
     display: flex;
     align-items: center;
   }
+}
+.membership-column {
+  width: 26rem !important;
 }
 
 .admin-table {
