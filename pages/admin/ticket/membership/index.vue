@@ -115,10 +115,7 @@
                 <div>{{ item?.phone }}</div>
               </td>
               <td>
-                <div
-                  v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE' && item.payment_status === '가입 완료'"
-                  class="refund-btn"
-                >
+                <div v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE' && item.is_refundable" class="refund-btn">
                   <SButton @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
