@@ -37,7 +37,7 @@
 
           <div v-if="invalidFileContent" class="validate-container">
             <div class="result-box">
-              <h3 class="failed-cases">실패한: {{ invalidFileContent.length }}</h3>
+              <h3 class="failed-cases">실패: {{ invalidFileContent.length }}</h3>
               <ol class="result-list failed-list">
                 <li v-for="(item, index) in invalidFileContent" :key="index">{{ index + 1 }}. {{ item }}</li>
               </ol>
@@ -48,7 +48,7 @@
         <div v-else class="result-container">
           <div class="result-total">
             <h2 class="success-cases mr-24">성공: {{ result?.success_cases?.length }}</h2>
-            <h2 class="failed-cases">실패한: {{ result?.failed_cases?.length }}</h2>
+            <h2 class="failed-cases">실패: {{ result?.failed_cases?.length }}</h2>
           </div>
           <div v-if="result?.success_cases?.length" class="result-box">
             <h3 class="success-cases">성공 목록</h3>
