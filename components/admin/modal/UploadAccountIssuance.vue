@@ -5,7 +5,7 @@
       <div class="result-container">
         <div class="result-total">
           <h2 class="success-cases mr-24">성공: {{ successCases?.length }}</h2>
-          <h2 class="failed-cases">실패한: {{ failedCases?.length }}</h2>
+          <h2 class="failed-cases">실패: {{ failedCases?.length }}</h2>
         </div>
         <div v-if="successCases?.length" class="result-box">
           <h3 class="success-cases">성공 목록</h3>
