@@ -261,51 +261,46 @@ export default {
     }
     /* Membership */
     &:nth-of-type(2) {
+      width: 207px;
+      min-width: 207px;
+    }
+    /* email */
+    &:nth-of-type(3) {
       width: 15vw;
       min-width: 200px;
-    }
-    /* ID */
-    &:nth-of-type(3) {
-      width: 120px;
-      min-width: 120px;
     }
     /* Name */
     &:nth-of-type(4) {
-      width: 15vw;
-      min-width: 200px;
+      width: 120px;
+      min-width: 120px;
     }
     /* Phone */
     &:nth-of-type(5) {
       width: 120px;
       min-width: 120px;
     }
-    /* Payment status */
-    &:nth-of-type(6) {
-      width: 100px;
-      min-width: 100px;
-    }
     /* Payment date */
-    &:nth-of-type(7) {
+    &:nth-of-type(6) {
       width: 173px;
       min-width: 173px;
     }
     /* Number of membership */
-    &:nth-of-type(8) {
-      width: 100px;
-      min-width: 100px;
+    &:nth-of-type(7) {
+      width: 120px;
+      min-width: 120px;
     }
     /* Number of display uses */
-    &:nth-of-type(9) {
+    &:nth-of-type(8) {
       width: 120px;
       min-width: 120px;
     }
     /* Number of program uses */
-    &:nth-of-type(10) {
+    &:nth-of-type(9) {
       width: 120px;
       min-width: 120px;
     }
     /* Number of drink uses */
-    &:nth-of-type(11) {
+    &:nth-of-type(10) {
       width: 120px;
       min-width: 120px;
     }

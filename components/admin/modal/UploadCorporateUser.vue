@@ -37,7 +37,7 @@
 
           <div v-if="invalidFileContent" class="validate-container">
             <div class="result-box">
-              <h3 class="failed-cases">실패한: {{ invalidFileContent.length }}</h3>
+              <h3 class="failed-cases">실패: {{ invalidFileContent.length }}</h3>
               <ol class="result-list failed-list">
                 <li v-for="(item, index) in invalidFileContent" :key="index">{{ index + 1 }}. {{ item }}</li>
               </ol>
@@ -48,7 +48,7 @@
         <div v-else class="result-container">
           <div class="result-total">
             <h2 class="success-cases mr-24">성공: {{ result?.success_cases?.length }}</h2>
-            <h2 class="failed-cases">실패한: {{ result?.failed_cases?.length }}</h2>
+            <h2 class="failed-cases">실패: {{ result?.failed_cases?.length }}</h2>
           </div>
           <div v-if="result?.success_cases?.length" class="result-box">
             <h3 class="success-cases">성공 목록</h3>
@@ -65,11 +65,13 @@
         </div>
       </template>
       <template v-if="!result" #modal-btn1>
-        <SButton v-if="!invalidFileContent" button-type="primary" @click="handleSubmit">확인</SButton>
+        <SButton v-if="!invalidFileContent" button-type="primary" :disabled="isFetching" @click="handleSubmit"
+          >확인</SButton
+        >
         <SButton v-if="invalidFileContent" @click="removeFile">재업로드</SButton>
       </template>
       <template v-if="invalidFileContent && !result" #modal-btn2>
-        <SButton button-type="primary" @click="handleSubmit">계속</SButton>
+        <SButton button-type="primary" :disabled="isFetching" @click="handleSubmit">계속</SButton>
       </template>
     </SModal>
     <SDialogModal :is-show="isFileError" @close="isFileError = false">
@@ -108,7 +110,8 @@ export default {
       isSubmitted: false,
       isFileError: false,
       result: null,
-      invalidFileContent: null
+      invalidFileContent: null,
+      isFetching: false
     };
   },
   async fetch() {
@@ -205,13 +208,16 @@ export default {
         const file = this.getFile();
         const formData = new FormData();
         formData.append('file', file);
+        this.isFetching = true;
         const res = await this.$axios.$post(
           `/admin/companies/${this.companyName}/membership-registrations/upload`,
           formData
         );
         this.result = res;
+        this.isFetching = false;
       } catch (error) {
         this.handleErrorUploadFile(error);
+        this.isFetching = false;
       }
     },
     handleErrorUploadFile(error) {

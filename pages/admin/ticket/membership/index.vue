@@ -42,8 +42,8 @@
               <th>결제일시</th>
               <th>시작일시</th>
               <th>종료일시</th>
-              <th>쿠폰 수</th>
-              <th>금액</th>
+              <th>사용 쿠폰 수</th>
+              <th>이용금액</th>
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
@@ -115,10 +115,7 @@
                 <div>{{ item?.phone }}</div>
               </td>
               <td>
-                <div
-                  v-if="item?.registration_type === 'MEMBERSHIP_PACKAGE' && item.payment_status === '가입 완료'"
-                  class="refund-btn"
-                >
+                <div v-if="item.is_refundable" class="refund-btn">
                   <SButton @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
