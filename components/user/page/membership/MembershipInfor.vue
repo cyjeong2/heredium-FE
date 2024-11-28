@@ -5,7 +5,7 @@
         <no-membership />
       </div>
       <div v-else>
-        <has-membership :data-merbership="dataMerbership" />
+        <has-membership :data-membership="dataMerbership" />
       </div>
     </div>
   </KeepAlive>
