@@ -82,7 +82,7 @@
                   <div>{{ exportParams.page * exportParams.size + index + 1 }}</div>
                 </td>
                 <td>
-                  <div class="text-left membership-column">{{ item.membershipName }}</div>
+                  <div>{{ item.membershipName }}</div>
                 </td>
                 <td>
                   <div>{{ item.email }}</div>
@@ -186,7 +186,7 @@
                   <div>{{ selectedData.tablePage * selectedData.pageSize + index + 1 }}</div>
                 </td>
                 <td>
-                  <div class="text-left">{{ item.membershipName }}</div>
+                  <div>{{ item.membershipName }}</div>
                 </td>
                 <td>
                   <div>{{ item.email }}</div>
@@ -821,9 +821,6 @@ export default {
 }
 
 .admin-table {
-  .membership-column {
-    width: 26rem !important;
-  }
   th {
     &:first-of-type {
       width: 4%;
@@ -832,7 +829,8 @@ export default {
       width: 6%;
     }
     &:nth-of-type(3) {
-      width: 13%;
+      width: 207px;
+      min-width: 207px;
     }
     &:nth-of-type(4) {
       width: 14%;
