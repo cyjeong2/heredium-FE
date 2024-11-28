@@ -65,13 +65,13 @@
         </div>
       </template>
       <template v-if="!result" #modal-btn1>
-        <SButton v-if="!invalidFileContent" button-type="primary" :disable="isFetching" @click="handleSubmit"
+        <SButton v-if="!invalidFileContent" button-type="primary" :disabled="isFetching" @click="handleSubmit"
           >확인</SButton
         >
         <SButton v-if="invalidFileContent" @click="removeFile">재업로드</SButton>
       </template>
       <template v-if="invalidFileContent && !result" #modal-btn2>
-        <SButton button-type="primary" :disable="isFetching" @click="handleSubmit">계속</SButton>
+        <SButton button-type="primary" :disabled="isFetching" @click="handleSubmit">계속</SButton>
       </template>
     </SModal>
     <SDialogModal :is-show="isFileError" @close="isFileError = false">
