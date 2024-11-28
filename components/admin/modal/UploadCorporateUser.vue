@@ -71,7 +71,7 @@
         <SButton v-if="invalidFileContent" @click="removeFile">재업로드</SButton>
       </template>
       <template v-if="invalidFileContent && !result" #modal-btn2>
-        <SButton button-type="primary" @click="handleSubmit">계속</SButton>
+        <SButton button-type="primary" :disable="isFetching" @click="handleSubmit">계속</SButton>
       </template>
     </SModal>
     <SDialogModal :is-show="isFileError" @close="isFileError = false">
