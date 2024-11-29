@@ -286,23 +286,23 @@ export default {
     }
     /* Number of membership */
     &:nth-of-type(7) {
-      width: 120px;
-      min-width: 120px;
+      width: 110px;
+      min-width: 110px;
     }
     /* Number of display uses */
     &:nth-of-type(8) {
-      width: 120px;
-      min-width: 120px;
+      width: 110px;
+      min-width: 110px;
     }
     /* Number of program uses */
     &:nth-of-type(9) {
-      width: 120px;
-      min-width: 120px;
+      width: 110px;
+      min-width: 110px;
     }
     /* Number of drink uses */
     &:nth-of-type(10) {
-      width: 120px;
-      min-width: 120px;
+      width: 110px;
+      min-width: 110px;
     }
     /* Agree to receive marketing */
     &:last-of-type {
