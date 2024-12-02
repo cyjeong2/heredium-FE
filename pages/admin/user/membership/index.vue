@@ -76,7 +76,7 @@
                 <div>{{ item.number_of_programs_used }}</div>
               </td>
               <td>
-                <div class="text-right">{{ item.number_of_coffee_used }}</div>
+                <div>{{ item.number_of_coffee_used }}</div>
               </td>
               <td>
                 <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
