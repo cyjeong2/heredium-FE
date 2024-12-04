@@ -115,8 +115,8 @@
                 <div>{{ item?.phone }}</div>
               </td>
               <td>
-                <div v-if="item.is_refundable" class="refund-btn">
-                  <SButton @click="refundingItem = item"> 환불하다 </SButton>
+                <div v-if="item.registration_type === membershipTypeOption.registration" class="refund-btn">
+                  <SButton :disabled="!item.is_refundable" @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
             </tr>
@@ -160,6 +160,7 @@ import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
 import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
+import { MembershipType } from '~/assets/js/membership';
 
 export default {
   name: 'MembershipTicketPage',
@@ -179,6 +180,7 @@ export default {
   layout: 'admin/default',
   data() {
     return {
+      membershipTypeOption: MembershipType,
       dateOptionList: [{ value: 'PAYMENT_DATE', label: '결제일시' }],
       sizeOptionList: [
         { value: 20, label: '20개' },
