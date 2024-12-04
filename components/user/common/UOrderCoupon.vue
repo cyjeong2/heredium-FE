@@ -112,7 +112,9 @@ export default {
         dataListCoupon = dataListCoupon.filter((couponCategory) => couponCategory.coupon_type === this.couponType);
         let totalCoupon = 0;
         for (const couponCategory of dataListCoupon) {
-          const availableCoupon = couponCategory?.unused_coupons?.filter((item) => !item.is_expired);
+          const availableCoupon = couponCategory?.unused_coupons?.filter(
+            (item) => !item.is_expired && !item.isCouponAwaitingStart
+          );
           totalCoupon += availableCoupon ? availableCoupon.length : 0;
         }
         this.totalCoupon = totalCoupon;
