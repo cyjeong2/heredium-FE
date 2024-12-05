@@ -121,7 +121,7 @@ export default {
     isCouponAwaitingStart() {
       const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
       if (!deliveredDate) return true;
-      const today = this.$dayjs().startOf('day');
+      const today = this.$dayjs();
       const startDate = this.$dayjs(deliveredDate, 'YYYY-MM-DD HH:mm:ss', true);
       if (!startDate.isValid()) {
         return true;
