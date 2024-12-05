@@ -126,7 +126,7 @@ export default {
       if (!startDate.isValid()) {
         return true;
       }
-      return today.isAfter(startDate);
+      return today.isBefore(startDate);
     },
     showCoupon() {
       if (this.isExpired) {
