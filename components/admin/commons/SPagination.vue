@@ -193,7 +193,6 @@ export default {
 .pagination__group button {
   color: var(--color-black);
   font-size: 1.6rem;
-  width: 16px;
   line-height: 2.4rem;
   text-align: center;
   margin-right: 1.65rem;
