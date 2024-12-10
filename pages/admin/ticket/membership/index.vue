@@ -108,7 +108,7 @@
               </td>
               <td>
                 <div v-if="item.registration_type === membershipTypeOption.registration" class="refund-btn">
-                  <SButton :disabled="!item.is_refundable" @click="refundingItem = item"> 환불하다 </SButton>
+                  <SButton :disabled="!item.is_refundable" @click="refundingItem = item">환불</SButton>
                 </div>
               </td>
             </tr>
