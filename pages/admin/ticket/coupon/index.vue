@@ -246,7 +246,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
-import { omit } from 'lodash';
 import STitle from '~/components/admin/commons/STitle';
 import SPageable from '~/components/admin/commons/SPageable';
 import SButton from '~/components/admin/commons/SButton';
@@ -261,7 +260,7 @@ import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import { API_ERROR } from '~/utils/message';
 import { COUPON_DEFAULT } from '~/assets/js/types';
 import { downloadMixin } from '~/mixins/donloadMixin';
-import { getCouponIssuanceStorage, removeCouponIssuanceStorage, setCouponIssuanceStorage } from '~/utils/storage';
+import { getCouponIssuanceStorage, setCouponIssuanceStorage } from '~/utils/storage';
 import SDownloadExcelTemplate from '~/components/admin/commons/SDownloadExcelTemplate.vue';
 import UploadAccountIssuance from '~/components/admin/modal/UploadAccountIssuance.vue';
 
@@ -625,10 +624,6 @@ export default {
       this.syncCouponDataTime = Date.now();
     },
     async handleSaveCouponIssuancePage() {
-      if (isEqual(omit(this.couponData, ['tempId']), omit(COUPON_DEFAULT, ['tempId']))) {
-        removeCouponIssuanceStorage();
-        return;
-      }
       if (this.isEqualCouponSaved()) {
         return;
       }

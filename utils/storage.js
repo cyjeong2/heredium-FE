@@ -24,7 +24,3 @@ export function setCouponIssuanceStorage(couponId) {
     return null;
   }
 }
-
-export function removeCouponIssuanceStorage() {
-  localStorage.removeItem(localStorageKeyName.couponIssuance);
-}

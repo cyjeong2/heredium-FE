@@ -50,6 +50,7 @@
               />
             </div>
           </template>
+          <template #content>일</template>
         </s-flex-input-grid>
       </div>
       <div class="field-group">
@@ -110,9 +111,7 @@
         </div>
       </div>
       <div v-if="!disabled" class="right">
-        <SButton v-if="showDeleteButton" button-type="standard" w-size="medium" @click="handleDeleteCoupon"
-          >삭제</SButton
-        >
+        <SButton v-if="showDeleteButton" button-type="standard" w-size="medium" @click="handleDeleteCoupon">삭제</SButton>
         <SButton v-if="showAddButton" button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가 </SButton>
       </div>
     </div>
@@ -243,7 +242,7 @@ export default {
     },
     handleDeleteCoupon() {
       this.$emit('delete-coupon');
-    }
+    },
   }
 };
 </script>

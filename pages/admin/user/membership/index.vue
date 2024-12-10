@@ -128,7 +128,7 @@ export default {
       marketingOptionList: [
         { value: null, label: '전체' },
         { value: true, label: '동의' },
-        { value: false, label: '미동의' }
+        { value: false, label: '미 동의' }
       ],
       dateOptionList: [{ value: 'CREATED_DATE', label: '가입일시' }],
       pageSizeList: [...PAGE_SIZE_OPTIONS],

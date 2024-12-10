@@ -155,7 +155,7 @@ export default {
       marketingOptionList: [
         { value: null, label: '전체' },
         { value: true, label: '동의' },
-        { value: false, label: '미동의' }
+        { value: false, label: '미 동의' }
       ],
       optionList: [...PAGE_SIZE_OPTIONS]
     };

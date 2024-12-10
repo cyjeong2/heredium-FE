@@ -33,6 +33,9 @@
         <table class="admin-table">
           <thead :class="{ 'data-none': !data || !data[0] }">
             <tr>
+              <th>
+                <SCheckbox v-model="isCheckedAll" @input="setCheckedAll" />
+              </th>
               <th>NO</th>
               <th>멤버십</th>
               <th>상태</th>
@@ -49,9 +52,14 @@
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
-              <td colspan="12"><div>리스트가 없습니다.</div></td>
+              <td colspan="13"><div>리스트가 없습니다.</div></td>
             </tr>
             <tr v-for="(item, index) in data" :key="item.id">
+              <td>
+                <div>
+                  <SCheckbox v-model="item.isChecked" />
+                </div>
+              </td>
               <td>
                 <div>{{ tableData.startCount - index }}</div>
               </td>
@@ -108,7 +116,7 @@
               </td>
               <td>
                 <div v-if="item.registration_type === membershipTypeOption.registration" class="refund-btn">
-                  <SButton :disabled="!item.is_refundable" @click="refundingItem = item">환불</SButton>
+                  <SButton :disabled="!item.is_refundable" @click="refundingItem = item"> 환불하다 </SButton>
                 </div>
               </td>
             </tr>
@@ -147,6 +155,7 @@ import SSearchBar from '~/components/admin/commons/SSearchBar';
 import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SCheckboxGroup from '~/components/admin/commons/SCheckboxGroup';
 import { TICKET_MEMBERSHIP_STATE_TYPE } from '~/assets/js/types';
+import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
 import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
@@ -156,6 +165,7 @@ import { MembershipType } from '~/assets/js/membership';
 export default {
   name: 'MembershipTicketPage',
   components: {
+    SCheckbox,
     SCheckboxGroup,
     SDatepicker,
     STitle,
@@ -369,16 +379,16 @@ export default {
 .admin-table {
   th {
     &:first-of-type {
-      width: 6%;
+      width: 4%;
     }
     &:nth-of-type(2) {
-      width: 26rem;
+      width: 6%;
     }
     &:nth-of-type(3) {
-      width: 16%;
+      width: 26rem;
     }
     &:nth-of-type(4) {
-      width: 10%;
+      width: 16%;
     }
     &:nth-of-type(5) {
       width: 10%;
@@ -390,17 +400,26 @@ export default {
       width: 10%;
     }
     &:nth-of-type(8) {
+      width: 10%;
+    }
+    &:nth-of-type(9) {
       width: 100px;
       min-width: 7%;
     }
-    &:nth-of-type(9) {
+    &:nth-of-type(10) {
       width: 8%;
     }
-    &:nth-of-type(10) {
+    &:nth-of-type(11) {
       width: 10%;
     }
-    &:nth-of-type(11) {
+    &:nth-of-type(12) {
       width: 12%;
+    }
+    &:nth-of-type(13) {
+      width: 5%;
+    }
+    &:nth-of-type(14) {
+      width: 10%;
     }
     &:last-of-type {
       width: 10%;
