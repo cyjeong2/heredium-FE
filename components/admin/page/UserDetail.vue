@@ -73,7 +73,7 @@
       </div>
       <div class="row">
         <label>마케팅 수신 동의 여부</label>
-        <div>{{ cloneDetailData.isMarketingReceive ? '동의' : '미 동의' }}</div>
+        <div>{{ cloneDetailData.isMarketingReceive ? '동의' : '미동의' }}</div>
       </div>
       <div class="row">
         <label>지역주민 여부</label>
