@@ -175,7 +175,6 @@ export default {
   }
   .caption {
     width: 100%;
-    text-align: center;
     font-size: 1.4rem;
     line-height: 2rem;
     font-weight: 400;

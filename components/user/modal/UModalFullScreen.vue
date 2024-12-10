@@ -93,7 +93,6 @@ export default {
     position: relative;
     min-height: 5.2rem;
     padding: 2.4rem 2rem;
-    margin-bottom: 0.8rem;
 
     h1 {
       font-size: 2rem;
