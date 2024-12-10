@@ -173,15 +173,17 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 1.2rem;
-    column-gap: 1.2rem;
+    column-gap: 0.8rem;
+    overflow: hidden;
+    border: 1px solid transparent;
 
     &:hover {
       cursor: pointer;
     }
 
     .img-wrap {
-      height: 12rem;
-      width: 12rem;
+      height: 10rem;
+      width: 10rem;
 
       > img {
         width: 100%;
@@ -191,7 +193,8 @@ export default {
     }
 
     .name {
-      font-weight: 700;
+      font-weight: 600;
+      font-size: 1.4rem;
       color: var(--color-default);
     }
 
@@ -323,7 +326,6 @@ export default {
   transform: translate(-50%, -50%);
 }
 .select-box {
-  flex: 1;
   display: flex;
   justify-content: end;
 }
