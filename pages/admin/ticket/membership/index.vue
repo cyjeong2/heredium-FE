@@ -108,7 +108,7 @@
               </td>
               <td>
                 <div v-if="item.registration_type === membershipTypeOption.registration" class="refund-btn">
-                  <SButton :disabled="!item.is_refundable" @click="refundingItem = item">환불</SButton>
+                  <SButton :disabled="!item.is_refundable" @click="handleClickRefund(item)">환불</SButton>
                 </div>
               </td>
             </tr>
@@ -125,8 +125,12 @@
 
     <SDialogModal :is-show="!!refundingItem" @close="refundingItem = null">
       <template #content>
-        <div v-if="refundingItem.number_of_coupons">쿠폰 {{ refundingItem.number_of_coupons }}개를 사용하셨습니다.</div>
-        환불을 진행하시겠습니까?
+        <div class="text-left">
+          <div v-if="refundingItem.numberCouponsUsed">
+            쿠폰 {{ refundingItem.numberCouponsUsed }}개를 사용하셨습니다.
+          </div>
+          환불을 진행하시겠습니까?
+        </div>
       </template>
       <template #modal-btn1>
         <SButton :disabled="inRefundProcessing" @click="refundingItem = null">취소</SButton>
@@ -325,6 +329,20 @@ export default {
       } catch (error) {
         alert(error?.response?.data?.BODY || '환불 오류.');
         this.refundingItem = null;
+        this.inRefundProcessing = false;
+      }
+    },
+    async handleClickRefund(record) {
+      try {
+        this.inRefundProcessing = true;
+        const response = await this.$axios.get(
+          `/admin/coupons/check-usage/membership/${record.membership_registration_id}`
+        );
+        const numberCouponsUsed = response.data?.number_of_used_coupons || 0;
+        this.refundingItem = { ...record, numberCouponsUsed };
+        this.inRefundProcessing = false;
+      } catch (error) {
+        alert('환불 오류.');
         this.inRefundProcessing = false;
       }
     }
