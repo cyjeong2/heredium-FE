@@ -19,7 +19,7 @@
             <li
               v-for="index in pageCount + 1"
               v-else
-              v-show="Math.floor((index - 1) / 5) === Math.floor(currentPage / 5)"
+              v-show="Math.floor((index - 1) / 10) === Math.floor(currentPage / 10)"
               :key="index"
             >
               <button type="button" :class="{ active: index === currentPage + 1 }" @click="clickPageNum(index)">
