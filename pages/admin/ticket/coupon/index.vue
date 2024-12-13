@@ -305,8 +305,8 @@ export default {
       couponSaved: null,
       feedback: {},
       dateOptionList: [{ value: 'CREATED_DATE', label: '생성일시' }],
-      queryOptions: INIT_GET_ACCOUNT_PARAMS,
-      exportParams: INIT_GET_ACCOUNT_PARAMS,
+      queryOptions: cloneDeep(INIT_GET_ACCOUNT_PARAMS),
+      exportParams: cloneDeep(INIT_GET_ACCOUNT_PARAMS),
       tableData: null,
       isCheckedAll: false,
       optionList: [
@@ -513,6 +513,11 @@ export default {
         });
       });
       this.selectedData.userList = this.selectedData.userList.map((item, index) => ({ ...item, index: index + 1 }));
+      const isLastPage = this.tableData?.totalPages === this.queryOptions?.page + 1;
+      const isCheckedAllRecord = targetUserList.length && targetUserList.length === this.tableData?.content?.length;
+      if (isLastPage && isCheckedAllRecord) {
+        this.queryOptions.page = Math.max(0, this.queryOptions.page - 1);
+      }
       this.fetch();
     },
     removeSelectedUser(isAll) {

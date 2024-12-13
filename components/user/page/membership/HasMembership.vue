@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <div class="center">
-          <p class="name-membership">등급 : {{ membershipNameDisplay }}</p>
+          <p class="name-membership">{{ membershipNameDisplay }}</p>
           <p>유효기간: {{ getFormattedDate(dataMembership.registration_date, dataMembership.expiration_date) }}</p>
         </div>
       </div>
