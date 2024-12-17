@@ -133,7 +133,7 @@
 
     <SDialogModal :is-show="!!refundingItem" @close="refundingItem = null">
       <template #content>
-        <div class="text-left">
+        <div>
           <div v-if="refundingItem.numberCouponsUsed">
             쿠폰 {{ refundingItem.numberCouponsUsed }}개를 사용하셨습니다.
           </div>
