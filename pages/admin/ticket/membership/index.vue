@@ -39,7 +39,9 @@
               <th>결제일시</th>
               <th>시작일시</th>
               <th>종료일시</th>
-              <th>사용 쿠폰 수</th>
+              <th>전시</th>
+              <th>프로그램</th>
+              <th>커피</th>
               <th>이용금액</th>
               <th>계정</th>
               <th>이름</th>
@@ -49,7 +51,7 @@
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
-              <td colspan="12"><div>리스트가 없습니다.</div></td>
+              <td colspan="14"><div>리스트가 없습니다.</div></td>
             </tr>
             <tr v-for="(item, index) in data" :key="item.id">
               <td>
@@ -92,7 +94,13 @@
                 </div>
               </td>
               <td>
-                <div>{{ item?.number_of_coupons }}</div>
+                <div>{{ item?.number_of_used_exhibition_coupons }}</div>
+              </td>
+              <td>
+                <div>{{ item?.number_of_used_program_coupons }}</div>
+              </td>
+              <td>
+                <div>{{ item?.number_of_used_coffee_coupons }}</div>
               </td>
               <td>
                 <div class="text-right">{{ getThreeCommaNum(item.amount) }}</div>
@@ -125,7 +133,7 @@
 
     <SDialogModal :is-show="!!refundingItem" @close="refundingItem = null">
       <template #content>
-        <div class="text-left">
+        <div>
           <div v-if="refundingItem.numberCouponsUsed">
             쿠폰 {{ refundingItem.numberCouponsUsed }}개를 사용하셨습니다.
           </div>
@@ -408,16 +416,22 @@ export default {
       width: 10%;
     }
     &:nth-of-type(8) {
+      width: 10%;
+    }
+    &:nth-of-type(9) {
+      width: 10%;
+    }
+    &:nth-of-type(10) {
       width: 100px;
       min-width: 7%;
     }
-    &:nth-of-type(9) {
+    &:nth-of-type(11) {
       width: 8%;
     }
-    &:nth-of-type(10) {
+    &:nth-of-type(12) {
       width: 10%;
     }
-    &:nth-of-type(11) {
+    &:nth-of-type(13) {
       width: 12%;
     }
     &:last-of-type {
