@@ -46,7 +46,7 @@
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
-              <th>행동</th>
+              <th>환불</th>
             </tr>
           </thead>
           <tbody>
