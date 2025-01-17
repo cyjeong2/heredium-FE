@@ -118,7 +118,7 @@
                   :key="`${membership.tempId}_active-register`"
                   class="grid-table-body checkbox-cell"
                 >
-                  <SCheckbox v-model="membership.is_register_membership_button_shown"  />
+                  <SCheckbox v-model="membership.is_register_membership_button_shown" />
                 </div>
                 <div
                   v-show="!membership.is_deleted"
@@ -183,12 +183,44 @@
       <div class="bottom">
         <SButton @click="modal.isCancel = true">취소</SButton>
         <div class="right">
-          <SButton class="mr-8" @click="modal.isShowHistory = true">역사</SButton>
           <SButton class="mr-8" @click="modal.isReset = true">초기화</SButton>
           <SButton button-type="primary" :disabled="isConfirmPending" @click="checkEdit">저장</SButton>
         </div>
       </div>
     </div>
+
+    <div class="mt-2 tm-1m">
+      <SPageable :table-data="tableData" @getTableData="setCurrentPage">
+        <template #data="{ data }">
+          <table class="admin-table">
+            <thead :class="{ 'data-none': !data || !data[0] }">
+              <tr>
+                <th>NO</th>
+                <th>업데이트 시간</th>
+                <th>업데이터</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!data || !data[0]">
+                <td colspan="3"><div>리스트가 없습니다.</div></td>
+              </tr>
+              <tr v-for="(item, index) in data" :key="item.id" @click="handleClickRow">
+                <td>
+                  <div>{{ tableData.startCount - index }}</div>
+                </td>
+                <td>
+                  <div>{{ item?.updated_at }}</div>
+                </td>
+                <td>
+                  <div>{{ item?.updater }}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+      </SPageable>
+    </div>
+
     <SDialogModal :is-show="modal.isCancel" @close="modal.isCancel = false">
       <template #content>콘텐츠를 저장하지 않고<br />이전페이지로 이동 하시겠습니까?</template>
       <template #modal-btn1>
@@ -219,10 +251,7 @@
         <SButton button-type="primary" @click="$router.go(0)">확인</SButton>
       </template>
     </SDialogModal>
-    <HistoryModal 
-      :is-show="modal.isShowHistory"
-      @close="modal.isShowHistory = false"
-    />
+    <HistoryModal :is-show="modal.isShowHistory" :history-item="historyItem" @close="modal.isShowHistory = false" />
   </div>
 </template>
 
@@ -232,7 +261,8 @@ import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import SDatepicker from '../../commons/SDatepicker.vue';
 import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
-import HistoryModal from "./HistoryModal.vue";
+import SPageable from '../../commons/SPageable.vue';
+import HistoryModal from './HistoryModal.vue';
 import STitle from '~/components/admin/commons/STitle';
 import SButton from '~/components/admin/commons/SButton';
 import SInput from '~/components/admin/commons/SInput';
@@ -251,6 +281,7 @@ import { API_ERROR } from '~/utils/message';
 export default {
   name: 'PostForm',
   components: {
+    SPageable,
     SDialogModal,
     SummernoteEditor,
     SToggle,
@@ -297,7 +328,27 @@ export default {
       },
       feedback: {},
       isConfirmPending: false,
-      isEdit: true
+      isEdit: true,
+
+      // table history data
+      historyItem: null,
+      queryOptions: {
+        page: 1
+      },
+      tableData: {
+        startCount: 10,
+
+        totalElements: 9,
+        totalPages: 1,
+        number: 0,
+        numberOfElements: 9,
+        content: [
+          {
+            updated_at: '2024-11-15 15:00:00',
+            updater: 'Mocking'
+          }
+        ]
+      }
     };
   },
   created() {
@@ -572,6 +623,54 @@ export default {
       const newCouponList = cloneDeep(membershipOption.coupons);
       newCouponList.splice(couponIndex, 1);
       membershipOption.coupons = newCouponList;
+    },
+    setCurrentPage(currentPage) {
+      this.queryOptions.page = currentPage;
+      this.fetchHistory();
+    },
+    async handleClickRow() {
+      try {
+        const { data } = await this.$axios.get(`/admin/posts/details`);
+        const transformData = data;
+        let memberships = transformData.memberships || [];
+        memberships = memberships.map((membership) => {
+          const membershipId = membership.membership_id;
+          if (membershipId) {
+            delete membership.membership_id;
+          }
+          const coupons = membership.coupons.map((coupon) => {
+            const couponsId = coupon.coupon_id;
+            if (couponsId) {
+              delete coupon.coupon_id;
+            }
+            return {
+              ...coupon,
+              id: couponsId
+            };
+          });
+
+          return {
+            ...membership,
+            id: membershipId,
+            coupons
+          };
+        });
+        transformData.memberships = memberships;
+        transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
+
+        this.historyItem = data;
+        this.modal.isShowHistory = true;
+      } catch (error) {}
+    },
+    async fetchHistory() {
+      // this.tableData = await this.$axios.$get('/admin/accounts/with-membership-info', {
+      //   params: {
+      //     ...this.queryOptions,
+      //     paymentDateFrom: this.queryOptions.paymentDateFrom ? `${this.queryOptions.paymentDateFrom} 00:00:00` : '',
+      //     paymentDateTo: this.queryOptions.paymentDateTo ? `${this.queryOptions.paymentDateTo} 23:59:59` : ''
+      //   }
+      // });
+      // this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
     }
   }
 };
@@ -751,5 +850,22 @@ export default {
   color: var(--color-red);
   font-size: 1.4rem;
   text-align: left;
+}
+
+.admin-table {
+  th {
+    &:first-of-type {
+      width: 10%;
+    }
+    &:nth-of-type(2) {
+      width: 40%;
+    }
+    &:last-of-type {
+      width: 50%;
+    }
+  }
+}
+.mt-2 {
+  margin-top: 2rem;
 }
 </style>

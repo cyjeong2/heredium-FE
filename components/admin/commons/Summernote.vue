@@ -7,7 +7,7 @@
         v-model="content"
         :set-content="value"
         :is-hide-video="isHideVideo"
-        :disabled="true"
+        :disabled="disabled"
         @onImageUpload="onImageUpload"
         @onChange="onChange"
       />
@@ -38,6 +38,11 @@ export default {
       default: ''
     },
     isHideVideo: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       required: false,
       default: false

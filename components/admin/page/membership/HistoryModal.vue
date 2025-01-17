@@ -1,46 +1,15 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
   <transition name="fade">
     <div v-if="isShow" class="modal-wrap">
-      <div class="modal-inner">
-        <div class="modal">
+      <div class="modal-inner" @click="$emit('close')">
+        <div class="modal" @click="(e) => e.stopPropagation()">
           <div class="head">
             <button type="button" class="close-btn" @click="$emit('close')">
               <i class="ic-close" />
             </button>
           </div>
-          <div v-show="historyItem === null" class="body tm-1m">
-            <SPageable :table-data="tableData" @getTableData="setCurrentPage">
-              <template #data="{ data }">
-                <table class="admin-table">
-                  <thead :class="{ 'data-none': !data || !data[0] }">
-                    <tr>
-                      <th>NO</th>
-                      <th>업데이트 시간</th>
-                      <th>업데이터</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="!data || !data[0]">
-                      <td colspan="3"><div>리스트가 없습니다.</div></td>
-                    </tr>
-                    <tr v-for="(item, index) in data" :key="item.id" @click="handleClickRow">
-                      <td>
-                        <div>{{ tableData.startCount - index }}</div>
-                      </td>
-                      <td>
-                        <div>{{ item?.updated_at }}</div>
-                      </td>
-                      <td>
-                        <div>{{ item?.updater }}</div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </template>
-            </SPageable>
-          </div>
-
-          <div v-if="historyItem !== null" class="body tm-1m">
+          <div class="body tm-1m">
             <div class="contents-info mb-36">
               <div class="representative-img mr-28">
                 <SImageUploadRepresentative
@@ -187,7 +156,7 @@
                 </section>
                 <section class="editor mb-16">
                   <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
-                  <div class="editor-wrap" v-html="historyItem.content_detail"></div>
+                  <SummernoteEditor v-model.trim="historyItem.content_detail" disabled />
                 </section>
                 <section class="mb-16">
                   <h3 class="mb-16">Note</h3>
@@ -198,9 +167,6 @@
                   />
                 </section>
               </div>
-              <div class="bottom">
-                <SButton @click="historyItem = null">뒤로</SButton>
-              </div>
             </div>
           </div>
         </div>
@@ -210,20 +176,18 @@
 </template>
 
 <script>
-import SButton from '../../commons/SButton.vue';
 import SCheckbox from '../../commons/SCheckbox.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
 import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
-import SPageable from '../../commons/SPageable.vue';
 import SToggle from '../../commons/SToggle.vue';
 import CouponEditor from './CouponEditor.vue';
+import SummernoteEditor from '~/components/admin/commons/Summernote';
 
 export default {
   name: 'HistoryModal',
   components: {
-    SPageable,
     SDatepicker,
     SImageUploadRepresentative,
     SInput,
@@ -231,83 +195,32 @@ export default {
     SToggle,
     SFlexInputGrid,
     SCheckbox,
-    SButton
+    SummernoteEditor
   },
   props: {
     isShow: {
       type: Boolean,
       required: true,
       default: false
+    },
+    historyItem: {
+      type: Object,
+      required: true,
+      default: undefined
     }
   },
   data() {
     return {
-      queryOptions: {
-        page: 1
-      },
-      tableData: {
-        startCount: 10,
-
-        totalElements: 9,
-        totalPages: 1,
-        number: 0,
-        numberOfElements: 9,
-        content: [
-          {
-            updated_at: '2024-11-15 15:00:00',
-            updater: 'Mocking'
-          },
-        ]
-      },
-
-      historyItem: null,
       membershipIndexExpanded: null
     };
   },
   methods: {
-    setCurrentPage(currentPage) {
-      this.queryOptions.page = currentPage;
-      this.fetch();
-    },
     toggleExposeCoupon(membershipIndex) {
       if (this.membershipIndexExpanded === membershipIndex) {
         this.membershipIndexExpanded = null;
         return;
       }
       this.membershipIndexExpanded = membershipIndex;
-    },
-    async handleClickRow() {
-      try {
-        const { data } = await this.$axios.get(`/admin/posts/details`);
-        const transformData = data;
-        let memberships = transformData.memberships || [];
-        memberships = memberships.map((membership) => {
-          const membershipId = membership.membership_id;
-          if (membershipId) {
-            delete membership.membership_id;
-          }
-          const coupons = membership.coupons.map((coupon) => {
-            const couponsId = coupon.coupon_id;
-            if (couponsId) {
-              delete coupon.coupon_id;
-            }
-            return {
-              ...coupon,
-              id: couponsId
-            };
-          });
-
-          return {
-            ...membership,
-            id: membershipId,
-            coupons
-          };
-        });
-        transformData.memberships = memberships;
-        transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
-
-        this.historyItem = data;
-      } catch (error) {}
     }
   }
 };
@@ -330,19 +243,25 @@ export default {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: var(--color-white);
+  background-color: rgba(var(--color-white), 0.3);
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
 }
 
 .modal {
   overflow: auto;
-  height: 100%;
+  width: 80%;
+  height: 80%;
+  background-color: var(--color-white);
+  translate: 10% 10%;
 
   .head {
-    position: relative;
+    position: sticky;
+    top: 0;
+    right: 0;
     min-height: 5.2rem;
     margin-bottom: 2.2rem;
     padding: 1.4rem 1.6rem;
+    background-color: white;
 
     .close-btn {
       position: absolute;
@@ -363,20 +282,6 @@ export default {
     display: flex;
     justify-content: center;
     margin-bottom: 3.6rem;
-  }
-}
-
-.admin-table {
-  th {
-    &:first-of-type {
-      width: 10%;
-    }
-    &:nth-of-type(2) {
-      width: 40%;
-    }
-    &:last-of-type {
-      width: 50%;
-    }
   }
 }
 
@@ -523,24 +428,6 @@ export default {
     button {
       width: 100%;
     }
-  }
-}
-
-.editor {
-  .editor-wrap {
-    border: 1px solid #00000032;
-    background-color: var(--color-white);
-    overflow: auto;
-    word-break: break-all;
-    border-radius: 4px;
-    max-height: 60vh;
-    font-size: 1.4rem;
-    letter-spacing: -0.02em;
-    line-height: 1.5;
-    height: 500px;
-    padding: 10px;
-    font-size: 1.4rem;
-    line-height: 1.5;
   }
 }
 

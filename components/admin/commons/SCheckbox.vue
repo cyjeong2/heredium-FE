@@ -80,8 +80,9 @@ label {
   }
 
   input:disabled + .toggle {
-    border-color: var(--color-grey-2);
-    background-color: var(--color-white);
+    cursor: default;
+    /* border-color: var(--color-grey-2);
+    background-color: var(--color-white); */
   }
 
   input:checked + .toggle::after {
