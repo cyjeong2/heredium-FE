@@ -109,6 +109,10 @@ Vue.component('SummerEditor', {
         onEnter: this.onEnter
       }
     });
+
+    if (this.disabled) {
+      this.summerNote.summernote('disable');
+    }
   },
   methods: {
     onInit() {
