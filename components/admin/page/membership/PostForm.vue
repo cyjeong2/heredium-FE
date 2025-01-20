@@ -204,15 +204,15 @@
               <tr v-if="!data || !data[0]">
                 <td colspan="3"><div>리스트가 없습니다.</div></td>
               </tr>
-              <tr v-for="(item, index) in data" :key="item.id" @click="handleClickRow">
+              <tr v-for="(item, index) in data" :key="item.id" @click="handleClickRow(item.id)">
                 <td>
                   <div>{{ tableData.startCount - index }}</div>
                 </td>
                 <td>
-                  <div>{{ item?.updated_at }}</div>
+                  <div>{{ item?.modify_date }}</div>
                 </td>
                 <td>
-                  <div>{{ item?.updater }}</div>
+                  <div>{{ item?.modify_user_name || item?.modify_user_email }}</div>
                 </td>
               </tr>
             </tbody>
@@ -333,22 +333,10 @@ export default {
       // table history data
       historyItem: null,
       queryOptions: {
-        page: 1
+        page: 0,
+        size: 10
       },
-      tableData: {
-        startCount: 10,
-
-        totalElements: 9,
-        totalPages: 1,
-        number: 0,
-        numberOfElements: 9,
-        content: [
-          {
-            updated_at: '2024-11-15 15:00:00',
-            updater: 'Mocking'
-          }
-        ]
-      }
+      tableData: undefined
     };
   },
   created() {
@@ -365,6 +353,8 @@ export default {
       });
     }
     this.detailData = detailData;
+
+    this.fetchHistory();
   },
   methods: {
     resetPost() {
@@ -628,10 +618,10 @@ export default {
       this.queryOptions.page = currentPage;
       this.fetchHistory();
     },
-    async handleClickRow() {
+    async handleClickRow(id) {
       try {
-        const { data } = await this.$axios.get(`/admin/posts/details`);
-        const transformData = data;
+        const { data } = await this.$axios.get(`/admin/posts/history/${id}`);
+        const transformData = data.content;
         let memberships = transformData.memberships || [];
         memberships = memberships.map((membership) => {
           const membershipId = membership.membership_id;
@@ -658,19 +648,21 @@ export default {
         transformData.memberships = memberships;
         transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
 
-        this.historyItem = data;
+        this.historyItem = transformData;
         this.modal.isShowHistory = true;
-      } catch (error) {}
+      } catch (error) {
+        alert(API_ERROR);
+      }
     },
     async fetchHistory() {
-      // this.tableData = await this.$axios.$get('/admin/accounts/with-membership-info', {
-      //   params: {
-      //     ...this.queryOptions,
-      //     paymentDateFrom: this.queryOptions.paymentDateFrom ? `${this.queryOptions.paymentDateFrom} 00:00:00` : '',
-      //     paymentDateTo: this.queryOptions.paymentDateTo ? `${this.queryOptions.paymentDateTo} 23:59:59` : ''
-      //   }
-      // });
-      // this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+      try {
+        const searchParams = new URLSearchParams(this.queryOptions);
+
+        this.tableData = await this.$axios.$get(`/admin/posts/history/search?${searchParams.toString()}`);
+        this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+      } catch (error) {
+        alert(API_ERROR);
+      }
     }
   }
 };
