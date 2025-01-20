@@ -11,6 +11,10 @@
               :class="{ 'is-error': isSubmitted && feedback.companyName }"
               :option-list="companyList"
               w-size="large"
+              editable
+              deletable
+              @onEdit="(item) => onCTADropdownClick(item, 'edit')"
+              @onDelete="(item) => onCTADropdownClick(item, 'delete')"
             ></SDropdown>
           </div>
           <div class="field-group flex-start">
@@ -80,10 +84,44 @@
         <SButton button-type="primary" @click="isFileError = false">확인</SButton>
       </template>
     </SDialogModal>
+
+    <SModal :is-show="modal.isEdit" @close="resetCTAModal">
+      <template #title>기업 회원 이름 업데이트</template>
+      <template #content>
+        <div class="content">
+          <div class="field-group">
+            <label class="mr-24"> 법인 회원 이름 </label>
+            <SInput
+              v-model="modal.companyName"
+              w-size="large"
+              :class="{ 'is-error': modal.isSubmitted && modal.feedback.companyName }"
+              :disabled="disabled"
+            />
+          </div>
+        </div>
+      </template>
+      <template #modal-btn1>
+        <SButton @click="resetCTAModal">취소</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="handleEditCompany">확인</SButton>
+      </template>
+    </SModal>
+
+    <SDialogModal :is-show="modal.isDelete" @close="resetCTAModal">
+      <template #content>롤백할 수 없습니다<br />이 회사를 삭제하시겠습니까?</template>
+      <template #modal-btn1>
+        <SButton @click="resetCTAModal">취소</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="handleDeleteCompany">확인</SButton>
+      </template>
+    </SDialogModal>
   </div>
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
 import SModal from './SModal.vue';
 import SInput from '~/components/admin/commons/SInput';
 import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
@@ -91,6 +129,15 @@ import SButton from '~/components/admin/commons/SButton';
 import SDropdown from '~/components/admin/commons/SDropdown';
 import { fileValid } from '~/assets/js/commons';
 import { API_ERROR } from '~/utils/message';
+
+const initModalState = {
+  isDelete: false,
+  isEdit: false,
+  companyId: undefined,
+  companyName: '',
+  isSubmitted: false,
+  feedback: {}
+};
 
 export default {
   name: 'UploadCorporateUser',
@@ -111,7 +158,8 @@ export default {
       isFileError: false,
       result: null,
       invalidFileContent: null,
-      isFetching: false
+      isFetching: false,
+      modal: cloneDeep(initModalState)
     };
   },
   async fetch() {
@@ -232,6 +280,57 @@ export default {
         default:
           alert(API_ERROR);
           break;
+      }
+    },
+    onCTADropdownClick(item, action) {
+      this.modal.companyId = item.value;
+
+      if (action === 'edit') {
+        this.modal.isEdit = true;
+        this.modal.companyName = item.label;
+      }
+
+      if (action === 'delete') {
+        this.modal.isDelete = true;
+      }
+    },
+    resetCTAModal() {
+      this.modal = cloneDeep(initModalState);
+    },
+    async handleEditCompany() {
+      this.modal.isSubmitted = true;
+
+      if (!this.modal.companyName) {
+        this.modal.feedback.companyName = true;
+        return;
+      }
+
+      try {
+        await this.$axios.$put(`/admin/companies/${this.modal.companyId}?name=${this.modal.companyName}`);
+        this.$fetch();
+        this.resetCTAModal();
+      } catch (error) {
+        const errorMessage = error.response.data?.MESSAGE || '';
+
+        if (errorMessage === 'DUPLICATE_KEY') {
+          this.$set(this.modal.feedback, 'companyName', true);
+
+          alert(`회사 이름이 이미 존재합니다: ${this.modal.companyName}`);
+          return;
+        }
+
+        alert(API_ERROR);
+      }
+    },
+    async handleDeleteCompany() {
+      try {
+        await this.$axios.$delete(`/admin/companies/${this.modal.companyId}`);
+
+        this.$fetch();
+      } catch (error) {
+        alert(API_ERROR);
+      } finally {
+        this.resetCTAModal();
       }
     }
   }
