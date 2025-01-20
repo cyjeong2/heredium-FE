@@ -19,9 +19,30 @@
         <i class="ic-expand-more" />
       </div>
       <div v-if="isOpen && optionList && optionList[0]" class="dropdown-menu">
-        <button v-for="item in optionList" :key="item.value" type="button" @click="onSelected(item)">
-          {{ item.label }}
-        </button>
+        <div v-for="item in optionList" :key="item.value" @click="onSelected(item)">
+          <button type="button">
+            {{ item.label }}
+          </button>
+
+          <div>
+            <button
+              v-if="editable"
+              type="button"
+              class="icon-btn edit-btn"
+              @click="(e) => onCTAClick(e, item, 'onEdit')"
+            >
+              <i class="ic-edit" />
+            </button>
+            <button
+              v-if="deletable"
+              type="button"
+              class="icon-btn delete-btn"
+              @click="(e) => onCTAClick(e, item, 'onDelete')"
+            >
+              <i class="ic-trash" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -54,6 +75,16 @@ export default {
       default: 'normal'
     },
     disabled: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    editable: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    deletable: {
       type: Boolean,
       required: false,
       default: false
@@ -118,6 +149,11 @@ export default {
       this.isOpen = false;
       this.$emit('input', value);
       this.$emit('change');
+    },
+    onCTAClick(e, item, action) {
+      this.onStopPropagation(e);
+      this.$emit(action, item);
+      this.isOpen = false;
     }
   }
 };
@@ -183,16 +219,21 @@ export default {
     left: 0;
     max-height: 20rem;
     overflow-y: auto;
-    width: 100%;
+    min-width: 100%;
+    width: max-content;
     z-index: 10;
     border: 1px solid var(--color-grey-2);
     background-color: var(--color-white);
 
-    & > button {
+    & > div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       min-height: 4rem;
       font-size: 1.4rem;
       padding: 0.5rem 1.6rem;
       text-align: left;
+      gap: 1rem;
 
       &:hover {
         background-color: var(--color-grey-1);
