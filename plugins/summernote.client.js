@@ -51,9 +51,9 @@ Vue.component('SummerEditor', {
       menu.push('video');
     }
 
-    if ($('#summernote').length > 0) {
-      $('#summernote').summernote('destroy');
-    }
+    // if ($('#summernote').length > 0) {
+    // $('#summernote').summernote('destroy');
+    // }
 
     this.summerNote = $(this.$el);
     this.summerNote.summernote({
@@ -66,17 +66,19 @@ Vue.component('SummerEditor', {
       disableDragAndDrop: true,
       disable: this.disabled,
       tabSize: 2,
-      toolbar: [
-        ['style', ['style']],
-        // ['font', ['fontname', 'bold', 'underline', 'strikethrough', 'clear']],
-        ['font', ['fontsize', 'bold', 'underline', 'strikethrough', 'clear']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['table', ['table']],
-        ['insert', menu],
-        ['misc', ['undo', 'redo']],
-        ['view', ['fullscreen', 'codeview', 'help']]
-      ],
+      toolbar: this.disabled
+        ? []
+        : [
+            ['style', ['style']],
+            // ['font', ['fontname', 'bold', 'underline', 'strikethrough', 'clear']],
+            ['font', ['fontsize', 'bold', 'underline', 'strikethrough', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', menu],
+            ['misc', ['undo', 'redo']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+          ],
       callbacks: {
         onInit: () => {
           this.onInit();
