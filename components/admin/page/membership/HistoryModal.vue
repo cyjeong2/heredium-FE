@@ -262,6 +262,7 @@ export default {
     margin-bottom: 2.2rem;
     padding: 1.4rem 1.6rem;
     background-color: white;
+    z-index: 1;
 
     .close-btn {
       position: absolute;
