@@ -96,7 +96,10 @@ export default {
       }
     },
     onChange(contents) {
-      this.$emit('input', contents);
+      if (contents !== this.content) {
+        this.content = contents;
+        this.$emit('input', contents);
+      }
     },
     setContent(contents) {
       this.$refs.summerNote.setNewContent(contents);
