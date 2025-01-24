@@ -196,8 +196,8 @@
             <thead :class="{ 'data-none': !data || !data[0] }">
               <tr>
                 <th>NO</th>
-                <th>업데이트 시간</th>
-                <th>업데이터</th>
+                <th>작성 일시</th>
+                <th>작성자</th>
               </tr>
             </thead>
             <tbody>
