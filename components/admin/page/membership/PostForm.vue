@@ -856,6 +856,11 @@ export default {
       width: 50%;
     }
   }
+
+  tbody td > div {
+    min-height: unset;
+    padding-block: 1rem;
+  }
 }
 .mt-2 {
   margin-top: 2rem;
