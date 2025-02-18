@@ -127,6 +127,7 @@
 
     <CouponCorporate
       v-if="modal.isShowCreateCouponCompany"
+      mode="create"
       @close="modal.isShowCreateCouponCompany = false"
     ></CouponCorporate>
     <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
