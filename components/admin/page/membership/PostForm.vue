@@ -188,6 +188,39 @@
         </div>
       </div>
     </div>
+
+    <div class="mt-2 tm-1m">
+      <SPageable :table-data="tableData" @getTableData="setCurrentPage">
+        <template #data="{ data }">
+          <table class="admin-table">
+            <thead :class="{ 'data-none': !data || !data[0] }">
+              <tr>
+                <th>NO</th>
+                <th>작성 일시</th>
+                <th>작성자</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!data || !data[0]">
+                <td colspan="3"><div>리스트가 없습니다.</div></td>
+              </tr>
+              <tr v-for="(item, index) in data" :key="item.id" @click="handleClickRow(item.id)">
+                <td>
+                  <div>{{ tableData.startCount - index }}</div>
+                </td>
+                <td>
+                  <div>{{ item?.modify_date }}</div>
+                </td>
+                <td>
+                  <div>{{ item?.modify_user_name || item?.modify_user_email }}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+      </SPageable>
+    </div>
+
     <SDialogModal :is-show="modal.isCancel" @close="modal.isCancel = false">
       <template #content>콘텐츠를 저장하지 않고<br />이전페이지로 이동 하시겠습니까?</template>
       <template #modal-btn1>
@@ -218,6 +251,7 @@
         <SButton button-type="primary" @click="$router.go(0)">확인</SButton>
       </template>
     </SDialogModal>
+    <HistoryModal :is-show="modal.isShowHistory" :history-item="historyItem" @close="modal.isShowHistory = false" />
   </div>
 </template>
 
@@ -227,6 +261,8 @@ import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import SDatepicker from '../../commons/SDatepicker.vue';
 import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
+import SPageable from '../../commons/SPageable.vue';
+import HistoryModal from './HistoryModal.vue';
 import STitle from '~/components/admin/commons/STitle';
 import SButton from '~/components/admin/commons/SButton';
 import SInput from '~/components/admin/commons/SInput';
@@ -245,6 +281,7 @@ import { API_ERROR } from '~/utils/message';
 export default {
   name: 'PostForm',
   components: {
+    SPageable,
     SDialogModal,
     SummernoteEditor,
     SToggle,
@@ -256,7 +293,8 @@ export default {
     AddMembershipOption,
     CouponEditor,
     SDatepicker,
-    SFlexInputGrid
+    SFlexInputGrid,
+    HistoryModal
   },
   mixins: [imageMixin],
   props: {
@@ -285,11 +323,20 @@ export default {
         isConfirmSave: false,
         isSave: false,
         isCancel: false,
-        isReset: false
+        isReset: false,
+        isShowHistory: false
       },
       feedback: {},
       isConfirmPending: false,
-      isEdit: true
+      isEdit: true,
+
+      // table history data
+      historyItem: null,
+      queryOptions: {
+        page: 0,
+        size: 10
+      },
+      tableData: undefined
     };
   },
   created() {
@@ -306,6 +353,8 @@ export default {
       });
     }
     this.detailData = detailData;
+
+    this.fetchHistory();
   },
   methods: {
     resetPost() {
@@ -564,6 +613,56 @@ export default {
       const newCouponList = cloneDeep(membershipOption.coupons);
       newCouponList.splice(couponIndex, 1);
       membershipOption.coupons = newCouponList;
+    },
+    setCurrentPage(currentPage) {
+      this.queryOptions.page = currentPage;
+      this.fetchHistory();
+    },
+    async handleClickRow(id) {
+      try {
+        const { data } = await this.$axios.get(`/admin/posts/history/${id}`);
+        const transformData = data.content;
+        let memberships = transformData.memberships || [];
+        memberships = memberships.map((membership) => {
+          const membershipId = membership.membership_id;
+          if (membershipId) {
+            delete membership.membership_id;
+          }
+          const coupons = membership.coupons.map((coupon) => {
+            const couponsId = coupon.coupon_id;
+            if (couponsId) {
+              delete coupon.coupon_id;
+            }
+            return {
+              ...coupon,
+              id: couponsId
+            };
+          });
+
+          return {
+            ...membership,
+            id: membershipId,
+            coupons
+          };
+        });
+        transformData.memberships = memberships;
+        transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
+
+        this.historyItem = transformData;
+        this.modal.isShowHistory = true;
+      } catch (error) {
+        alert(API_ERROR);
+      }
+    },
+    async fetchHistory() {
+      try {
+        const searchParams = new URLSearchParams(this.queryOptions);
+
+        this.tableData = await this.$axios.$get(`/admin/posts/history/search?${searchParams.toString()}`);
+        this.tableData.startCount = this.tableData.totalElements - this.tableData.number * this.tableData.size;
+      } catch (error) {
+        alert(API_ERROR);
+      }
     }
   }
 };
@@ -743,5 +842,27 @@ export default {
   color: var(--color-red);
   font-size: 1.4rem;
   text-align: left;
+}
+
+.admin-table {
+  th {
+    &:first-of-type {
+      width: 10%;
+    }
+    &:nth-of-type(2) {
+      width: 40%;
+    }
+    &:last-of-type {
+      width: 50%;
+    }
+  }
+
+  tbody td > div {
+    min-height: unset;
+    padding-block: 1rem;
+  }
+}
+.mt-2 {
+  margin-top: 2rem;
 }
 </style>

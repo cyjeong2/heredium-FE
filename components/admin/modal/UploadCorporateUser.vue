@@ -11,6 +11,10 @@
               :class="{ 'is-error': isSubmitted && feedback.companyName }"
               :option-list="companyList"
               w-size="large"
+              editable
+              deletable
+              @onEdit="(item) => onCTADropdownClick(item, 'edit')"
+              @onDelete="(item) => onCTADropdownClick(item, 'delete')"
             ></SDropdown>
           </div>
           <div class="field-group flex-start">
@@ -80,11 +84,31 @@
         <SButton button-type="primary" @click="isFileError = false">확인</SButton>
       </template>
     </SDialogModal>
+
+    <CouponCorporate
+      v-if="modal.isEdit"
+      :initial-value="modal"
+      :on-success="handleEditCompanySuccess"
+      mode="update"
+      @close="resetCTAModal"
+    ></CouponCorporate>
+
+    <SDialogModal :is-show="modal.isDelete" @close="resetCTAModal">
+      <template #content>롤백할 수 없습니다<br />이 회사를 삭제하시겠습니까?</template>
+      <template #modal-btn1>
+        <SButton @click="resetCTAModal">취소</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="handleDeleteCompany">확인</SButton>
+      </template>
+    </SDialogModal>
   </div>
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
 import SModal from './SModal.vue';
+import CouponCorporate from './CouponCorporate.vue';
 import SInput from '~/components/admin/commons/SInput';
 import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
 import SButton from '~/components/admin/commons/SButton';
@@ -92,10 +116,20 @@ import SDropdown from '~/components/admin/commons/SDropdown';
 import { fileValid } from '~/assets/js/commons';
 import { API_ERROR } from '~/utils/message';
 
+const initModalState = {
+  isDelete: false,
+  isEdit: false,
+  companyId: undefined,
+  companyName: '',
+  companyCoupons: [],
+  isSubmitted: false,
+  feedback: {}
+};
+
 export default {
   name: 'UploadCorporateUser',
 
-  components: { SModal, SDropdown, SButton, SInput, SDialogModal },
+  components: { SModal, SDropdown, SButton, SInput, SDialogModal, CouponCorporate },
 
   directives: {},
 
@@ -105,13 +139,14 @@ export default {
     return {
       companyName: '',
       fileName: '',
-      companyList: [],
+      companyList: undefined,
       feedback: {},
       isSubmitted: false,
       isFileError: false,
       result: null,
       invalidFileContent: null,
-      isFetching: false
+      isFetching: false,
+      modal: cloneDeep(initModalState)
     };
   },
   async fetch() {
@@ -232,6 +267,41 @@ export default {
         default:
           alert(API_ERROR);
           break;
+      }
+    },
+    async onCTADropdownClick(item, action) {
+      this.modal.companyId = item.value;
+
+      if (action === 'edit') {
+        this.modal.companyName = item.label;
+
+        const details = await this.$axios.$get(`/admin/companies/${this.modal.companyId}/detail`);
+
+        this.modal.companyCoupons = details.coupons.map((item) => ({ ...item, coupon_type: item.type }));
+
+        this.modal.isEdit = true;
+      }
+
+      if (action === 'delete') {
+        this.modal.isDelete = true;
+      }
+    },
+    resetCTAModal() {
+      this.modal = cloneDeep(initModalState);
+    },
+    handleEditCompanySuccess() {
+      this.$fetch();
+      this.resetCTAModal();
+    },
+    async handleDeleteCompany() {
+      try {
+        await this.$axios.$delete(`/admin/companies/${this.modal.companyId}`);
+
+        this.$fetch();
+      } catch (error) {
+        alert(API_ERROR);
+      } finally {
+        this.resetCTAModal();
       }
     }
   }
