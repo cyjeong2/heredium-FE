@@ -44,3 +44,5 @@ npm install
 npm run build-prod
 pm2 delete "heredium"
 pm2 start npm --name "heredium" -- run start-prod
+
+test
