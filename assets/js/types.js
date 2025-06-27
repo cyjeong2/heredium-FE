@@ -4,7 +4,8 @@ export const POLICY_TYPE = Object.freeze({
   SERVICE: '서비스 이용 약관',
   AGREE: '개인정보 수집 및 이용 동의서',
   REFUND: '취소 및 환불 정책',
-  VIDEO: '영상정보처리기기 운영 관리방침'
+  VIDEO: '영상정보처리기기 운영 관리방침',
+  MARKETING: '마케팅 활용 동의 및 광고 수신'
 });
 
 export const AUTH_TYPE = Object.freeze({

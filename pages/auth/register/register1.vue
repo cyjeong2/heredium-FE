@@ -22,7 +22,11 @@
             <strong>[필수]</strong>
             <button @click="showTerm('AGREE')">개인정보 수집 및 이용동의서</button> 동의</UCheckbox
           >
-          <UCheckbox v-model="isTerms.MARKETING"> <strong>[선택]</strong> 마케팅 활용 동의 및 광고 수신 동의</UCheckbox>
+          <UCheckbox v-model="isTerms.MARKETING">
+            <strong>[선택]</strong>
+            <button @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
+          </UCheckbox>
+          <p>마케팅 수신·활용 동의 시 추가 쿠폰을 제공해 드립니다.</p>
         </div>
       </div>
       <UButton w-size="100" @click="onNextRegister">다음</UButton>
@@ -44,13 +48,16 @@
 </template>
 
 <script>
+// import UDatepicker from '~/components/user/common/UDatepicker';
 import UCheckbox from '~/components/user/common/UCheckbox';
 import UButton from '~/components/user/common/UButton';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 import UDialogModal from '~/components/user/modal/UDialogModal';
+
 export default {
   name: 'Register1Page',
-  components: { URegisterModal, UCheckbox, UButton, UDialogModal },
+  // UDatepicker
+  components: { URegisterModal, UCheckbox, UButton, UDialogModal},
   data() {
     return {
       termTarget: '',
@@ -65,19 +72,21 @@ export default {
       modal: {
         isTerms: false,
         isError: false
-      }
+      },
     };
   },
   watch: {
+    // 마케팅 동의 저장
     isTerms: {
       deep: true,
-      handler(newValue) {
-        this.isAllChecked = !Object.values(newValue).some((item) => !item);
-        localStorage.setItem('isMarketing', JSON.stringify(this.isTerms.MARKETING));
+      handler(v) {
+        this.isAllChecked = !Object.values(v).some(x => !x);
+        localStorage.setItem('isMarketing', JSON.stringify(v.MARKETING));
       }
-    }
+    },
   },
   mounted() {
+    // 마케팅 동의 초기화
     localStorage.removeItem('isMarketing');
   },
   methods: {
@@ -167,7 +176,7 @@ p {
     display: flex;
     flex-direction: column;
     padding: 2.4rem 0;
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
     border-top: 1px solid var(--color-grey-1);
     border-bottom: 1px solid var(--color-grey-1);
 
@@ -177,6 +186,12 @@ p {
 
     strong {
       font-size: 1.4rem;
+    }
+
+    p {
+      margin-top: 0.8rem;
+      font-size: 1.3rem;     /* 안내문은 좀 더 작게 1.4rem */
+      margin-left: 3rem;
     }
   }
 
@@ -240,7 +255,6 @@ p {
       display: flex;
       flex-direction: column;
       padding: 2rem 0 0;
-      margin-bottom: 5.2rem;
       border-top: 0.1rem solid var(--color-grey-1);
       border-bottom: unset;
 
@@ -254,5 +268,58 @@ p {
       transform: unset;
     }
   }
+
+  .container {
+    padding-top: 3.2rem;
+    margin-bottom: 12rem;
+
+    .input {
+      label {
+        font-size: 1.6rem;
+        line-height: 160%;
+        letter-spacing: 0.25px;
+
+        &.bold {
+          font-weight: 700;
+        }
+      }
+
+      &.mb-13 {
+        margin-bottom: 1.3rem;
+      }
+    }
+
+    textarea {
+      height: 18.8rem;
+      padding: 1.3rem 1.6rem 0;
+      font-size: 1.8rem;
+      line-height: 160%;
+
+      &::placeholder {
+        font-size: 1.8rem;
+        line-height: 160%;
+        font-weight: 500;
+      }
+    }
+
+    .btn-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 1.6rem;
+      margin-top: 4rem;
+
+      button {
+        width: 15.2rem !important;
+
+        &:first-child {
+          justify-self: flex-end;
+        }
+      }
+    }
+  }
+}
+
+.marketing_area {
+  margin-bottom: 5.2rem;
 }
 </style>

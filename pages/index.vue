@@ -1,5 +1,15 @@
 <template>
   <div>
+    <!-- <MarketingPop
+          v-if="isShowMarketingPop && userInfo?.marketingPending"
+          :is-show="isShowMarketingPop"
+          @close="isShowMarketingPop = false"
+          @issued="onCouponIssued"
+        />
+    <MarketingCoupon
+      :is-show="showCouponModal"
+      @close="showCouponModal = false"
+    /> -->
     <client-only>
       <section>
         <Swiper ref="mainSwiper" :options="mainSwiperOption" class="main-slider" @slideChange="onMainSlideChange">
@@ -136,6 +146,7 @@ import UPopupModal from '~/components/user/modal/UPopupModal.vue';
 
 export default {
   name: 'IndexPage',
+  // MarketingPop, MarketingCoupon
   components: { UPopupModal, UTag },
   async asyncData({ $axios, req }) {
     const mainData = await $axios.$get('/user/common/home');
@@ -193,7 +204,9 @@ export default {
       currentExSlide: 1,
       isSubTitle: false,
       mainData: null,
-      isShowPopup: false
+      isShowPopup: false,
+      isShowMarketingPop: false,
+      showCouponModal: false,
     };
   },
   computed: {
@@ -202,6 +215,9 @@ export default {
     },
     exSwiper() {
       return this.$refs.exSwiper.$swiper;
+    },
+    userInfo() {
+      return this.$store.getters['service/auth/getUserInfo'];
     }
   },
   created() {
@@ -223,6 +239,7 @@ export default {
       this.isShowPopup = true;
     }
     this.isSubTitle = !!this.mainData?.projects[0]?.subtitle;
+    this.isShowMarketingPop = true;
   },
   methods: {
     getFormattedDate(startDate, endDate) {
@@ -245,6 +262,10 @@ export default {
     },
     goExDetail(item) {
       this.$router.push(`/${item.kind.toLowerCase()}/${item.id}`);
+    },
+    onCouponIssued() {
+      // when AdditionalInfoModal emits "issued", open the coupon modal
+      this.showCouponModal = true;
     }
   }
 };

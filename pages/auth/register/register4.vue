@@ -7,14 +7,39 @@
     </div>
     <p>헤레디움과 함께 해주셔서 감사해요!<br />지금 헤레디움의 다양한 서비스를 경험해보세요!</p>
     <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">메인으로 이동</ULink>
+    <!-- 쿠폰 모달 -->
+    <MarketingCoupon
+      :is-show="showCouponModal"
+      @close="closeCouponModal"
+    />
   </main>
 </template>
 
 <script>
 import ULink from '~/components/user/common/ULink';
+import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
+
 export default {
   name: 'Register4Page',
-  components: { ULink }
+  components: { ULink, MarketingCoupon },
+  data() {
+    return {
+      showCouponModal: false,
+    };
+  },
+  mounted() {
+    // 마케팅 동의 시 쿠폰 모달 보여주기
+    const isMarketing = localStorage.getItem('isMarketing');
+    if (isMarketing === 'true') {
+      this.showCouponModal = true;
+    }
+    localStorage.removeItem('isMarketing');
+  },
+  methods: {
+    closeCouponModal() {
+      this.showCouponModal = false;
+    }
+  }
 };
 </script>
 

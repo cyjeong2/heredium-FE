@@ -209,6 +209,10 @@ export default {
         titleText = '영상정보처리기기 운영 관리방침';
         baseUrl = '/admin/terms/video';
         break;
+      case 'MARKETING':
+        titleText = '마케팅 활용 동의 및 광고 수신';
+        baseUrl = '/admin/terms/marketing';
+        break;
       default:
         titleText = '올바르지 않은 페이지 타입';
         break;
