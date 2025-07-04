@@ -80,55 +80,28 @@
                       <!-- HEADER -->
                       <div class="grid-table-header">노출</div>
                       <div class="grid-table-header">멤버십 이름</div>
-                      <div class="grid-table-header">가격</div>
-                      <div class="grid-table-header">결제버튼 활성화</div>
+                      <!-- <div class="grid-table-header">가격</div> -->
+                      <!-- <div class="grid-table-header">결제버튼 활성화</div> -->
                       <div class="grid-table-header">세부내용</div>
                       <!-- BODY -->
                       <template v-for="(membership, membershipIndex) in historyItem.memberships">
                         <div
                           v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_checkbox`"
+                          :key="`${membership.id}_checkbox`"
                           class="grid-table-body checkbox-cell"
                         >
                           <SCheckbox v-model="membership.is_enabled" disabled />
                         </div>
                         <div
                           v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_name_edit`"
+                          :key="`${membership.id}_name_edit`"
                           class="grid-table-body membership-name"
                         >
                           <SInput v-model="membership.name" w-size="full" readonly />
                         </div>
                         <div
                           v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_price_edit`"
-                          class="grid-table-body"
-                        >
-                          <SFlexInputGrid>
-                            <template #input>
-                              <SInput
-                                v-model="membership.price"
-                                is-comma-num
-                                w-size="full"
-                                text-align="right"
-                                readonly
-                              />
-                            </template>
-                            <template #content>
-                              <div class="currency">원</div>
-                            </template>
-                          </SFlexInputGrid>
-                        </div>
-                        <div
-                          v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_active-register`"
-                          class="grid-table-body checkbox-cell"
-                        >
-                          <SCheckbox v-model="membership.is_register_membership_button_shown" disabled />
-                        </div>
-                        <div
-                          v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_action`"
+                          :key="`${membership.id}_action`"
                           class="grid-table-body membership-action"
                         >
                           <div
@@ -145,7 +118,7 @@
                         <CouponEditor
                           v-for="coupon in membership.coupons"
                           v-show="membershipIndexExpanded === membershipIndex"
-                          :key="`${membership.tempId}_coupon_${coupon.tempId}`"
+                          :key="`${membership.id}_coupon_${coupon.id}`"
                           :coupon="coupon"
                           :validate-before-add-new-coupon="true"
                           disabled
@@ -178,7 +151,7 @@
 <script>
 import SCheckbox from '../../commons/SCheckbox.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
-import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
+// import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
 import SToggle from '../../commons/SToggle.vue';
@@ -193,7 +166,7 @@ export default {
     SInput,
     CouponEditor,
     SToggle,
-    SFlexInputGrid,
+    // SFlexInputGrid,
     SCheckbox,
     SummernoteEditor
   },
@@ -359,7 +332,7 @@ export default {
 
 .grid-table {
   display: grid;
-  grid-template-columns: 7rem 1fr 1fr 20rem 15rem;
+  grid-template-columns: 7rem 1fr 15rem;
   box-shadow: 0 0 0 1px var(--color-grey-2);
   overflow: hidden;
   margin-bottom: 2.75rem;
@@ -375,7 +348,7 @@ export default {
   .create-membership,
   .benefit-container,
   .delete-membership {
-    grid-column: span 5;
+    grid-column: span 3;
   }
   .checkbox-cell {
     display: flex;

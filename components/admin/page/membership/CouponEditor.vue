@@ -111,9 +111,9 @@
       </div>
       <div v-if="!disabled" class="right">
         <SButton v-if="showDeleteButton" button-type="standard" w-size="medium" @click="handleDeleteCoupon"
-          >삭제</SButton
+          >쿠폰삭제</SButton
         >
-        <SButton v-if="showAddButton" button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가 </SButton>
+        <SButton v-if="showAddButton" button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 쿠폰추가 </SButton>
       </div>
     </div>
   </div>

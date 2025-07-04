@@ -73,7 +73,17 @@ export default {
       type: String,
       required: false,
       default: 'left'
-    }
+    },
+    min: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    max: {
+      type: Number,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -92,6 +102,9 @@ export default {
         break;
       case 'normal':
         minWidth = '20rem';
+        break;
+      case 's-large':
+        minWidth = '30rem';
         break;
       case 'large':
         minWidth = '32rem';
@@ -127,7 +140,38 @@ export default {
   },
   methods: {
     updateInput(e) {
-      this.$emit('input', this.getComputedValue(e));
+      // 1) 필터링된 값 얻기
+      let newVal = this.getComputedValue(e);
+
+      // 2) 숫자 모드라면
+      if ((this.type === 'number' || this.isNumeric)) {
+        // 사용자가 "-" 만 누른 상태라면, 그대로 놔두고 emit
+        if (newVal === '-') {
+          this.$emit('input', newVal);
+          return;
+        }
+
+        // 실제 숫자로 변환
+        const num = Number(newVal);
+        // 숫자로 변환할 수 없는 경우(예: 빈 문자열) 그냥 emit
+        if (isNaN(num)) {
+          this.$emit('input', newVal);
+          return;
+        }
+
+        // 3) clamp 처리
+        if (this.min != null && num < this.min) {
+          newVal = String(this.min);
+        }
+        if (this.max != null && num > this.max) {
+          newVal = String(this.max);
+        }
+        // input 요소에도 반영
+        e.target.value = newVal;
+      }
+
+      // 4) emit
+      this.$emit('input', newVal);
     },
     keyup(e) {
       this.$emit('keyup', this.getComputedValue(e));
@@ -162,7 +206,12 @@ export default {
       return Number(replaceNum);
     },
     toNumber(value) {
-      return value.replace(/\D+/g, '');
+      // 1) 선두의 '-' 은 살려두고
+      const isNegative = value.startsWith('-');
+      // 2) 나머지 문자 중 숫자만 남기기
+      const digits = value.replace(/[^0-9]/g, '');
+      // 3) 음수 플래그가 있으면 다시 붙이기
+      return isNegative ? ('-' + digits) : digits;
     }
   }
 };

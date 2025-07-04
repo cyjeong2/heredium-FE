@@ -4,7 +4,17 @@
       <div class="fill" />
     </div>
     <div class="register-wrap">
-      <h1>회원가입</h1>
+      <div class="logo-area">
+        <img
+          src="~assets/img/pc/logo.svg"
+          alt="HEREDIUM 로고"
+          class="logo"
+          width="130"
+          height="120"
+        />
+        <h2>회원가입하고</h2>
+        <h2>더 깊은 예술을 경험해보세요!</h2>
+      </div>
       <div class="pc progress-bar">
         <div class="fill" />
       </div>
@@ -22,11 +32,10 @@
             <strong>[필수]</strong>
             <button @click="showTerm('AGREE')">개인정보 수집 및 이용동의서</button> 동의</UCheckbox
           >
-          <UCheckbox v-model="isTerms.MARKETING">
+          <!-- <UCheckbox v-model="isTerms.MARKETING">
             <strong>[선택]</strong>
             <button @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
-          </UCheckbox>
-          <p>마케팅 수신·활용 동의 시 추가 쿠폰을 제공해 드립니다.</p>
+          </UCheckbox> -->
         </div>
       </div>
       <UButton w-size="100" @click="onNextRegister">다음</UButton>
@@ -67,7 +76,7 @@ export default {
         AGE: false,
         SERVICE: false,
         AGREE: false,
-        MARKETING: false
+        // MARKETING: false
       },
       modal: {
         isTerms: false,
@@ -81,13 +90,13 @@ export default {
       deep: true,
       handler(v) {
         this.isAllChecked = !Object.values(v).some(x => !x);
-        localStorage.setItem('isMarketing', JSON.stringify(v.MARKETING));
+        // localStorage.setItem('isMarketing', JSON.stringify(v.MARKETING));
       }
     },
   },
   mounted() {
     // 마케팅 동의 초기화
-    localStorage.removeItem('isMarketing');
+    // localStorage.removeItem('isMarketing');
   },
   methods: {
     async showTerm(target) {
@@ -124,12 +133,12 @@ export default {
   margin-bottom: 12rem;
 }
 
-h1 {
-  margin: 5.2rem 0 2rem;
-  font-size: 2.8rem;
+h2 {
+  margin: 3.0rem 0 2rem;
+  font-size: 3.0rem;
   font-weight: 700;
   text-align: center;
-  line-height: 2.8rem;
+  line-height: 4.0rem;
 }
 
 p {
@@ -319,7 +328,28 @@ p {
   }
 }
 
-.marketing_area {
-  margin-bottom: 5.2rem;
+// .marketing_area {
+//   margin-bottom: 5.2rem;
+// }
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  p {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--color-grey-6);
+    margin: 0 0 2.4rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.8rem;
+      margin-bottom: 3rem;
+      text-align: left;
+      width: 100%;
+    }
+  }
 }
 </style>

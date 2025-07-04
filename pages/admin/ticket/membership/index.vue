@@ -19,6 +19,7 @@
       </div>
     </div>
     <div class="top-menus mb-16">
+      <SButton class="mr-16" @click="goToCreateMembership">멤버십 등록</SButton>
       <SButton class="mr-16" @click="modal.isShowCreateCouponCompany = true">법인 항목 추가</SButton>
       <SButton class="mr-16" @click="modal.isUploadData = true">엑셀 파일 업로드</SButton>
       <SButton class="mr-16" @click="downloadTemplateExcel">양식 다운로드 </SButton>
@@ -36,7 +37,6 @@
               <th>NO</th>
               <th>멤버십</th>
               <th>상태</th>
-              <th>결제일시</th>
               <th>시작일시</th>
               <th>종료일시</th>
               <th>전시</th>
@@ -46,7 +46,6 @@
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
-              <th>환불</th>
             </tr>
           </thead>
           <tbody>
@@ -62,16 +61,6 @@
               </td>
               <td>
                 <div>{{ item?.payment_status }}</div>
-              </td>
-              <td>
-                <div>
-                  <p>
-                    {{ item?.payment_date && $dayjs(item?.payment_date).format('YYYY-MM-DD') }}
-                  </p>
-                  <p>
-                    {{ item?.payment_date && $dayjs(item?.payment_date).format('HH:mm') }}
-                  </p>
-                </div>
               </td>
               <td>
                 <div>
@@ -114,11 +103,11 @@
               <td>
                 <div>{{ item?.phone }}</div>
               </td>
-              <td>
+              <!-- <td>
                 <div v-if="item.registration_type === membershipTypeOption.registration" class="refund-btn">
                   <SButton :disabled="!item.is_refundable" @click="handleClickRefund(item)">환불</SButton>
                 </div>
-              </td>
+              </td> -->
             </tr>
           </tbody>
         </table>
@@ -132,7 +121,7 @@
     ></CouponCorporate>
     <UploadCorporateUser v-if="modal.isUploadData" @close="modal.isUploadData = false"></UploadCorporateUser>
 
-    <SDialogModal :is-show="!!refundingItem" @close="refundingItem = null">
+    <!-- <SDialogModal :is-show="!!refundingItem" @close="refundingItem = null">
       <template #content>
         <div>
           <div v-if="refundingItem.numberCouponsUsed">
@@ -147,7 +136,7 @@
       <template #modal-btn2>
         <SButton button-type="primary" :disabled="inRefundProcessing" @click="handleRefund">확인</SButton>
       </template>
-    </SDialogModal>
+    </SDialogModal> -->
   </div>
 </template>
 
@@ -163,7 +152,7 @@ import { TICKET_MEMBERSHIP_STATE_TYPE } from '~/assets/js/types';
 import CouponCorporate from '~/components/admin/modal/CouponCorporate.vue';
 import UploadCorporateUser from '~/components/admin/modal/UploadCorporateUser.vue';
 import { threeCommaNum } from '~/assets/js/commons';
-import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
+// import SDialogModal from '~/components/admin/modal/SDialogModal.vue';
 import { MembershipType } from '~/assets/js/membership';
 
 export default {
@@ -178,20 +167,20 @@ export default {
     SSearchBar,
     CouponCorporate,
     UploadCorporateUser,
-    SDialogModal
+    // SDialogModal
   },
   layout: 'admin/default',
   data() {
     return {
       membershipTypeOption: MembershipType,
-      dateOptionList: [{ value: 'PAYMENT_DATE', label: '결제일시' }],
+      dateOptionList: [{ value: 'REGISTRATION_DATE', label: '시작일시' }],
       sizeOptionList: [
         { value: 20, label: '20개' },
         { value: 30, label: '30개' },
         { value: 50, label: '50개' }
       ],
       queryOptions: {
-        searchDateType: 'PAYMENT_DATE',
+        searchDateType: 'REGISTRATION_DATE',
         paymentDateFrom: this.$route.query.paymentDateFrom || '',
         paymentDateTo: this.$route.query.paymentDateTo || '',
         paymentStatus:
@@ -224,6 +213,9 @@ export default {
     this.fetch();
   },
   methods: {
+    goToCreateMembership() {
+      this.$router.push('/admin/ticket/membership/create');
+    },
     getThreeCommaNum(num) {
       return threeCommaNum(num);
     },
@@ -325,36 +317,36 @@ export default {
       this.queryOptions.page = 0;
       this.fetch();
     },
-    async handleRefund() {
-      if (!this.refundingItem) {
-        return;
-      }
-      try {
-        this.inRefundProcessing = true;
-        await this.$axios.post(`/admin/memberships/${this.refundingItem.membership_registration_id}/refund`);
-        this.fetch();
-        this.refundingItem = null;
-        this.inRefundProcessing = false;
-      } catch (error) {
-        alert(error?.response?.data?.BODY || '환불 오류.');
-        this.refundingItem = null;
-        this.inRefundProcessing = false;
-      }
-    },
-    async handleClickRefund(record) {
-      try {
-        this.inRefundProcessing = true;
-        const response = await this.$axios.get(
-          `/admin/coupons/check-usage/membership/${record.membership_registration_id}`
-        );
-        const numberCouponsUsed = response.data?.number_of_used_coupons || 0;
-        this.refundingItem = { ...record, numberCouponsUsed };
-        this.inRefundProcessing = false;
-      } catch (error) {
-        alert('환불 오류.');
-        this.inRefundProcessing = false;
-      }
-    }
+    // async handleRefund() {
+    //   if (!this.refundingItem) {
+    //     return;
+    //   }
+    //   try {
+    //     this.inRefundProcessing = true;
+    //     await this.$axios.post(`/admin/memberships/${this.refundingItem.membership_registration_id}/refund`);
+    //     this.fetch();
+    //     this.refundingItem = null;
+    //     this.inRefundProcessing = false;
+    //   } catch (error) {
+    //     alert(error?.response?.data?.BODY || '환불 오류.');
+    //     this.refundingItem = null;
+    //     this.inRefundProcessing = false;
+    //   }
+    // },
+    // async handleClickRefund(record) {
+    //   try {
+    //     this.inRefundProcessing = true;
+    //     const response = await this.$axios.get(
+    //       `/admin/coupons/check-usage/membership/${record.membership_registration_id}`
+    //     );
+    //     const numberCouponsUsed = response.data?.number_of_used_coupons || 0;
+    //     this.refundingItem = { ...record, numberCouponsUsed };
+    //     this.inRefundProcessing = false;
+    //   } catch (error) {
+    //     alert('환불 오류.');
+    //     this.inRefundProcessing = false;
+    //   }
+    // }
   }
 };
 </script>

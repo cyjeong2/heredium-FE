@@ -21,7 +21,7 @@
             :disabled="disabled"
           />
         </div>
-        <div class="field-group">
+        <!-- <div class="field-group">
           <label> 가격 </label>
           <s-flex-input-grid>
             <template #input>
@@ -38,7 +38,7 @@
               <div class="currency">원</div>
             </template>
           </s-flex-input-grid>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="create-membership__action">
@@ -52,16 +52,16 @@
 
 <script>
 import SButton from '../../commons/SButton.vue';
-import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
+// import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
 
 const DEFAULT_MEMBERSHIP_NAME = '';
-const DEFAULT_MEMBERSHIP_PRICE = 0;
+// const DEFAULT_MEMBERSHIP_PRICE = 0;
 
 export default {
   name: 'AddMembershipOption',
-  components: { SInput, SButton, SImageUploadRepresentative, SFlexInputGrid },
+  components: { SInput, SButton, SImageUploadRepresentative },
   props: {
     disabled: {
       type: Boolean,
@@ -71,7 +71,7 @@ export default {
   data() {
     return {
       membershipName: DEFAULT_MEMBERSHIP_NAME,
-      price: DEFAULT_MEMBERSHIP_PRICE,
+      // price: DEFAULT_MEMBERSHIP_PRICE,
       membershipImage: '',
       isSubmitted: false
     };
@@ -84,18 +84,18 @@ export default {
       this.membershipImage = '';
     },
     handleAddMembershipOption() {
-      if (!this.membershipName || !this.price || !this.membershipImage) {
+      if (!this.membershipName || !this.membershipImage) {
         this.isSubmitted = true;
         return null;
       }
 
       this.$emit('add-membership-option', {
         name: this.membershipName,
-        price: this.price,
+        // price: this.price,
         image_url: this.membershipImage
       });
       this.membershipName = DEFAULT_MEMBERSHIP_NAME;
-      this.price = DEFAULT_MEMBERSHIP_PRICE;
+      // this.price = DEFAULT_MEMBERSHIP_PRICE;
       this.membershipImage = '';
       this.isSubmitted = false;
     }

@@ -1,7 +1,8 @@
 <template>
   <div>
-    <!-- <MarketingPop
-          v-if="isShowMarketingPop && userInfo?.marketingPending"
+    <!-- 기존회원 초기 휴대폰 인증 & 마케팅 동의 팝업 -->
+    <MarketingPop
+          v-if="isShowMarketingPop && userInfo?.marketingPending && !userPhoneInfo"
           :is-show="isShowMarketingPop"
           @close="isShowMarketingPop = false"
           @issued="onCouponIssued"
@@ -9,7 +10,7 @@
     <MarketingCoupon
       :is-show="showCouponModal"
       @close="showCouponModal = false"
-    /> -->
+    />
     <client-only>
       <section>
         <Swiper ref="mainSwiper" :options="mainSwiperOption" class="main-slider" @slideChange="onMainSlideChange">
@@ -143,12 +144,13 @@
 import UTag from '~/components/user/common/UTag';
 import { getDateCommonDateOutput, numberPad } from '~/assets/js/commons';
 import UPopupModal from '~/components/user/modal/UPopupModal.vue';
+import MarketingPop from '~/components/user/modal/UMarketingModal.vue';
+import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
 
 export default {
   name: 'IndexPage',
-  // MarketingPop, MarketingCoupon
-  components: { UPopupModal, UTag },
-  async asyncData({ $axios, req }) {
+  components: { UPopupModal, UTag, MarketingPop, MarketingCoupon },
+  async asyncData({ $axios, query, redirect, req }) {
     const mainData = await $axios.$get('/user/common/home');
 
     if (req?.body?.previewData) {
@@ -158,7 +160,32 @@ export default {
       mainData.popups = [];
     }
 
-    return { mainData };
+    let userPhoneInfo = null
+
+    // 2) EncodeData 쿼리 감지
+    if (query.EncodeData) {
+      try {
+        // 복호화해서 userPhoneInfo 획득
+        userPhoneInfo = await $axios
+          .$get('/nice/decrypt', {
+            params: {
+              encodeData: query.EncodeData
+            }
+          })
+          .catch(() => {
+            redirect('/auth/register/register1');
+          });
+      } catch {
+        // 복호화 실패 시 홈으로 리다이렉트(혹은 에러 처리)
+        redirect('/')
+      }
+    }
+
+    if (query.failed) {
+      // 14세 미만 모달 띄우기
+    }
+
+    return { mainData, userPhoneInfo };
   },
   data() {
     return {
@@ -235,6 +262,10 @@ export default {
           };
   },
   mounted() {
+    if (this.userPhoneInfo) {
+      console.log('📱 userPhoneInfo in mounted:', this.userPhoneInfo)
+    }
+
     if (!this.$cookies.get('mainPopupHide')) {
       this.isShowPopup = true;
     }

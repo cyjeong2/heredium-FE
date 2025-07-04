@@ -4,11 +4,21 @@
       <div class="fill" />
     </div>
     <div class="title-area">
-      <h1>회원가입</h1>
+      <div class="logo-area">
+        <img
+          src="~assets/img/pc/logo.svg"
+          alt="HEREDIUM 로고"
+          class="logo"
+          width="130"
+          height="120"
+        />
+        <h2>회원가입하고</h2>
+        <h2>더 깊은 예술을 경험해보세요!</h2>
+      </div>
       <div class="pc progress-bar">
         <div class="fill" />
       </div>
-      <p>헤레디움에서 사용할 정보를 입력해주세요.</p>
+      <p style="font-size: 1.4rem; text-align: center;">헤레디움에서 사용할 정보를 입력해주세요.</p>
     </div>
     <section class="register-sec">
       <div class="input">
@@ -80,10 +90,32 @@
           {{ feedback.region.text }}
         </p>
       </div>
+      <div class="terms-area">
+        <div class="each-terms">
+          <UCheckbox v-model="isTerms.MARKETING">
+            <strong>[선택]</strong>
+            <button @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
+          </UCheckbox>
+        </div>
+        <div class="marketing-info">
+          <p>
+            고객(정보주체)의 개인정보보호 및 권리는
+            <strong>「개인정보보호법」</strong> 및 관계 법령에 따라 안전하게
+            관리하고 있습니다. 자세한 사항은 헤리디움 사이트에서 확인할 수 있습니다.
+          </p>
+        </div>
+      </div>
     </section>
     <div class="btn-area">
       <UButton w-size="100" @click="onRegister">가입 완료</UButton>
     </div>
+    <URegisterModal
+      :is-show="modal.isTerms"
+      :term-target="termTarget"
+      :terms-data="termsData"
+      @close="modal.isTerms = false"
+      @agree="termAgree"
+    />
   </main>
 </template>
 
@@ -91,10 +123,13 @@
 import UInput from '~/components/user/common/UInput';
 import UButton from '~/components/user/common/UButton';
 import USelect from '~/components/user/common/USelect.vue';
+import UCheckbox from '~/components/user/common/UCheckbox';
+import { REGION_DATA } from '~/assets/js/types';
+import URegisterModal from '~/components/user/modal/URegisterModal';
 
 export default {
   name: 'Register3Page',
-  components: { UInput, UButton, USelect },
+  components: { UInput, UButton, USelect, UCheckbox, URegisterModal },
   async asyncData({ query, $axios, $dayjs, redirect }) {
     const userInfo = await $axios
       .$get('/nice/decrypt', {
@@ -148,25 +183,16 @@ export default {
       form: {
         region: { state: '대전광역시', district: '동구' },
       },
-      regionData: [
-        { state: '서울특별시', districts: ['종로구','중구','용산구','성동구','광진구','동대문구','중랑구','성북구','강북구','도봉구','노원구','은평구','서대문구','마포구','양천구','강서구','구로구','금천구','영등포구','동작구','관악구','서초구','강남구','송파구','강동구'] },
-        { state: '부산광역시', districts: ['중구','서구','동구','영도구','부산진구','동래구','남구','북구','해운대구','사하구','금정구','강서구','연제구','수영구','사상구','기장군'] },
-        { state: '대구광역시', districts: ['중구','동구','서구','남구','북구','수성구','달서구','달성군'] },
-        { state: '인천광역시', districts: ['중구','동구','미추홀구','연수구','남동구','부평구','계양구','서구','강화군','옹진군'] },
-        { state: '광주광역시', districts: ['동구','서구','남구','북구','광산구'] },
-        { state: '대전광역시', districts: ['동구','중구','서구','유성구','대덕구'] },
-        { state: '울산광역시', districts: ['중구','남구','동구','북구','울주군'] },
-        { state: '세종특별자치시', districts: ['세종시'] },
-        { state: '경기도', districts: ['수원시','성남시','의정부시','안양시','부천시','광명시','평택시','동두천시','안산시','고양시','과천시','구리시','남양주시','오산시','시흥시','군포시','의왕시','하남시','용인시','파주시','이천시','안성시','김포시','화성시','광주시','양주시','포천시','여주시','연천군','가평군','양평군'] },
-        { state: '강원도', districts: ['춘천시','원주시','강릉시','동해시','태백시','속초시','삼척시','홍천군','횡성군','영월군','평창군','정선군','철원군','화천군','양구군','인제군','고성군','양양군'] },
-        { state: '충청북도', districts: ['청주시','충주시','제천시','보은군','옥천군','영동군','진천군','괴산군','음성군','단양군','증평군'] },
-        { state: '충청남도', districts: ['천안시','공주시','보령시','아산시','서산시','논산시','계룡시','당진시','금산군','부여군','서천군','청양군','홍성군','예산군','태안군'] },
-        { state: '전라북도', districts: ['전주시','군산시','익산시','정읍시','남원시','김제시','완주군','진안군','무주군','장수군','임실군','순창군','고창군','부안군'] },
-        { state: '전라남도', districts: ['목포시','여수시','순천시','나주시','광양시','담양군','곡성군','구례군','고흥군','보성군','화순군','장흥군','강진군','해남군','영암군','무안군','함평군','영광군','장성군','완도군','진도군','신안군'] },
-        { state: '경상북도', districts: ['포항시','경주','김천시','안동시','구미시','영주시','영천시','상주시','문경시','경산시','군위군','의성군','청송군','영양군','영덕군','청도군','고령군','성주군','칠곡군','예천군','봉화군','울진군','울릉군'] },
-        { state: '경상남도', districts: ['창원시','김해시','진주시','통영시','사천시','밀양시','거제시','양산시','의령군',' 함안군','창녕군','고성군','남해군','하동군','산청군','함양군','거창군','합천군'] },
-        { state: '제주특별자치도', districts: ['제주시','서귀포시'] },
-      ],
+      regionData: REGION_DATA,
+      isTerms: {
+        MARKETING: false
+      },
+      modal: {
+        isTerms: false,
+        isError: false
+      },
+      termsData: null,
+      termTarget: '',
     };
   },
   computed: {
@@ -192,7 +218,7 @@ export default {
     async onRegister() {
       if (this.isValidate()) {
 
-        const isMarketing = JSON.parse(localStorage.getItem('isMarketing'));
+        const isMarketing = this.isTerms.MARKETING;
         const isLocal = (this.form.region.state === '대전광역시');
 
         await this.$axios
@@ -283,7 +309,20 @@ export default {
       }
 
       return isClearForm();
-    }
+    },
+    async showTerm(target) {
+      this.termTarget = target;
+      this.termsData = await this.$axios.$get('/user/policies/posting', {
+        params: {
+          type: this.termTarget
+        }
+      });
+      this.modal.isTerms = true;
+    },
+    termAgree() {
+      this.isTerms[this.termTarget] = true;
+      this.modal.isTerms = false;
+    },
   }
 };
 </script>
@@ -322,10 +361,6 @@ p {
     height: 100%;
     background: var(--color-black);
   }
-}
-
-button {
-  margin-top: 4rem;
 }
 
 .register-sec {
@@ -391,6 +426,10 @@ button {
   .title-area {
     max-width: 43.6rem;
     margin: 0 auto;
+
+    p {
+      margin-top: 2.4rem;
+    }
   }
 
   .register-sec {
@@ -431,7 +470,6 @@ button {
   }
 
   p {
-    margin-top: 2.4rem;
     font-size: 2rem;
     line-height: 3rem;
     text-align: left;
@@ -468,6 +506,104 @@ button {
     margin-top: 0.8rem;
     font-size: 1.4rem;
     color: var(--color-u-error);
+  }
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  p {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--color-grey-6);
+    margin: 0 0 2.4rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.8rem;
+      margin-bottom: 3rem;
+      text-align: left;
+      width: 100%;
+    }
+  }
+}
+
+.terms-area {
+  .all-terms {
+    margin: 4rem 0 2.2rem;
+  }
+
+  strong {
+    margin-right: 0.5rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 100%;
+    transform: translateY(0.2rem);
+  }
+
+  .each-terms {
+    display: flex;
+    flex-direction: column;
+    padding: 2.4rem 0;
+    margin-bottom: 2rem;
+    border-top: 1px solid var(--color-grey-1);
+    border-bottom: 1px solid var(--color-grey-1);
+
+    label + label {
+      margin-top: 2rem;
+    }
+
+    strong {
+      font-size: 1.4rem;
+    }
+
+    p {
+      margin-top: 0.8rem;
+      font-size: 1.3rem;     /* 안내문은 좀 더 작게 1.4rem */
+      margin-left: 3rem;
+    }
+  }
+
+  button {
+    margin-right: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-u-primary);
+    line-height: 150%;
+  }
+
+  .marketing-info {
+    padding: 1.2rem 1.2rem;
+    background-color: var(--color-grey-1);
+    border: 1px solid var(--color-grey-2);
+    border-radius: 0.3rem;
+    font-size: 1.4rem;
+    color: var(--color-grey-8);
+
+    p {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin: 0;
+      line-height: 1.6;
+      text-align: left; /* 기본 왼쪽 정렬 */
+    }
+
+    strong {
+      font-weight: 700;
+    }
+  }
+
+  /* 모바일 전용: padding만 줄이고, 여전히 왼쪽 정렬 */
+  @media screen and (max-width: 767px) {
+    .marketing-info {
+      padding: 0.8rem 1rem;
+    }
+    .marketing-info p {
+      /* 이미 기본이 left라면 이 라인은 선택 사항입니다 */
+      text-align: left;
+    }
   }
 }
 </style>

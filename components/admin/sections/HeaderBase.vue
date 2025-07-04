@@ -195,7 +195,7 @@
       </nav>
     </div>
     <div class="header-bottom">
-      <NuxtLink v-slot="{ isActive, href, navigate }" to="/admin/myinfo">
+      <NuxtLink v-slot="{ isActive, href, navigate }" to="/admin/myinfo" custom>
         <a :class="{ 'nuxt-link-active': isActive }" @click="clearAndGo(navigate, href)">
           <i class="ic-settings" />
           <p class="nt-5">Setting</p>

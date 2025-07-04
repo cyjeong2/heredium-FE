@@ -4,7 +4,7 @@
       <div class="head">{{ title }}</div>
       <div class="body" body-scroll-lock-ignore>
         <div class="content-wrap">
-          <img src="~assets/img/pc/logo.svg" alt="HEREDIUM 로고" class="logo" width="130" height="120" />
+          <!-- <img src="~assets/img/pc/logo.svg" alt="HEREDIUM 로고" class="logo" width="130" height="120" /> -->
           <p class="coupon-name">{{ couponName }}</p>
           <p class="market-note">{{ marketNote }}</p>
           <p class="note">{{ note }}</p>

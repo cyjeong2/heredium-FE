@@ -78,8 +78,6 @@
               <!-- HEADER -->
               <div class="grid-table-header">노출</div>
               <div class="grid-table-header">멤버십 이름</div>
-              <div class="grid-table-header">가격</div>
-              <div class="grid-table-header">결제버튼 활성화</div>
               <div class="grid-table-header">세부내용</div>
               <!-- BODY -->
               <template v-for="(membership, membershipIndex) in detailData.memberships">
@@ -96,29 +94,6 @@
                   class="grid-table-body membership-name"
                 >
                   <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
-                </div>
-                <div v-show="!membership.is_deleted" :key="`${membership.tempId}_price_edit`" class="grid-table-body">
-                  <SFlexInputGrid>
-                    <template #input>
-                      <SInput
-                        v-model="membership.price"
-                        is-comma-num
-                        w-size="full"
-                        text-align="right"
-                        :class="{ 'is-error': !membership.price }"
-                      />
-                    </template>
-                    <template #content>
-                      <div class="currency">원</div>
-                    </template>
-                  </SFlexInputGrid>
-                </div>
-                <div
-                  v-show="!membership.is_deleted"
-                  :key="`${membership.tempId}_active-register`"
-                  class="grid-table-body checkbox-cell"
-                >
-                  <SCheckbox v-model="membership.is_register_membership_button_shown" />
                 </div>
                 <div
                   v-show="!membership.is_deleted"
@@ -260,7 +235,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import SDatepicker from '../../commons/SDatepicker.vue';
-import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SPageable from '../../commons/SPageable.vue';
 import HistoryModal from './HistoryModal.vue';
 import STitle from '~/components/admin/commons/STitle';
@@ -293,7 +267,6 @@ export default {
     AddMembershipOption,
     CouponEditor,
     SDatepicker,
-    SFlexInputGrid,
     HistoryModal
   },
   mixins: [imageMixin],
@@ -747,7 +720,7 @@ export default {
 
 .grid-table {
   display: grid;
-  grid-template-columns: 7rem 1fr 1fr 20rem 15rem;
+  grid-template-columns: 7rem 1fr 15rem;
   box-shadow: 0 0 0 1px var(--color-grey-2);
   overflow: hidden;
   margin-bottom: 2.75rem;
@@ -763,7 +736,7 @@ export default {
   .create-membership,
   .benefit-container,
   .delete-membership {
-    grid-column: span 5;
+    grid-column: span 3;
   }
   .checkbox-cell {
     display: flex;

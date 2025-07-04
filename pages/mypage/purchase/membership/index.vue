@@ -8,7 +8,7 @@
           <div class="box-membership only-mobile">
             <div class="head-mobile only-mobile">
               <div class="head">멤버십</div>
-              <NuxtLink to="/mypage/purchase/membership/coupon-history">
+              <NuxtLink v-if="dataMembership.code !== 3" to="/mypage/purchase/membership/coupon-history">
                 <span>마일리지 적립 내역</span>
                 <i class="m umic-arrow_forward" />
               </NuxtLink>
@@ -46,6 +46,11 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 export default {
   name: 'MembershipAndCouponPage',
   components: { SideBarMyPage, MembershipInfor, CouponList },
+  async asyncData({ $axios }) {
+    const dataMembership = await $axios.$get('/user/membership/info');
+    dataMembership.code = 3
+    return { dataMembership};
+  },
   data() {
     return {
       dataMembership: null,
@@ -54,12 +59,11 @@ export default {
   },
   mounted() {
     this.getCouponList();
-    this.getMembershipInfor();
   },
   methods: {
-    async getCouponList() {
+    getCouponList() {
       try {
-        const dataListCoupon = await this.$axios.$get('/user/coupons/usage');
+        const dataListCoupon = this.$axios.$get('/user/coupons/usage');
         const availableCouponsList = dataListCoupon
           .map((item) => ({
             ...item,
@@ -72,14 +76,6 @@ export default {
         this.availableCouponsList = availableCouponsList;
       } catch (error) {
         // empty state handling
-      }
-    },
-    async getMembershipInfor() {
-      try {
-        const dataMembership = await this.$axios.$get('/user/membership/info');
-        this.dataMembership = dataMembership;
-      } catch (error) {
-        this.dataMembership = null;
       }
     },
     refreshCouponList() {

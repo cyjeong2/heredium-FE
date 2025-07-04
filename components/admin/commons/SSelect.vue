@@ -92,6 +92,9 @@ export default {
       case 'x-large':
         width = 46;
         break;
+      case 's-large':
+        width = 30;
+        break;
       default:
         width = 15.2;
         break;

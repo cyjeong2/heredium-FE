@@ -11,13 +11,13 @@
             <i class="pc uic-info" />
             <p>현재 적용된 멤버십</p>
           </div>
-          <NuxtLink :to="'/mypage/purchase/membership/coupon-history'" class="only-pc-flex">
+          <NuxtLink v-if="dataMembership?.code !== 3" :to="'/mypage/purchase/membership/coupon-history'" class="only-pc-flex">
             <span>마일리지 적립 내역 </span> <i class="pc uic-arrow_next" />
           </NuxtLink>
         </div>
+        <div class="head">멤버십</div>
         <div class="box-contents">
           <div class="box-membership">
-            <div class="head">멤버십</div>
             <MembershipInfor :data-merbership="dataMembership" />
           </div>
         </div>
@@ -33,6 +33,10 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 export default {
   name: 'MembershipAndCouponPage',
   components: { SideBarMyPage, MembershipInfor },
+  async asyncData({ $axios }) {
+    const dataMembership = await $axios.$get('/user/membership/info');
+    return { dataMembership };
+  },
   data() {
     return {
       dataMembership: null,
@@ -40,39 +44,6 @@ export default {
       baseUrl: '/mypage/purchase/membership/coupon-histoty'
     };
   },
-  mounted() {
-    this.getCouponList();
-    this.getMembershipInfor();
-  },
-  methods: {
-    async getCouponList() {
-      try {
-        const dataListCoupon = await this.$axios.$get('/user/coupons/usage');
-        const availableCouponsList = dataListCoupon
-          .map((item) => ({
-            ...item,
-            unused_coupons: item.unused_coupons.filter((coupon) => !coupon.is_expired)
-          }))
-          .filter((item) => item.unused_coupons.length > 0);
-
-        this.availableCouponsList = availableCouponsList;
-      } catch (error) {
-        // show empty coupon
-      }
-    },
-    async getMembershipInfor() {
-      try {
-        const dataMembership = await this.$axios.$get('/user/membership/info');
-        this.dataMembership = dataMembership;
-      } catch (error) {
-        // show empty
-        this.dataMembership = null;
-      }
-    },
-    refreshCouponList() {
-      this.getCouponList();
-    }
-  }
 };
 </script>
 
@@ -91,33 +62,6 @@ export default {
     font-weight: 700;
     line-height: 1.8rem;
   }
-}
-
-.head-mobile {
-  display: flex;
-  align-content: center;
-  justify-content: space-between;
-
-  span {
-    color: var(--color-u-primary);
-  }
-
-  .umic-arrow_forward {
-    width: 8.5px;
-    height: 15.5px;
-    color: var(--color-u-primary);
-  }
-
-  a {
-    display: flex;
-    align-content: center;
-    justify-content: space-between;
-  }
-}
-
-.note-mobile {
-  color: var(--color-u-placeholder);
-  margin-bottom: 2.4rem;
 }
 
 .head {
@@ -165,6 +109,7 @@ export default {
     margin-bottom: 3.2rem;
   }
 }
+
 @media screen and (min-width: 769px) {
   .container {
     display: flex;
@@ -224,10 +169,13 @@ export default {
   }
 
   .box-contents {
-    display: flex;
-    column-gap: 2.4rem;
+    width: 100%;
+    display: flex;               // <-- 추가!
+    justify-content: center;     // 가로 중앙 정렬
+    align-items: center;         // 세로 중앙 정렬 (필요 시)
+
     .box-membership {
-      max-width: 50%;
+      max-width: 35%;
     }
   }
 
@@ -237,19 +185,6 @@ export default {
     padding-left: 8px;
     border-left: 5px solid var(--color-u-primary);
     margin-bottom: 2rem;
-  }
-
-  .box {
-    &-membership {
-      flex: 1;
-    }
-
-    &-coupon {
-      flex: 2;
-      .contents {
-        width: 100%;
-      }
-    }
   }
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <main class="container">
-    <h1>회원 가입에 성공하셨어요!</h1>
-    <div>
-      <img class="m" src="~assets/img/mobile/register_img.png" alt="" width="120" height="120" />
-      <img class="pc" src="~assets/img/pc/register_img.png" alt="" width="144" height="144" />
+    <div style="margin-top: 4rem;">
+      <img class="m" src="~assets/img/pc/logo.svg" alt="" width="120" height="120" />
+      <img class="pc" src="~assets/img/pc/logo.svg" alt="" width="144" height="144" />
     </div>
-    <p>헤레디움과 함께 해주셔서 감사해요!<br />지금 헤레디움의 다양한 서비스를 경험해보세요!</p>
-    <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">메인으로 이동</ULink>
+    <h1>헤레디움<br/> 회원가입을 축하합니다!</h1>
+    <p>헤레디움의 다양한 전시 프로그램을 만나보세요.</p>
+    <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">시작</ULink>
     <!-- 쿠폰 모달 -->
     <MarketingCoupon
       :is-show="showCouponModal"
@@ -17,7 +17,6 @@
 
 <script>
 import ULink from '~/components/user/common/ULink.vue';
-// import UCheckbox from '~/components/user/common/UCheckbox.vue';
 import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
 
 export default {
