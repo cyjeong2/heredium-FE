@@ -4,7 +4,6 @@
     :table-data="tableData"
     :detail-data="detailData"
     @changePage="onChangePage"
-    @coffee="onCoffee"
   />
 </template>
 
@@ -31,8 +30,7 @@ export default {
       id: null,
       queryOptions: {
         page: this.$route.query.page || 0,
-        size: Number(this.$route.query.size) || 10,
-        isCoffee: this.$route.query.isCoffee === 'false'
+        size: Number(this.$route.query.size) || 10
       }
     };
   },
@@ -44,16 +42,10 @@ export default {
       })
       .catch(() => {});
 
-    this.tableData = await this.$axios.$get(`/admin/accounts/${this.id}/tickets`, { params: this.queryOptions });
+    this.tableData = await this.$axios.$get(`/admin/membershipMileage/${this.id}`, { params: this.queryOptions });
     this.tableData.startCount = this.tableData.totalElements - (this.tableData.number * this.tableData.size);
   },
   methods: {
-    onCoffee(isCoffee) {
-      if (!this.$fetchState.pending) {
-        this.queryOptions.isCoffee = isCoffee;
-        this.$fetch();
-      }
-    },
     onChangePage(page) {
       if (!this.$fetchState.pending) {
         this.queryOptions.page = page;

@@ -372,3 +372,23 @@ export const REGION_DATA = [
   { state: '경상남도', districts: ['창원시','김해시','진주시','통영시','사천시','밀양시','거제시','양산시','의령군',' 함안군','창녕군','고성군','남해군','하동군','산청군','함양군','거창군','합천군'] },
   { state: '제주특별자치도', districts: ['제주시','서귀포시'] },
 ]
+
+export const CATEGORY_TYPE = Object.freeze({
+  0: '전시',
+  1: '프로그램',
+  2: '커피',
+  3: '아트숍'
+});
+
+export const PAYMENT_METHOD_TYPE = Object.freeze({
+  0: '온라인',
+  1: '오프라인',
+});
+
+export const MILEAGE_EVENT_TYPE = Object.freeze({
+  0: '적립',
+  1: '승급',
+  2: '소멸(유효기간 경과)',
+  3: '소멸(환불)',
+  4: '환불완료'
+});

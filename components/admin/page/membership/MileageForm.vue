@@ -15,13 +15,13 @@
           />
         </div>
 
-        <!-- 2. 구분 -->
+        <!-- 2. 제목 -->
         <div class="row mb-13">
-          <label>구분<b class="must">*</b></label>
+          <label>제목<b class="must">*</b></label>
           <SSelect
-            v-model="form.type"
-            :option-list="typeOptions"
-            default-text="구분을 선택해주세요"
+            v-model="form.categoryId"
+            :option-list="titleOptions"
+            default-text="제목을 선택해주세요"
             w-size="s-large"
           />
         </div>
@@ -30,8 +30,14 @@
         <div class="row mb-13">
           <label>결제방법<b class="must">*</b></label>
           <div class="options">
-            <SRadio v-model="form.paymentMethod" value="ONLINE">온라인</SRadio>
-            <SRadio v-model="form.paymentMethod" value="OFFLINE">오프라인</SRadio>
+            <SRadio
+              v-for="opt in paymentMethodOptions"
+              :key="opt.value"
+              v-model="form.paymentMethod"
+              :value="opt.value"
+            >
+              {{ opt.label }}
+            </SRadio>
           </div>
         </div>
 
@@ -46,18 +52,18 @@
           />
         </div>
 
-        <!-- 5. 적립마일리지 -->
+        <!-- 5. 결제금액 -->
+        <!-- -입력 못하도록 -->
         <div class="row">
-          <label>적립마일리지<b class="must">*</b></label>
+          <label>결제금액<b class="must">*</b></label>
           <SInput
-            v-model.number="form.mileage"
+            v-model.number="form.paymentAmount"
             type="text"
             is-numeric
             text-align="right"
-            placeholder="숫자를 입력해주세요"
+            placeholder="결제금액을 입력해주세요"
             w-size="s-large"
-            :min="-99"
-            :max="99"
+            is-comma-num
           />
         </div>
       </div>
@@ -70,6 +76,7 @@
       <SButton button-type="primary" @click="submit">등록</SButton>
     </template>
   </SModal>
+
 </template>
 
 <script>
@@ -78,10 +85,11 @@ import SSelect from '~/components/admin/commons/SSelect';
 import SInput from '~/components/admin/commons/SInput';
 import SButton from '~/components/admin/commons/SButton';
 import SRadio from '~/components/admin/commons/SRadio';
+import { CATEGORY_TYPE, PAYMENT_METHOD_TYPE } from '~/assets/js/types';
 
 export default {
   name: 'MileageForm',
-  components: { SModal, SSelect, SInput, SButton, SRadio },
+  components: { SModal, SSelect, SInput, SButton, SRadio},
   props: {
     accountId: { type: [String, Number] , required: true },
     isShow:    { type: Boolean, default: false }
@@ -89,47 +97,68 @@ export default {
   data() {
     const initialForm = {
       category:      null,
-      type:          null,
-      paymentMethod: 'ONLINE',
-      serialNumber:  '',
-      mileage:       null
+      categoryId:          null,
+      paymentMethod: '0',
+      serialNumber:  null,
+      paymentAmount:  null,
+      mileageAmount: null,
     };
     return {
       initialForm,
       form: { ...initialForm },
-      categoryOptions: [
-        { label: '멤버십', value: 'MEMBERSHIP' },
-        { label: '프로그램', value: 'PROGRAM' },
-        /* … */
-      ],
-      typeOptions: [
-        { label: '자동', value: 'AUTO' },
-        { label: '수동', value: 'MANUAL' },
-        /* … */
-      ]
+      titleOptions: [],
     };
+  },
+  computed: {
+    categoryOptions() {
+      return Object.entries(CATEGORY_TYPE).map(([value, label]) => ({
+        label,
+        value: Number(value)
+      }));
+    },
+    paymentMethodOptions() {
+      return Object.entries(PAYMENT_METHOD_TYPE).map(([value, label]) => ({
+        label,
+        value
+      }));
+    }
   },
   watch: {
     // 2) 모달이 열릴 때마다 초기화
     isShow(newVal) {
       if (newVal) {
         this.form = { ...this.initialForm };
+        this.titleOptions = [];
       }
+    },
+    // category가 바뀔 때마다 호출
+    'form.category'(newCategory) {
+      this.form.categoryId = null;        // 이전 선택 초기화
+      this.titleOptions = [];        // 이전 옵션 초기화
+      if (newCategory == null) return;
+
+      // API 요청
+      this.$axios.$get(`/admin/membershipMileage/category/${newCategory}`)
+      .then(items => {
+        this.titleOptions = items.map(item => ({
+          label: item.title,
+          value: item.id
+        }));
+      })
+      .catch(() => {
+        this.titleOptions = [];
+      });
     }
   },
   methods: {
     submit() {
-      // 간단 검증
-      console.log('this.accountId', this.accountId)
-      if (!this.form.category || !this.form.type || !this.form.mileage) {
-        return alert('필수 항목을 모두 입력해주세요.');
-      }
+      this.form.mileageAmount = Math.floor(this.form.paymentAmount / 1000);
       this.$emit('save', { accountId: this.accountId, ...this.form });
     },
     handleClose() {
       this.$emit('close');
       this.form = { ...this.initialForm };
-    }
+    },
   }
 };
 </script>

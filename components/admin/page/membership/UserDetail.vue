@@ -56,14 +56,16 @@
           <thead :class="{ 'data-none': !data || !data[0] }">
             <tr>
               <th>NO</th>
+              <th>구분</th>
               <th>카테고리</th>
               <th>제목</th>
-              <th>결제일시</th>
+              <th>적립일시</th>
+              <th>일련번호</th>
               <th>결제금액</th>
               <th>적립마일리지</th>
-              <th>적립방법</th>
+              <th>결제방법</th>
               <th>작성자</th>
-              <th>작성일시</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -75,37 +77,53 @@
               <td>
                 <div>{{ tableData.startCount - index }}</div>
               </td>
+              <!-- 구분 -->
+              <td>
+                <div class="text-center">{{ getTypeText(item.type) }}</div>
+              </td>
               <!-- 카테고리 -->
               <td>
-                <div class="text-left">{{ item.title }}</div>
+                <div class="text-center">{{ getCategoryText(item.category) }}</div>
               </td>
               <!-- 제목 -->
               <td>
                 <div class="text-left">{{ item.title }}</div>
               </td>
-              <!-- 결제일시 -->
+              <!-- 적립일시 -->
               <td>
                 <div>{{ $dayjs(item.createdDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+              </td>
+              <!-- 일련번호 -->
+              <td>
+                <div class="text-center">{{ item.serialNumber }}</div>
               </td>
               <!-- 결제금액 -->
               <td>
-                <div class="text-right">{{ item.price.toLocaleString() }}</div>
+                <div class="text-right">{{ item.paymentAmount.toLocaleString() }}</div>
               </td>
               <!-- 적립마일리지 -->
               <td>
-                <div class="text-right">{{ item.number.toLocaleString() }}</div>
+                <div class="text-right">{{ item.mileageAmount.toLocaleString() }}</div>
               </td>
-              <!-- 적립방법 -->
+              <!-- 결제방법 -->
               <td>
-                <div>{{ item.name }}</div>
+                <div>{{ getPaymentMethodText(item.paymentMethod) }}</div>
               </td>
               <!-- 작성자 -->
               <td>
-                <div>{{ getState(item.state) }}</div>
+                <div>{{ item.createdName }}</div>
               </td>
-              <!-- 작성일시 -->
               <td>
-                <div>{{ $dayjs(item.createdDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+                <div class="flex justify-center" style="margin-left: 5px;">
+                  <SButton
+                    v-if="item.type === 0"
+                    button-type="standard"
+                    size="small"
+                    @click="handleBeforeRefund(item)"
+                  >
+                    취소
+                  </SButton>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -116,6 +134,12 @@
       <template #content>회원정보가 수정되었습니다.</template>
       <template #modal-btn2>
         <SLink button-type="primary" :to="baseUrl">확인</SLink>
+      </template>
+    </SDialogModal>
+     <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
+      <template #content>취소 하시겠습니까?</template>
+      <template #modal-btn1>
+        <SButton button-type="primary" @click="handleRefund">확인</SButton>
       </template>
     </SDialogModal>
     <MileageForm
@@ -135,7 +159,7 @@ import SLink from '~/components/admin/commons/SLink';
 import SButton from '~/components/admin/commons/SButton';
 import SPageable from '~/components/admin/commons/SPageable';
 import SProgressTab from '~/components/admin/commons/SProgressTab';
-import { GENDER_TYPE, TICKET_KIND_TYPE, TICKET_STATE_TYPE, TICKET_TYPE } from '~/assets/js/types';
+import { CATEGORY_TYPE, PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 import MileageForm from '~/components/admin/page/membership/MileageForm.vue';
 
@@ -159,19 +183,11 @@ export default {
       id: this.$route.params.id,
       titleText: '계정 정보',
       baseUrl: '',
-      isOverlapId: false,
-      originEmail: this.detailData.email,
       cloneDetailData: cloneDeep(this.detailData),
-      feedback: {
-        email: {
-          success: true,
-          isValid: true,
-          text: ''
-        }
-      },
       modal: {
         isSave: false,
-        isMileageModal: false
+        isMileageModal: false,
+        isConfirmSave: false
       },
       isConfirmPending: false
     };
@@ -181,98 +197,46 @@ export default {
       this.modal.isMileageModal = true;
     },
     async handleSaveMileage(payload) {
-      // payload = { accountId, category, type, paymentMethod, serialNumber, mileage }
-      await this.$axios.$post('/admin/membership/mileage', payload);
-      this.modal.isMileageModal = false;
-      // 필요하면 리스트 리로딩...
-    },
-    updateDetailData() {
-      const newValue = this.cloneDetailData.email;
-      const originValue = this.originEmail;
-      const email = this.feedback.email;
+      try {
+        await this.$axios.$post('/admin/membershipMileage', payload);
+        this.modal.isMileageModal = false;
 
-      if ((this.isOverlapId = newValue !== originValue)) {
-        email.isValid = false;
-        email.success = true;
-        email.text = '이메일 중복확인을 해주세요.';
-      } else {
-        email.isValid = true;
-        email.success = true;
-        email.text = '';
+        const currentPage = this.tableData.pageable.pageNumber;
+        this.$emit('changePage', currentPage);
+
+      } catch (err) {
+        console.error(err);
+        alert('저장에 실패했습니다.');
       }
     },
-    getGender(gender) {
-      return GENDER_TYPE[gender];
+    getCategoryText(code) {
+      return CATEGORY_TYPE[code] || '-';
     },
-    getKind(kind) {
-      return TICKET_KIND_TYPE[kind];
+    getPaymentMethodText(code) {
+      // PAYMENT_METHOD_TYPE 이 undefined 면 빈 객체로 대체
+      const map = PAYMENT_METHOD_TYPE || {};
+      return map[code] ?? '-';
     },
-    getType(type) {
-      return TICKET_TYPE[type];
+    getTypeText(code) {
+      return MILEAGE_EVENT_TYPE[code] ?? '-';
     },
-    getState(state) {
-      return TICKET_STATE_TYPE[state];
+    handleBeforeRefund() {
+      this.modal.isConfirmSave = true;
     },
-    async checkRedundancy() {
-      if (this.isValidate()) {
-        const isOverlap = await this.$axios.$get(`/admin/accounts/duplicate`, {
-          params: {
-            email: this.cloneDetailData.email
-          }
-        });
+    async handleRefund(item) {
+      try {
+        this.modal.isConfirmSave = false;
+        // 백엔드에 취소 API 엔드포인트가 있다면 호출
+        await this.$axios.$post(`/admin/membershipMileage/${item.id}/refund`);
 
-        if (!isOverlap) {
-          this.feedback.email.isValid = true;
-          this.feedback.email.success = false;
-          this.feedback.email.text = '사용가능한 이메일 입니다.';
-          this.isOverlapId = false;
-        } else {
-          this.feedback.email.isValid = false;
-          this.feedback.email.success = true;
-          this.feedback.email.text = '가입된 이메일 입니다';
-        }
-
-        this.modal.isError = true;
+        // 성공 후 테이블 새로고침
+        const currentPage = this.tableData.pageable.pageNumber;
+        this.$emit('changePage', currentPage);
+      } catch (err) {
+        console.error(err);
+        alert('취소 처리에 실패했습니다.');
       }
     },
-    isValidate() {
-      const clearValid = () => {
-        Object.values(this.feedback).forEach((value) => {
-          value.isValid = true;
-        });
-      };
-
-      const emailPattern =
-        /^([\w._-])*[a-zA-Z0-9]+([\w._-])*([a-zA-Z0-9])+([\w._-])+@([\w_-])*([a-zA-Z0-9]+\.)+[a-zA-Z0-9]{2,8}$/;
-      const isClearForm = () => !Object.values(this.feedback).find((value) => value.isValid === false);
-      const emailFeedback = this.feedback.email;
-      const { email } = this.cloneDetailData;
-
-      clearValid();
-      if (!email) {
-        emailFeedback.isValid = false;
-        emailFeedback.success = true;
-        emailFeedback.text = '이메일을 입력해 주세요.';
-      }
-
-      if (!emailPattern.test(email)) {
-        emailFeedback.isValid = false;
-        emailFeedback.success = true;
-        emailFeedback.text = '잘못된 이메일 양식입니다.';
-      }
-      return isClearForm();
-    },
-    providerTextConverter(type) {
-      return type === 'KAKAO'
-        ? '카카오'
-        : type === 'GOOGLE'
-        ? '구글'
-        : type === 'NAVER'
-        ? '네이버'
-        : type === 'APPLE'
-        ? '애플'
-        : '이메일';
-    }
   }
 };
 </script>
@@ -328,13 +292,13 @@ export default {
         width: 5rem;
       }
       &:nth-of-type(2) {
-        width: 20rem;
+        width: 10rem;
       }
       &:nth-of-type(3) {
-        width: 30rem;
+        width: 10rem;
       }
       &:nth-of-type(4) {
-        width: 10rem;
+        width: 30rem;
       }
       &:nth-of-type(5) {
         width: 10rem;
@@ -343,10 +307,16 @@ export default {
         width: 10rem;
       }
       &:nth-of-type(7) {
-        width: 8rem;
+        width: 10rem;
       }
       &:nth-of-type(8) {
-        width: 30rem;
+        width: 8rem;
+      }
+      &:nth-of-type(9) {
+        width: 10rem;
+      }
+      &:nth-of-type(10) {
+        width: 10rem;
       }
       &:last-of-type {
         width: 10rem;
