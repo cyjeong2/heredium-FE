@@ -336,7 +336,12 @@ export const COUPON_DEFAULT = {
   is_permanent: false,
   start_date: '',
   end_date: '',
-  tempId: Date.now()
+  tempId: Date.now(),
+  // add these four here:
+  is_recurring: false,
+  recipient_type: [],
+  send_day_of_month: 1,
+  marketing_consent_benefit: false
 };
 
 export const MEMBERSHIP_DEFAULT = {
@@ -392,3 +397,19 @@ export const MILEAGE_EVENT_TYPE = Object.freeze({
   3: '소멸(환불)',
   4: '환불완료'
 });
+
+/**
+ * 회원가입 · 프로필 작성 시 사용할 직업 옵션
+ */
+export const JOB_OPTIONS = [
+  { value: 'employed',         label: '회사원' },
+  { value: 'self_employed',    label: '자영업자' },
+  { value: 'public_officer',   label: '공무원' },
+  { value: 'student',          label: '학생' },
+  { value: 'housewife',        label: '주부' },
+  { value: 'professional',     label: '전문직(의사·변호사 등)' },
+  { value: 'tech',             label: 'IT·기술직' },
+  { value: 'teacher',          label: '교사·강사' },
+  { value: 'freelancer',       label: '프리랜서' },
+  { value: 'unemployed',       label: '무직·기타' },
+];

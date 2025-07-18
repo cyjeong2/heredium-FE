@@ -80,6 +80,7 @@
             :show-add-button="couponIndex === coupons.length - 1"
             :show-delete-button="coupons.length > 1"
             :error="isSubmitted ? feedback?.coupons?.[couponIndex] : null"
+            :is-coupon-date="false"
             @add-coupon="handleAddCoupon"
             @update-coupon="(e) => handleUpdateCoupon(e, couponIndex)"
             @delete-coupon="() => handleDeleteCoupon(couponIndex)"
@@ -210,8 +211,6 @@ export default {
       try {
         const { data } = await this.$axios.get(`/admin/memberships/${id}`)
 
-        console.log("data", data)
-
         const loaded = data.coupons || [];
 
         // data: { name, imageUrl, usageThreshold, coupons: […] }
@@ -230,7 +229,7 @@ export default {
               name:             c.name,
               coupon_type:      c.coupon_type,
               discount_percent: c.discount_percent,
-              period_in_days:   c.period_in_days,
+              period_in_days:   0,
               number_of_uses:   c.number_of_uses,
               is_permanent:     c.is_permanent,
               image_url:        c.image_url,
@@ -343,9 +342,6 @@ export default {
         feedback.discountPercent = true;
       } else if (Number(couponItem.discount_percent) > 100) {
         feedback.discountPercent = true;
-      }
-      if (!couponItem.period_in_days || isNaN(Number(couponItem.period_in_days))) {
-        feedback.periodInDays = true;
       }
       if (!couponItem.image_url) {
         feedback.imageUrl = true;

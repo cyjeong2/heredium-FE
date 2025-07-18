@@ -21,93 +21,123 @@
       <p style="font-size: 1.4rem; text-align: center;">헤레디움에서 사용할 정보를 입력해주세요.</p>
     </div>
     <section class="register-sec">
-      <div class="input">
-        <label>이메일 <b class="must">*</b></label>
-        <UInput
-          v-model="email"
-          class="h-m"
-          :class="{ 'is-error': !feedback.email.isValid }"
-          :error-msg="feedback.email.text"
-          w-size="full"
-          placeholder="heredium@example.com"
-        ></UInput>
-      </div>
-      <div class="input">
-        <label>비밀번호 <b class="must">*</b></label>
-        <UInput
-          v-model="password"
-          class="h-m"
-          :class="{ 'is-error': !feedback.password.isValid }"
-          :error-msg="feedback.password.text"
-          type="password"
-          w-size="full"
-          placeholder="8 ~ 16자로 입력해주세요."
-        ></UInput>
-      </div>
-      <div class="input">
-        <label>비밀번호 확인 <b class="must">*</b></label>
-        <UInput
-          v-model="passwordConfirm"
-          class="h-m"
-          :class="{ 'is-error': !feedback.passwordConfirm.isValid }"
-          :error-msg="feedback.passwordConfirm.text"
-          type="password"
-          w-size="full"
-          placeholder="비밀번호를 재입력해주세요."
-        />
-      </div>
-      <div class="grid-wrap">
+      <div v-if="hydrated && !isSocialFlow">
+        <p style="font-size: 1.8rem; text-align: left;">회원 정보 등록</p>
+        <div class="grid-wrap"></div>
         <div class="input">
           <label>이름</label>
           <UInput :value="userInfo.name" class="h-m" w-size="full" disabled />
         </div>
         <div class="input">
-          <label>전화번호</label>
+          <label>휴대폰 번호</label>
           <UInput :value="userInfo.mobileNo" class="h-m" w-size="full" disabled />
         </div>
+        <div class="input">
+          <label>이메일 <b class="must">*</b></label>
+          <UInput
+            v-model="email"
+            class="h-m"
+            :class="{ 'is-error': !feedback.email.isValid }"
+            :error-msg="feedback.email.text"
+            w-size="full"
+            placeholder="heredium@example.com"
+          ></UInput>
+        </div>
+        <div class="input">
+          <label>비밀번호 <b class="must">*</b></label>
+          <UInput
+            v-model="password"
+            class="h-m"
+            :class="{ 'is-error': !feedback.password.isValid }"
+            :error-msg="feedback.password.text"
+            type="password"
+            w-size="full"
+            placeholder="8 ~ 16자로 입력해주세요."
+          ></UInput>
+        </div>
+        <div class="input">
+          <label>비밀번호 확인 <b class="must">*</b></label>
+          <UInput
+            v-model="passwordConfirm"
+            class="h-m"
+            :class="{ 'is-error': !feedback.passwordConfirm.isValid }"
+            :error-msg="feedback.passwordConfirm.text"
+            type="password"
+            w-size="full"
+            placeholder="비밀번호를 재입력해주세요."
+          />
+        </div>
       </div>
-      <div class="input region-input">
-        <label>지역 <b class="must">*</b></label>
-        <div class="region-row">
-          <div class="region-col">
+      <div v-if="hydrated">
+        <div class="add-info">
+          <p class="p1">추가 정보 입력</p>
+          <p class="p2">추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!</p>
+        </div>
+        <div class="grid-wrap"></div>
+
+        <div class="input region-input">
+          <label>직업</label>
+          <div style="margin-top: 1.2rem;">
             <USelect
-              v-model="form.region.state"
-              :option-list="cityOptions"
+              v-model="form.job"
+              :option-list="jobOptions"
+              default-text="선택"
               w-size="full"
-              default-text="시/도 선택"
-            />
-          </div>
-          <div class="region-col">
-            <USelect
-              v-model="form.region.district"
-              :option-list="districtOptions"
-              w-size="full"
-              default-text="시/군/구 선택"
             />
           </div>
         </div>
-        <p v-if="!feedback.region.isValid" class="error-msg">
-          {{ feedback.region.text }}
-        </p>
-      </div>
-      <div class="terms-area">
-        <div class="each-terms">
-          <UCheckbox v-model="isTerms.MARKETING">
-            <strong>[선택]</strong>
-            <button @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
-          </UCheckbox>
-        </div>
-        <div class="marketing-info">
-          <p>
-            고객(정보주체)의 개인정보보호 및 권리는
-            <strong>「개인정보보호법」</strong> 및 관계 법령에 따라 안전하게
-            관리하고 있습니다. 자세한 사항은 헤리디움 사이트에서 확인할 수 있습니다.
+
+        <div class="input region-input">
+          <label>지역</label>
+          <div class="region-row">
+            <div class="region-col">
+              <USelect
+                v-model="form.region.state"
+                :option-list="cityOptions"
+                w-size="full"
+                default-text="시/도 선택"
+              />
+            </div>
+            <div class="region-col">
+              <USelect
+                v-model="form.region.district"
+                :option-list="districtOptions"
+                w-size="full"
+                default-text="시/군/구 선택"
+              />
+            </div>
+          </div>
+          <p v-if="!feedback.region.isValid" class="error-msg">
+            {{ feedback.region.text }}
           </p>
+        </div>
+        <div class="terms-area">
+          <div class="each-terms">
+            <!-- <UCheckbox v-model="isTerms.MARKETING">
+              <strong>[선택]</strong>
+              <button @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
+            </UCheckbox> -->
+            <UCheckbox v-model="form.additionalInfoAgreed">
+              <strong>(선택)</strong> 추가 개인정보 수집 및 활용에 동의합니다.
+            </UCheckbox>
+            <UCheckbox v-model="isTerms.MARKETING">
+              <strong>(선택)</strong> 마케팅 정보 활용에 동의합니다.
+            </UCheckbox>
+          </div>
+          <div class="marketing-info">
+            <p>
+              고객(정보주체)의 개인정보보호 및 권리는
+              <strong>「개인정보보호법」</strong> 및 관계 법령에 따라 안전하게
+              관리하고 있습니다. 자세한 사항은 헤리디움 사이트에서 확인할 수 있습니다.
+            </p>
+          </div>
         </div>
       </div>
     </section>
-    <div class="btn-area">
-      <UButton w-size="100" @click="onRegister">가입 완료</UButton>
+    <div v-if="hydrated">
+      <div class="btn-area">
+        <UButton w-size="100" :disabled="submitting" @click="onRegister()">가입 완료</UButton>
+      </div>
     </div>
     <URegisterModal
       :is-show="modal.isTerms"
@@ -124,7 +154,7 @@ import UInput from '~/components/user/common/UInput';
 import UButton from '~/components/user/common/UButton';
 import USelect from '~/components/user/common/USelect.vue';
 import UCheckbox from '~/components/user/common/UCheckbox';
-import { REGION_DATA } from '~/assets/js/types';
+import { REGION_DATA, JOB_OPTIONS } from '~/assets/js/types';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 
 export default {
@@ -182,8 +212,11 @@ export default {
       },
       form: {
         region: { state: '대전광역시', district: '동구' },
+        job: null,
+        additionalInfoAgreed: false,
       },
       regionData: REGION_DATA,
+      jobOptions: JOB_OPTIONS,
       isTerms: {
         MARKETING: false
       },
@@ -193,9 +226,28 @@ export default {
       },
       termsData: null,
       termTarget: '',
+      submitting: false,
+      snsToken: null,
+      provider: null,
+      hydrated: false,
     };
   },
   computed: {
+    snsInfo() {
+      if (!this.hydrated) {
+        // 서버 사이드 렌더링 단계나 최초 Client hydration 에선 항상 이메일 플로우
+        return { snsToken: null, provider: null }
+      }
+      try {
+        return JSON.parse(localStorage.getItem('snsInfo')) || { snsToken: null, provider: null }
+      } catch {
+        return { snsToken: null, provider: null }
+      }
+    },
+    isSocialFlow() {
+      const { snsToken, provider } = this.snsInfo
+      return Boolean(snsToken && provider)
+    },
     cityOptions() {
       return this.regionData.map(r => ({ value: r.state, label: r.state }));
     },
@@ -214,41 +266,65 @@ export default {
       this.feedback.region.text = '';
     }
   },
+  beforeMount() {
+    this.hydrated = true
+  },
   methods: {
     async onRegister() {
-      if (this.isValidate()) {
 
-        const isMarketing = this.isTerms.MARKETING;
-        const isLocal = (this.form.region.state === '대전광역시');
+      this.submitting = true;
 
-        await this.$axios
-          .$post('/user/auth/sign-up', {
-            email: this.email,
-            password: this.password,
-            isLocalResident: isLocal,
-            isMarketingReceive: isMarketing,
-            gender: isMarketing
-              ? (this.userInfo.gender === 'MAN' ? 'M' : 'W') : null,
-            birthDate: isMarketing
-              ? this.$dayjs(this.userInfo.birthDate).format('YYYY-MM-DD') : null,
-            marketingPending: false,
-            state: this.form.region.state,
-            district: this.form.region.district,
-            encodeData: this.encodeData
-          })
-          .then(async ({ token }) => {
-            this.$store.commit('service/auth/setAccessToken', token);
-            const userInfo = await this.$axios.$get('/user/account/info').catch(() => {});
-            this.$store.commit('service/auth/setUserInfo', userInfo);
-            this.$router.replace('/auth/register/register4');
-          })
-          .catch((err) => {
-            const errorMessage = err.response.data?.MESSAGE || '';
-            if (errorMessage === 'DUPLICATE_EMAIL') {
-              this.feedback.email.isValid = false;
-              this.feedback.email.text = '가입된 이메일 입니다.';
-            }
-          });
+      // 공통 파라미터
+      const payload = {
+        state: this.form.region.state,
+        district: this.form.region.district,
+        job: this.form.job,
+        additionalInfoAgreed: this.form.additionalInfoAgreed,
+        isMarketingReceive: this.isTerms.MARKETING
+      };
+
+      // (선택) 마케팅 수신 시에만 gender/birthDate 전달
+      if (this.isTerms.MARKETING) {
+        payload.gender    = this.userInfo.gender === 'MAN' ? 'M' : 'W';
+        payload.birthDate = this.$dayjs(this.userInfo.birthDate).format('YYYY-MM-DD');
+      }
+      payload.marketingPending  = false;
+      payload.isLocalResident   = this.form.region.state === '대전광역시';
+      payload.encodeData        = this.encodeData;
+
+      // 소셜 플로우면 validation 스킵
+      if (this.isSocialFlow) {
+        const { provider, snsToken } = this.snsInfo;
+        payload.snsType = provider;
+        payload.snsId   = snsToken;
+      } else {
+        // 이메일 가입은 validation 체크
+        if (!this.isValidate()) {
+          this.submitting = false;
+          return;
+        }
+        // 이메일·비밀번호 필드 추가
+        payload.email           = this.email;
+        payload.password        = this.password;
+      }
+
+      try {
+        const { token } = await this.$axios.$post('/user/auth/sign-up', payload);
+        // 토큰 저장 & 유저 정보 조회
+        this.$store.commit('service/auth/setAccessToken', token);
+        const userInfo = await this.$axios.$get('/user/account/info');
+        this.$store.commit('service/auth/setUserInfo', userInfo);
+        localStorage.removeItem('snsInfo');
+        this.$router.replace('/auth/register/register4');
+      } catch (err) {
+        const msg = err.response?.data?.MESSAGE;
+        // 이메일 중복 오류만 이메일 플로우에서 처리
+        if (!this.isSocialFlow && msg === 'DUPLICATE_EMAIL') {
+          this.feedback.email.isValid = false;
+          this.feedback.email.text    = '이미 사용중인 이메일입니다.';
+        }
+      } finally {
+        this.submitting = false;
       }
     },
     isValidate() {
@@ -383,8 +459,8 @@ p {
   .grid-wrap {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    margin-top: 4rem;
-    border-top: 1px solid var(--color-u-grey-2);
+    margin-top: 1.4rem;
+    border-top: 1px solid black;
     padding-top: 3.2rem;
     row-gap: 3.2rem;
     column-gap: 1.6rem;
@@ -408,6 +484,19 @@ p {
     text-align: left;
     line-height: 2.2rem;
     word-break: keep-all;
+  }
+}
+
+.add-info {
+  margin-top: 1.8rem;
+  p {
+    margin-top: 0rem;
+  }
+  .p1 {
+    font-size: 1.8rem; text-align: left; margin-bottom: 1.0rem; margin-top: 2.5rem;
+  }
+  .p2 {
+    font-size: 1.1rem; text-align: left;
   }
 }
 
@@ -451,7 +540,7 @@ p {
     }
 
     .grid-wrap {
-      margin-top: 3.2rem;
+      margin-top: 1.4rem;
       row-gap: 2.4rem;
       column-gap: 2.8rem;
     }
@@ -490,6 +579,19 @@ p {
       background: var(--color-black);
     }
   }
+
+  .add-info {
+    margin-top: 2.8rem;
+    p {
+      margin-top: 0rem;
+    }
+    .p1 {
+      font-size: 1.8rem; text-align: left; margin-bottom: 0.5rem; margin-top: 2.5rem;
+    }
+    .p2 {
+      font-size: 1.3rem; text-align: left;
+    }
+  }
 }
 
 .region-row {
@@ -501,7 +603,6 @@ p {
   flex: 1;
 }
 .region-input{
-  margin-top: 3.2rem;
   .error-msg {
     margin-top: 0.8rem;
     font-size: 1.4rem;
@@ -537,7 +638,7 @@ p {
 
   strong {
     margin-right: 0.5rem;
-    font-size: 1.7rem;
+    font-size: 1.4rem;
     font-weight: 700;
     line-height: 100%;
     transform: translateY(0.2rem);

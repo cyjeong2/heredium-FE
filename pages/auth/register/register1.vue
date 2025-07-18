@@ -94,10 +94,6 @@ export default {
       }
     },
   },
-  mounted() {
-    // 마케팅 동의 초기화
-    // localStorage.removeItem('isMarketing');
-  },
   methods: {
     async showTerm(target) {
       this.termTarget = target;
@@ -135,10 +131,10 @@ export default {
 
 h2 {
   margin: 3.0rem 0 2rem;
-  font-size: 3.0rem;
+  font-size: 2.7rem;
   font-weight: 700;
   text-align: center;
-  line-height: 4.0rem;
+  line-height: 0rem;
 }
 
 p {
@@ -235,9 +231,9 @@ p {
 
   p {
     margin-top: 2.4rem;
-    font-size: 2rem;
+    font-size: 1.7rem;
     line-height: 3rem;
-    text-align: left;
+    text-align: center;
   }
 
   .progress-bar {

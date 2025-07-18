@@ -1,12 +1,29 @@
 <template>
   <div>
-    <!-- 기존회원 초기 휴대폰 인증 & 마케팅 동의 팝업 -->
+    <!-- 1. 기존회원 초기 휴대폰 인증 모달 -->
     <MarketingPop
-          v-if="isShowMarketingPop && userInfo?.marketingPending && !userPhoneInfo"
-          :is-show="isShowMarketingPop"
-          @close="isShowMarketingPop = false"
-          @issued="onCouponIssued"
-        />
+      v-if="isShowMarketingPop && userInfo?.marketingPending && !userInfo.birthDate"
+      :is-show="isShowMarketingPop"
+      @close="onMarketingPopClose"
+      @issued="onMarketingPopClose"
+    />
+    <!-- 2. 멤버십1이나 멤버십3 등급 모달 -->
+    <NotificationModal
+      v-if="showNotificationModal && userInfo?.marketingPending"
+      :is-show="showNotificationModal"
+      :code="notificationCode"
+      @next="openAdditionalInfo"
+      @close="showNotificationModal = false"
+    />
+    <!-- @next="openAdditionalInfo" -->
+    <!-- 3. 마케팅 정보 수집 모달 -->
+    <AdditionalInfoModal
+      v-if="showAdditionalInfoModal && userInfo?.marketingPending"
+      :is-show="showAdditionalInfoModal"
+      @close="showAdditionalInfoModal = false"
+      @issued="onCouponIssued"
+    />
+    <!-- 4. 동의 회원 > 마케팅 동의 쿠폰 모달 -->
     <MarketingCoupon
       :is-show="showCouponModal"
       @close="showCouponModal = false"
@@ -146,11 +163,13 @@ import { getDateCommonDateOutput, numberPad } from '~/assets/js/commons';
 import UPopupModal from '~/components/user/modal/UPopupModal.vue';
 import MarketingPop from '~/components/user/modal/UMarketingModal.vue';
 import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
+import NotificationModal from '~/components/user/modal/NotificationModal.vue';
+import AdditionalInfoModal from '~/components/user/modal/AdditionalInfoModal.vue';
 
 export default {
   name: 'IndexPage',
-  components: { UPopupModal, UTag, MarketingPop, MarketingCoupon },
-  async asyncData({ $axios, query, redirect, req }) {
+  components: { UPopupModal, UTag, MarketingPop, MarketingCoupon, NotificationModal, AdditionalInfoModal },
+  async asyncData({ $axios, query, redirect, req, store }) {
     const mainData = await $axios.$get('/user/common/home');
 
     if (req?.body?.previewData) {
@@ -160,10 +179,15 @@ export default {
       mainData.popups = [];
     }
 
-    let userPhoneInfo = null
+    let userPhoneInfo = null;
+
+    // 이미 birthDate 가 채워진 유저라면(=> 한 번 처리된 유저) EncodeData 분기 스킵
+    const currentUser = store.getters['service/auth/getUserInfo'];
+    console.log('currentUser', currentUser)
+    const needsAuth = query.EncodeData && !currentUser?.birthDate;
 
     // 2) EncodeData 쿼리 감지
-    if (query.EncodeData) {
+    if (needsAuth) {
       try {
         // 복호화해서 userPhoneInfo 획득
         userPhoneInfo = await $axios
@@ -173,16 +197,30 @@ export default {
             }
           })
           .catch(() => {
-            redirect('/auth/register/register1');
+            redirect('/');
           });
+
+          // 2‑2) 유저 정보 업데이트 (PUT)
+          const payload = {
+            gender: userPhoneInfo.gender,
+            birthDate: userPhoneInfo.birthDate,
+            // …필요한 다른 필드
+            phone: userPhoneInfo.mobileNo,            // 새로 받은 번호
+            isLocalResident: false,
+            isMarketingReceive: false,
+            marketingPending: true,
+            additionalInfoAgreed: false,
+          };
+          const updated = await $axios.$put('/user/account/info', payload);
+
+          // 2‑3) 스토어 커밋
+          store.commit('service/auth/setUserInfo', updated);
+
+          // return redirect({ path: '/', query: {} });
       } catch {
         // 복호화 실패 시 홈으로 리다이렉트(혹은 에러 처리)
         redirect('/')
       }
-    }
-
-    if (query.failed) {
-      // 14세 미만 모달 띄우기
     }
 
     return { mainData, userPhoneInfo };
@@ -234,6 +272,9 @@ export default {
       isShowPopup: false,
       isShowMarketingPop: false,
       showCouponModal: false,
+      showNotificationModal: false,
+      showAdditionalInfoModal: false,
+      notificationCode: null,
     };
   },
   computed: {
@@ -245,6 +286,16 @@ export default {
     },
     userInfo() {
       return this.$store.getters['service/auth/getUserInfo'];
+    }
+  },
+  watch: {
+    userPhoneInfo: {
+      handler(newVal) {
+        if (!newVal) return;
+
+        this.handlePhoneInfo();
+      },
+      immediate: true
     }
   },
   created() {
@@ -262,10 +313,6 @@ export default {
           };
   },
   mounted() {
-    if (this.userPhoneInfo) {
-      console.log('📱 userPhoneInfo in mounted:', this.userPhoneInfo)
-    }
-
     if (!this.$cookies.get('mainPopupHide')) {
       this.isShowPopup = true;
     }
@@ -297,8 +344,40 @@ export default {
     onCouponIssued() {
       // when AdditionalInfoModal emits "issued", open the coupon modal
       this.showCouponModal = true;
-    }
-  }
+    },
+    onMarketingPopClose(code) {
+      this.isShowMarketingPop = false;
+      this.showNotificationModal = true;    // 2단계 열기
+    },
+    // 3단계에서 완료되면 쿠폰 모달
+    onAdditionalInfoIssued() {
+      this.showAdditionalInfoModal = false;
+      this.showCouponModal = true;          // 4단계 쿠폰 모달
+    },
+    // NotificationModal 'next' 눌렀을 때
+    openAdditionalInfo() {
+      this.showNotificationModal = false;
+      this.showAdditionalInfoModal = true;  // 3단계 열기
+    },
+    openCoupon() {
+      this.showNotificationModal = false;
+      this.showCouponModal = true;
+    },
+    handlePhoneInfo() {
+      // ② 생년월일로 나이 계산
+      const birth = this.$dayjs(this.userInfo?.birthDate, 'YYYY-MM-DD');
+      const today = this.$dayjs();
+      let age = today.year() - birth.year();
+      if (today.isBefore(birth.add(age, 'year'))) age--;
+
+      console.log('this.userInfo', this.userInfo)
+
+      // ③ 알림 코드 결정
+      this.notificationCode = age < 19 ? 3 : 1;
+      // ④ 알림 모달 열기
+      this.showNotificationModal = true;
+    },
+  },
 };
 </script>
 

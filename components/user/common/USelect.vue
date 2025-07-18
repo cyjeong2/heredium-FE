@@ -27,7 +27,7 @@
         @focusout="toggleOff"
         @change="onSelected"
       >
-        <option v-if="defaultText && !optionList[0]" :value="null" hidden>{{ defaultText }}</option>
+        <option v-if="defaultText" :value="null" hidden>{{ defaultText }}</option>
         <option v-for="item in optionList" :key="item.value" :value="item.value">{{ item.label }}</option>
       </select>
       <div class="dropdown-icon">
@@ -102,6 +102,9 @@ export default {
     let width = '';
 
     switch (this.wSize) {
+      case 'small':
+        width = '25rem';
+        break;
       case 'normal':
         width = '40rem';
         break;

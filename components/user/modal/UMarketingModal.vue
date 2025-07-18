@@ -3,13 +3,13 @@
   <div v-if="isShow" class="modal-wrap">
     <div class="modal-inner">
       <div class="head">
-        추가 정보 입력
+        핸드폰 인증
         <button type="button" @click="close"><i class="ic-close" /></button>
       </div>
       <div class="body" body-scroll-lock-ignore>
-      <h3 style="text-align: center; margin-bottom: 5rem; margin-top: 3.0rem;">멤버십 전환을 위해 추가 정보 입력이 필요합니다.</h3>
-        <form class="content-wrap" @submit.prevent="submitForm">
-          <!-- 지역 -->
+        <h3 style="text-align: center; margin-bottom: 5rem; margin-top: 3.0rem;">멤버십 전환을 위해
+        <br/>핸드폰 인증이 필요합니다.<br/> 인증을 완료하시면 혜택을 드립니다!</h3>
+        <!-- <form class="content-wrap" @submit.prevent="submitForm">
           <div class="input mb-13">
             <label>거주지</label>
             <div class="region-row">
@@ -31,21 +31,20 @@
               </div>
             </div>
           </div>
-          <!-- 마케팅 동의 -->
-          <!-- <div class="terms-area">
+          <div class="terms-area">
             <div class="form-group checkbox-group each-terms">
               <UCheckbox v-model="isTerms.MARKETING">
                 <strong>[선택]</strong>
                 <button type="button" @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
               </UCheckbox>
             </div>
-          </div> -->
-        </form>
+          </div>
+        </form> -->
       </div>
       <div class="foot">
         <!-- <UButton :disabled="!isTerms.MARKETING" @click="openPhoneModal">휴대폰 인증하고 혜택 받기</UButton> -->
-        <UButton @click="openPhoneModal">휴대폰 인증하고 혜택 받기</UButton>
-        <UButton button-type="secondary" @click="skipMarketing">다음에 하기</UButton>
+        <UButton button-type="secondary" @click="skipMarketing">취소</UButton>
+        <UButton @click="openPhoneModal">인증하기</UButton>
       </div>
     </div>
     <URegisterModal
@@ -58,7 +57,6 @@
     <UPhoneModal
       :is-show="showPhoneModal"
       @close="showPhoneModal = false"
-      @verified="onPhoneVerified"
     />
   </div>
   </transition>
@@ -67,7 +65,7 @@
 <script>
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import UButton from '~/components/user/common/UButton';
-import USelect from '~/components/user/common/USelect.vue';
+// import USelect from '~/components/user/common/USelect.vue';
 // import UCheckbox from '~/components/user/common/UCheckbox';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 import UPhoneModal from '~/components/user/modal/UPhoneModal.vue';
@@ -76,7 +74,7 @@ import { REGION_DATA } from '~/assets/js/types';
 export default {
   name: 'AdditionalInfoModal',
   // UCheckbox
-  components: { UButton, USelect, URegisterModal, UPhoneModal},
+  components: { UButton, URegisterModal, UPhoneModal },
   props: {
     isShow: { type: Boolean, default: false }
   },
@@ -135,39 +133,16 @@ export default {
     clearAllBodyScrollLocks();
   },
   methods: {
-    async submitForm() {
-      try {
-        const isLocal = (this.form.region.state === '대전광역시');
-
-        const payload = {
-          gender: this.form.gender,
-          birthDate: this.form.birthDate,
-          state: this.form.region.state,
-          district: this.form.region.district,
-          isLocalResident: isLocal,
-          isMarketingReceive: true,
-          marketingPending: false
-        };
-
-        const updated = await this.$axios.$put('/user/account/info', payload);
-
-        this.$store.commit('service/auth/setUserInfo', updated);
-        this.$emit('issued');
-        this.$emit('close');
-      } catch (err) {
-        console.error(err);
-      }
-    },
     async skipMarketing() {
       try {
         // 마케팅 동의 안 함(0)
-        await this.$axios.$put('/user/account/info', {
+        await this.$axios.$put('/user/account/marketing', {
           marketingPending: false,
           isMarketingReceive: false,
           isLocalResident: false,
+          additionalInfoAgreed: false,
         });
 
-        localStorage.removeItem('userInfo');
       } catch (err) {
         console.warn('마케팅 스킵 처리 실패', err);
       } finally {
@@ -203,11 +178,6 @@ export default {
     },
     openPhoneModal() {
       this.showPhoneModal = true;
-    },
-    onPhoneVerified() {
-      this.showPhoneModal = false;
-      // now do your existing submitForm() logic to save info & issue coupon
-      this.submitForm();
     },
   }
 };
