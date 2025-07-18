@@ -189,7 +189,8 @@ export default {
         isMileageModal: false,
         isConfirmSave: false
       },
-      isConfirmPending: false
+      isConfirmPending: false,
+      pendingRefundItem: null,
     };
   },
   methods: {
@@ -220,14 +221,16 @@ export default {
     getTypeText(code) {
       return MILEAGE_EVENT_TYPE[code] ?? '-';
     },
-    handleBeforeRefund() {
+    handleBeforeRefund(item) {
+      this.pendingRefundItem = item;
       this.modal.isConfirmSave = true;
     },
-    async handleRefund(item) {
+    async handleRefund() {
       try {
+        const recordId = this.pendingRefundItem.id;
         this.modal.isConfirmSave = false;
         // 백엔드에 취소 API 엔드포인트가 있다면 호출
-        await this.$axios.$post(`/admin/membershipMileage/${item.id}/refund`);
+        await this.$axios.$post(`/admin/membershipMileage/${recordId}/refund`);
 
         // 성공 후 테이블 새로고침
         const currentPage = this.tableData.pageable.pageNumber;
