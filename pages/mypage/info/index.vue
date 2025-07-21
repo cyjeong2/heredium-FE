@@ -6,7 +6,7 @@
         <h2>내 정보 수정</h2>
       </div>
       <div v-if="modify === false" class="my-info-body">
-        <p>계정 정보는 안전하게 보호되고 있어요. <br class="only-mobile" />수정을 원하면 비밀번호를 입력해주세요.</p>
+        <p class="account-info">계정 정보는 안전하게 보호되고 있어요. <br class="only-mobile" />수정을 원하면 비밀번호를 입력해주세요.</p>
         <UInput
           v-model="password"
           type="password"
@@ -101,13 +101,70 @@
           <!--            <td>성별</td>-->
           <!--            <td>{{ getGender(account.gender) }}</td>-->
           <!--          </tr>-->
-          <tr>
-            <td>지역주민</td>
-            <td><UCheckbox v-model="account.isLocalResident">대전에 살고 있어요!</UCheckbox></td>
-          </tr>
+          <!-- <tr> -->
+            <!-- <td>지역주민</td> -->
+            <!-- <td><UCheckbox v-model="account.isLocalResident">대전에 살고 있어요!</UCheckbox></td> -->
+          <!-- </tr> -->
         </table>
-        <div class="marketing-area">
-          <UCheckbox v-model="account.isMarketingReceive">마케팅 활용 동의 및 광고 수신 동의</UCheckbox>
+        <!-- <div class="marketing-area"> -->
+          <!-- <UCheckbox v-model="account.isMarketingReceive">마케팅 활용 동의 및 광고 수신 동의</UCheckbox> -->
+        <!-- </div> -->
+         <div class="add-info">
+          <p class="p1">추가 정보 입력</p>
+          <p class="p2">추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!</p>
+        </div>
+        <div class="grid-wrap">
+        </div>
+
+        <div class="add-input">
+          <div class="input job-input">
+            <label>직업</label>
+            <div style="margin-top: 1.2rem;">
+              <USelect
+                v-model="form.job"
+                :option-list="jobOptions"
+                default-text="선택"
+                w-size="full"
+              />
+            </div>
+          </div>
+
+          <div class="input city-input">
+            <label >지역</label>
+            <div style="margin-top: 1.2rem;">
+              <USelect
+                v-model="form.region.state"
+                :option-list="cityOptions"
+                w-size="full"
+                default-text="시/도 선택"
+              />
+            </div>
+          </div>
+          <div class="input district-input">
+            <USelect
+              v-model="form.region.district"
+              :option-list="districtOptions"
+              w-size="full"
+              default-text="시/군/구 선택"
+            />
+          </div>
+        </div>
+        <div class="terms-area">
+          <div class="each-terms">
+            <UCheckbox v-model="form.additionalInfoAgreed">
+              <strong>(선택)</strong> 추가 개인정보 수집 및 활용에 동의합니다.
+            </UCheckbox>
+            <UCheckbox v-model="isTerms.MARKETING">
+              <strong>(선택)</strong> 마케팅 정보 활용에 동의합니다.
+            </UCheckbox>
+          </div>
+          <div class="marketing-info">
+            <p>
+              고객(정보주체)의 개인정보보호 및 권리는
+              <strong>「개인정보보호법」</strong> 및 관계 법령에 따라 안전하게
+              관리하고 있습니다. <br/> 자세한 사항은 헤리디움 사이트에서 확인할 수 있습니다.
+            </p>
+          </div>
         </div>
         <div class="submit-area">
           <UButton w-size="100" @click="onSaveData">저장</UButton>
@@ -135,13 +192,14 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UInput from '~/components/user/common/UInput';
 import UButton from '~/components/user/common/UButton';
 import UDialogModal from '~/components/user/modal/UDialogModal';
+import USelect   from '~/components/user/common/USelect';
 import UCheckbox from '~/components/user/common/UCheckbox';
-import { GENDER_TYPE } from '~/assets/js/types';
 import { createFormElement } from '~/assets/js/commons';
+import { REGION_DATA, JOB_OPTIONS, GENDER_TYPE } from '~/assets/js/types';
 
 export default {
   name: 'MyPage',
-  components: { UInput, UButton, UCheckbox, UDialogModal, SideBarMyPage },
+  components: { UInput, UButton, UDialogModal, SideBarMyPage, USelect, UCheckbox },
   asyncData({ store, redirect }) {
     const isLogged = !!store.getters['service/auth/getAccessToken'];
 
@@ -179,7 +237,15 @@ export default {
           isValid: true,
           text: ''
         }
-      }
+      },
+      form: {
+        job: null,
+        region: { state: null, district: null },
+        additionalInfoAgreed: false
+      },
+      jobOptions: JOB_OPTIONS,
+      regionData: REGION_DATA,
+      isTerms: { MARKETING: false },
     };
   },
   async fetch() {
@@ -201,6 +267,26 @@ export default {
           isMarketingReceive: this.$route.params.isMarketingReceive === 'true'
         };
       }
+    }
+  },
+  computed: {
+    // table 렌더링용
+    cityOptions() {
+      return this.regionData.map(r => ({ value: r.state, label: r.state }));
+    },
+    districtOptions() {
+      const region = this.regionData.find(r => r.state === this.form.region.state);
+      return region
+        ? region.districts.map(d => ({ value: d, label: d }))
+        : [];
+    }
+  },
+  watch: {
+    'form.region.state'(newState) {
+      // 시 선택 시 첫 번째 군구 기본 설정
+      const opts = this.districtOptions;
+      this.form.region.district = opts.length ? opts[0].value : null;
+      this.feedback.region = { isValid: true, text: '' };
     }
   },
   created() {
@@ -320,8 +406,13 @@ export default {
             email: this.account.email,
             password: this.passwordChange ? this.newPassword1 : null,
             isLocalResident: this.account.isLocalResident,
-            isMarketingReceive: this.account.isMarketingReceive,
-            encodeData: this.$route.params.EncodeData
+            // isMarketingReceive: this.account.isMarketingReceive,
+            encodeData: this.$route.params.EncodeData,
+            job: this.form.job,
+            state: this.form.region.state,
+            district: this.form.region.district,
+            additionalInfoAgreed: this.form.additionalInfoAgreed,
+            isMarketingReceive: this.isTerms.MARKETING
           })
           .catch((err) => {
             const errorMessage = err.response.data?.MESSAGE || '';
@@ -404,13 +495,12 @@ h2 {
 
 .info-sec {
   .my-info-body {
-    p {
+    .account-info{
       margin: 2.4rem 0;
       font-size: 1.6rem;
       font-weight: 500;
       line-height: 2.6rem;
     }
-
     .input-wrap {
       margin-bottom: 2.4rem;
     }
@@ -542,7 +632,7 @@ h2 {
     }
 
     .my-info-body {
-      p {
+      .account-info{
         margin: 2rem 0 3.7rem;
         font-size: 2rem;
         line-height: 150%;
@@ -637,4 +727,164 @@ h2 {
     }
   }
 }
+
+/* ─── 추가 정보 입력 섹션 ───────────────────────────────── */
+.add-info {
+  margin-top: 1.8rem;
+  p {
+    margin-top: 0;
+  }
+  .p1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-align: left;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .p2 {
+    font-size: 1.1rem;
+    text-align: left;
+    margin-bottom: 1.3rem;
+  }
+}
+@media screen and (min-width: 768px) {
+  .add-info {
+    margin-top: 2.8rem;
+    .p1 {
+      margin-bottom: 1.5rem;
+    }
+    .p2 {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+/* ─── 두 칼럼 그리드 ───────────────────────────────────── */
+.grid-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid black;
+  padding-top: 2.2rem;
+  row-gap: 3.2rem;
+  column-gap: 1.6rem;
+}
+@media screen and (min-width: 768px) {
+  .grid-wrap {
+    row-gap: 2.4rem;
+    column-gap: 2.8rem;
+  }
+}
+
+/* ─── 지역 입력 ───────────────────────────────────────── */
+.region-row {
+  display: flex;
+  gap: 1.6rem;
+  margin-top: 1.2rem;
+}
+.region-input {
+  margin-bottom: 2.0rem;
+  .error-msg {
+    margin-top: 0.8rem;
+    font-size: 1.4rem;
+    color: var(--color-u-error);
+  }
+}
+
+/* ─── 동의 체크박스 & 안내 ──────────────────────────────── */
+.terms-area {
+  .each-terms {
+    display: flex;
+    flex-direction: column;
+    padding: 2.4rem 0;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--color-grey-1);
+    border-bottom: 1px solid var(--color-grey-1);
+    label + label {
+      margin-top: 2rem;
+    }
+    strong {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    p {
+      margin-top: 0.8rem;
+      font-size: 1.3rem;
+      margin-left: 3rem;
+    }
+  }
+  button {
+    margin-right: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-u-primary);
+  }
+  .marketing-info {
+    padding: 1.2rem;
+    margin-bottom: 2.5rem;
+    background-color: var(--color-grey-1);
+    border: 1px solid var(--color-grey-2);
+    border-radius: 0.3rem;
+    font-size: 1.4rem;
+    color: var(--color-grey-8);
+  }
+  @media screen and (max-width: 767px) {
+    .marketing-info {
+      padding: 0.8rem 1rem;
+    }
+  }
+}
+
+/* ─── .add-input 에 Grid 레이아웃 적용 ───────────────── */
+.add-input {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* 모바일: 한 칸 */
+  grid-template-rows: auto auto;/* 두 행 (직업 / 지역) */
+  gap: 1.6rem;                  /* 행 간격 */
+  width: 100%;
+}
+
+.add-input .job-input {
+  grid-column: 1/3;  /* 1열부터 3열 직전까지(=두 칸) */
+}
+
+.add-input .city-input {
+  grid-column: 1;      /* 왼쪽 */
+}
+.add-input .district-input {
+  grid-column: 2;      /* 오른쪽 */
+}
+
+/* PC(≥768px) 전용: 2열, 2행 그리드 */
+@media screen and (min-width: 768px) {
+  .add-input {
+    grid-template-columns: 1fr 1fr; /* 두 칸(각각 50%) */
+    grid-template-rows: auto auto;  /* 첫째행=직업, 둘째행=지역 */
+    width: 50%;
+  }
+  /* 첫째 행: job-input 이 두 칸을 모두 차지 */
+  .add-input .job-input {
+    grid-column: 1 / 3;  /* 1열부터 3열 직전까지(=두 칸) */
+  }
+  /* 둘째 행: city-input 은 왼쪽 칸, district-input 은 오른쪽 칸 */
+  .add-input .city-input {
+    grid-column: 1;      /* 왼쪽 */
+  }
+  .add-input .district-input {
+    grid-column: 2;      /* 오른쪽 */
+  }
+}
+
+/* ─── 시군구 레이블 숨기기 ───────────────────────────── */
+.district-input > label {
+  display: none;
+}
+
+/* ─── 시군구 셀렉트와 시/도 셀렉트 높이 정렬 ─────────── */
+.district-input {
+  /* USelect 컴포넌트가 .u-select 라는 클래스라 가정했을 때 예시 */
+  margin-top: 3.4rem;   /* 레이블 아래에서 동일 간격 */
+}
+
+
 </style>

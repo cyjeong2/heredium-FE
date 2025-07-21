@@ -211,7 +211,7 @@ export default {
         region: { isValid: true, text: '' }
       },
       form: {
-        region: { state: '대전광역시', district: '동구' },
+        region: { state: null, district: null },
         job: null,
         additionalInfoAgreed: false,
       },
