@@ -4,6 +4,7 @@
     <section class="info-sec">
       <div class="my-info-head">
         <h2>내 정보 수정</h2>
+        <div v-if="modify === false" class="grid-wrap"></div>
       </div>
       <div v-if="modify === false" class="my-info-body">
         <p class="account-info">계정 정보는 안전하게 보호되고 있어요. <br class="only-mobile" />수정을 원하면 비밀번호를 입력해주세요.</p>
@@ -18,6 +19,10 @@
         <UButton w-size="100" @click="onPasswordConfirm">확인</UButton>
       </div>
       <div v-else class="my-info-body">
+        <div class="add-info">
+          <p class="p1">회원 정보</p>
+        </div>
+        <div class="grid-wrap"></div>
         <table>
           <tr>
             <td>아이디</td>
@@ -88,8 +93,11 @@
             <td>휴대폰 번호</td>
             <td>
               {{ getPhone(account.phone) }}
-              <div>
+              <div v-if="currentUser.birthDate == null">
                 <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 번호 변경</UButton>
+              </div>
+              <div v-else>
+                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 인증</UButton>
               </div>
             </td>
           </tr>
@@ -109,14 +117,17 @@
         <!-- <div class="marketing-area"> -->
           <!-- <UCheckbox v-model="account.isMarketingReceive">마케팅 활용 동의 및 광고 수신 동의</UCheckbox> -->
         <!-- </div> -->
-         <div class="add-info">
+        <div class="add-info">
           <p class="p1">추가 정보 입력</p>
           <p class="p2">추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!</p>
         </div>
-        <div class="grid-wrap">
+        <div class="grid-wrap"></div>
+        <div>
+          <UCheckbox v-model="form.additionalInfoAgreed">
+            <strong>(선택)</strong>&nbsp;추가 개인정보 수집 및 활용에 동의합니다.
+          </UCheckbox>
         </div>
-
-        <div class="add-input">
+        <div v-if="form.additionalInfoAgreed" class="add-input">
           <div class="input job-input">
             <label>직업</label>
             <div style="margin-top: 1.2rem;">
@@ -151,11 +162,8 @@
         </div>
         <div class="terms-area">
           <div class="each-terms">
-            <UCheckbox v-model="form.additionalInfoAgreed">
-              <strong>(선택)</strong> 추가 개인정보 수집 및 활용에 동의합니다.
-            </UCheckbox>
             <UCheckbox v-model="isTerms.MARKETING">
-              <strong>(선택)</strong> 마케팅 정보 활용에 동의합니다.
+              <strong>(선택)</strong>&nbsp;마케팅 정보 활용에 동의합니다.
             </UCheckbox>
           </div>
           <div class="marketing-info">
@@ -178,11 +186,17 @@
         </template>
       </UDialogModal>
       <UDialogModal no-scroll-lock :is-show="modal.isSave">
-        <template #content>저장되었어요.</template>
+        <template #content>저장 완료</template>
         <template #modal-btn2>
           <UButton w-size="100" button-type="primary" @click="onConfirmModal">확인</UButton>
         </template>
       </UDialogModal>
+      <!-- 발급 쿠폰 모달 -->
+      <!-- <MarketingCoupon
+        :is-show="couponModalVisible"
+        :coupons="issuedCoupons"
+        @close="couponModalVisible = false"
+      /> -->
     </section>
   </main>
 </template>
@@ -196,9 +210,11 @@ import USelect   from '~/components/user/common/USelect';
 import UCheckbox from '~/components/user/common/UCheckbox';
 import { createFormElement } from '~/assets/js/commons';
 import { REGION_DATA, JOB_OPTIONS, GENDER_TYPE } from '~/assets/js/types';
+// import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
 
 export default {
   name: 'MyPage',
+  // MarketingCoupon
   components: { UInput, UButton, UDialogModal, SideBarMyPage, USelect, UCheckbox },
   asyncData({ store, redirect }) {
     const isLogged = !!store.getters['service/auth/getAccessToken'];
@@ -241,11 +257,14 @@ export default {
       form: {
         job: null,
         region: { state: null, district: null },
-        additionalInfoAgreed: false
+        additionalInfoAgreed: false,
+        marketingAgreedDate: null,
       },
       jobOptions: JOB_OPTIONS,
       regionData: REGION_DATA,
       isTerms: { MARKETING: false },
+      couponModalVisible: false,
+      issuedCoupons: [],
     };
   },
   async fetch() {
@@ -270,6 +289,9 @@ export default {
     }
   },
   computed: {
+    currentUser() {
+      return this.$store.getters['service/auth/getUserInfo']
+    },
     // table 렌더링용
     cityOptions() {
       return this.regionData.map(r => ({ value: r.state, label: r.state }));
@@ -285,11 +307,25 @@ export default {
     'form.region.state'(newState) {
       // 시 선택 시 첫 번째 군구 기본 설정
       const opts = this.districtOptions;
-      this.form.region.district = opts.length ? opts[0].value : null;
-      this.feedback.region = { isValid: true, text: '' };
+      if(!this.currentUser.district){
+        this.form.region.district = opts.length ? opts[0].value : null;
+      }
+      // this.feedback.region = { isValid: true, text: '' };
     }
   },
   created() {
+
+    if (this.currentUser) {
+      // and seed your 추가 정보 form
+      this.form.job                  = this.currentUser.job
+      this.form.region.state         = this.currentUser.state
+      this.form.region.district      = this.currentUser.district
+      this.form.additionalInfoAgreed = this.currentUser.additionalInfoAgreed
+      this.isTerms.MARKETING         = this.currentUser.isMarketingReceive
+      this.account.isLocalResident   = this.currentUser.isLocalResident
+      this.form.marketingAgreedDate  = this.currentUser.marketingAgreedDate
+    }
+
     this.$nextTick(() => {
       this.SNSLoginType = this.$store.getters['service/auth/getUserInfo']?.provider;
       this.isSNSLogin = this.SNSLoginType !== 'EMAIL';
@@ -401,18 +437,22 @@ export default {
     },
     async onSaveData() {
       if (this.isValidate()) {
+        const isLocal = (this.form.region.state === '대전광역시');
+
         const res = await this.$axios
           .$put('/user/account', {
             email: this.account.email,
             password: this.passwordChange ? this.newPassword1 : null,
-            isLocalResident: this.account.isLocalResident,
+            isLocalResident: isLocal,
             // isMarketingReceive: this.account.isMarketingReceive,
             encodeData: this.$route.params.EncodeData,
             job: this.form.job,
             state: this.form.region.state,
             district: this.form.region.district,
             additionalInfoAgreed: this.form.additionalInfoAgreed,
-            isMarketingReceive: this.isTerms.MARKETING
+            isMarketingReceive: this.isTerms.MARKETING,
+            marketingAgreedDate: this.form.marketingAgreedDate,
+            marketingPending: false,
           })
           .catch((err) => {
             const errorMessage = err.response.data?.MESSAGE || '';
@@ -421,10 +461,21 @@ export default {
               this.feedback.email.text = '중복된 이메일 입니다.';
             }
           });
+
         if (res) {
           this.account.email = res.email;
+
+          // 추가 정보
+          this.form.job                      = res.job;
+          this.form.region.state             = res.state;
+          this.form.region.district          = res.district;
+          this.form.additionalInfoAgreed     = res.additionalInfoAgreed;
+          this.isTerms.MARKETING             = res.isMarketingReceive;
+
+          this.issuedCoupons = res.coupons || [];
           this.modal.isSave = true;
           this.$store.commit('service/auth/setUserInfo', res);
+
         }
       }
     },
@@ -446,7 +497,15 @@ export default {
       this.passwordChange = false;
       this.emailChange = false;
       this.modal.isSave = false;
-    }
+
+      if (this.issuedCoupons.length > 0) {
+        this.couponModalVisible = true;
+      }
+    },
+    closeCouponModal() {
+      this.couponModalVisible = false;
+      this.issuedCoupons = [];
+    },
   }
 };
 </script>
@@ -461,7 +520,7 @@ h1 {
 
 h2 {
   padding-bottom: 1.3rem;
-  border-bottom: 0.1rem solid var(--color-black);
+  border-bottom: none;
   font-size: 1.8rem;
   font-weight: 700;
   line-height: 1.8rem;
@@ -821,7 +880,7 @@ h2 {
   }
   .marketing-info {
     padding: 1.2rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 3.5rem;
     background-color: var(--color-grey-1);
     border: 1px solid var(--color-grey-2);
     border-radius: 0.3rem;
@@ -831,6 +890,7 @@ h2 {
   @media screen and (max-width: 767px) {
     .marketing-info {
       padding: 0.8rem 1rem;
+      margin-bottom: 2.5rem;
     }
   }
 }
@@ -842,6 +902,7 @@ h2 {
   grid-template-rows: auto auto;/* 두 행 (직업 / 지역) */
   gap: 1.6rem;                  /* 행 간격 */
   width: 100%;
+  margin-top: 20px;
 }
 
 .add-input .job-input {

@@ -8,7 +8,6 @@
             <i class="ic-close" />
           </button>
         </div>
-
         <div class="body">
           <div class="guide-content">
             <div class="guide-icon-div">
@@ -24,14 +23,16 @@
               </div>
             </div>
             <div class="guide-text">
-              <p>{{ code === 3 ? 'Green 회원으로 자동 전환됩니다.'  : 'Brown 회원으로 자동 전환됩니다.' }}</p>
+              <p>나이 기준에 따라 {{ code === 3 ? 'Green'  : 'Brown' }} 회원으로 전환됩니다.</p>
               <p>Mypage에서 혜택을 확인할 수 있습니다.</p>
             </div>
           </div>
         </div>
 
         <div class="foot">
-          <UButton w-size='100' button-type="secondary" @click="$emit('next')">다음</UButton>
+          <UButton w-size='100' button-type="secondary" @click="$emit('next')">
+            {{ canNext ? '추가 정보 입력하고 혜택 받기' : '완료' }}
+          </UButton>
         </div>
       </div>
     </div>
@@ -47,7 +48,8 @@ export default {
   props: {
     isShow: { type: Boolean, required: true },
     title: { type: String, default: '등급 전환 안내' },
-    code: { type: Number, required: true }
+    code: { type: Number, required: true },
+    canNext:  { type: Boolean, default: false }
   },
   emits: ['close', 'next'],
   methods: {
@@ -85,7 +87,7 @@ export default {
   width: 100%; height: 100%;
   background: #fff;
   @media screen and (min-width: 769px) {
-    width: 60.4rem;
+    width: 45.4rem;
     height: auto;
     position: absolute;
     top: 50%; left: 50%;
@@ -134,7 +136,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.2rem;
+    gap: 2.5rem;
   }
   .guide-icon-div {
     width: 100%;

@@ -16,43 +16,45 @@
             추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!
           </div>
           <hr class="divider" />
-
-          <!-- 직업 입력 -->
-          <div class="form-group">
-            <label for="jobSelect">직업</label>
-            <USelect
-              id="jobSelect"
-              v-model="form.job"
-              :option-list="jobOptions"
-              default-text="선택"
-              w-size="full"
-            />
-          </div>
-
-          <!-- 지역 입력 -->
-          <div class="form-group region">
-            <label>지역</label>
-            <div class="region-selects">
-              <USelect
-                v-model="form.region.state"
-                :option-list="stateOptions"
-                default-text="시/도 선택"
-                w-size="full"
-              />
-              <USelect
-                v-model="form.region.district"
-                :option-list="districtOptions"
-                default-text="시/군/구 선택"
-                w-size="full"
-              />
-            </div>
-          </div>
-
-          <!-- 동의 항목 -->
-          <div class="terms-area">
+          <div>
             <UCheckbox v-model="form.additionalInfoAgreed">
               <strong>(선택)</strong> 추가 개인정보 수집 및 활용에 동의합니다.
             </UCheckbox>
+          </div>
+          <div v-if="form.additionalInfoAgreed" class="add-input">
+            <!-- 직업 입력 -->
+            <div class="form-group">
+              <label for="jobSelect">직업</label>
+              <USelect
+                id="jobSelect"
+                v-model="form.job"
+                :option-list="jobOptions"
+                default-text="선택"
+                w-size="full"
+              />
+            </div>
+
+            <!-- 지역 입력 -->
+            <div class="form-group region">
+              <label>지역</label>
+              <div class="region-selects">
+                <USelect
+                  v-model="form.region.state"
+                  :option-list="stateOptions"
+                  default-text="시/도 선택"
+                  w-size="full"
+                />
+                <USelect
+                  v-model="form.region.district"
+                  :option-list="districtOptions"
+                  default-text="시/군/구 선택"
+                  w-size="full"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- 동의 항목 -->
+          <div class="terms-area">
             <UCheckbox v-model="form.agreeMarketing">
               <strong>(선택)</strong> 마케팅 정보 활용에 동의합니다.
             </UCheckbox>
@@ -135,10 +137,10 @@ export default {
         additionalInfoAgreed: true,
       };
 
-      const updated = await this.$axios.$put('/user/account/marketing', payload);
-      this.$store.commit('service/auth/setUserInfo', updated);
+      const res = await this.$axios.$put('/user/account/marketing', payload);
+      this.$store.commit('service/auth/setUserInfo', res);
 
-      this.$emit('issued', { ...this.form });
+      this.$emit('issued', res.coupons || []);
       this.$emit('close');
     },
     async skipMarketing() {
@@ -202,21 +204,21 @@ export default {
     padding: 2.4rem 3.6rem;
   }
   .subtitle {
-    font-size: 1.6rem; line-height:1.4; margin-bottom:1rem;
+    font-size: 1.6rem; line-height:1.4; margin-bottom:2rem;
   }
   .divider {
     border: none; border-top:1px solid var(--color-u-grey-1); margin-bottom:2rem;
   }
   .form-group {
-    margin-bottom: 2rem;
+    margin-top: 1.5rem;
     label { display:block; margin-bottom:0.8rem; font-size:1.4rem; }
     &.region .region-selects {
       display:flex; gap:1.6rem;
     }
   }
   .terms-area {
-    display:flex; flex-direction:column; gap:1rem;
-    margin-top: 1rem;
+    display:flex; flex-direction:column; gap:2rem;
+    margin-top: 2rem;
     .marketing-info {
       padding: 1.2rem 1.2rem;
       background-color: var(--color-grey-1);

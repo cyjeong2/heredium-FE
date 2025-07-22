@@ -8,23 +8,26 @@
     <p>헤레디움의 다양한 전시 프로그램을 만나보세요.</p>
     <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">시작</ULink>
     <!-- 쿠폰 모달 -->
-    <MarketingCoupon
+    <!-- <MarketingCoupon
       :is-show="showCouponModal"
+      :coupons="coupons"
       @close="closeCouponModal"
-    />
+    /> -->
   </main>
 </template>
 
 <script>
 import ULink from '~/components/user/common/ULink';
-import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
+// import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
 
 export default {
   name: 'Register4Page',
-  components: { ULink, MarketingCoupon },
+  // MarketingCoupon
+  components: { ULink },
   data() {
     return {
       showCouponModal: false,
+      // coupons: [],
     };
   },
   mounted() {
@@ -35,6 +38,20 @@ export default {
     }
     localStorage.removeItem('isMarketing');
   },
+  // created() {
+  //   // 1) 쿼리로 넘어온 coupons(JSON)를 파싱
+  //   const raw = this.$route.query.coupons;
+  //   if (raw) {
+  //     try {
+  //       this.coupons = JSON.parse(decodeURIComponent(raw));
+  //       if (this.coupons.length > 0) {
+  //         this.showCouponModal = true;
+  //       }
+  //     } catch (err) {
+  //       console.warn('쿠폰 데이터 파싱 실패:', err);
+  //     }
+  //   }
+  // },
   methods: {
     closeCouponModal() {
       this.showCouponModal = false;

@@ -4,11 +4,18 @@
     <div class="modal-inner">
       <div class="head">
         핸드폰 인증
-        <button type="button" @click="close"><i class="ic-close" /></button>
+        <button type="button" @click="skipMarketing"><i class="ic-close" /></button>
       </div>
       <div class="body" body-scroll-lock-ignore>
-        <h3 style="text-align: center; margin-bottom: 5rem; margin-top: 3.0rem;">멤버십 전환을 위해
-        <br/>핸드폰 인증이 필요합니다.<br/> 인증을 완료하시면 혜택을 드립니다!</h3>
+        <h3 style="text-align: center; margin-bottom: 3rem; margin-top: 3.0rem;">멤버십 전환을 위해
+        <br/>핸드폰 인증이 필요합니다.</h3>
+
+        <div class="term-select" style="text-align: center;">
+          <UCheckbox v-model="isTerms.AGREE">
+            <strong>[필수]</strong>
+            <button @click="showTerm('AGREE')">&nbsp;개인정보 수집 및 이용동의서</button> 동의</UCheckbox
+          >
+        </div>
         <!-- <form class="content-wrap" @submit.prevent="submitForm">
           <div class="input mb-13">
             <label>거주지</label>
@@ -44,7 +51,7 @@
       <div class="foot">
         <!-- <UButton :disabled="!isTerms.MARKETING" @click="openPhoneModal">휴대폰 인증하고 혜택 받기</UButton> -->
         <UButton button-type="secondary" @click="skipMarketing">취소</UButton>
-        <UButton @click="openPhoneModal">인증하기</UButton>
+        <UButton :disabled="!isTerms.AGREE" @click="openPhoneModal">인증하기</UButton>
       </div>
     </div>
     <URegisterModal
@@ -66,15 +73,14 @@
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import UButton from '~/components/user/common/UButton';
 // import USelect from '~/components/user/common/USelect.vue';
-// import UCheckbox from '~/components/user/common/UCheckbox';
+import UCheckbox from '~/components/user/common/UCheckbox';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 import UPhoneModal from '~/components/user/modal/UPhoneModal.vue';
 import { REGION_DATA } from '~/assets/js/types';
 
 export default {
   name: 'AdditionalInfoModal',
-  // UCheckbox
-  components: { UButton, URegisterModal, UPhoneModal },
+  components: { UButton, URegisterModal, UPhoneModal, UCheckbox },
   props: {
     isShow: { type: Boolean, default: false }
   },
@@ -88,7 +94,8 @@ export default {
       regionData: REGION_DATA,
       beforeScroll: 0,
       isTerms: {
-        MARKETING: true
+        // MARKETING: true,
+        AGREE: false,
       },
       modal: {
         isTerms: false,
@@ -114,8 +121,8 @@ export default {
       this.form.region.district = region && region.districts.length
         ? region.districts[0]
         : '';
-      this.feedback.region.isValid = true;
-      this.feedback.region.text = '';
+      // this.feedback.region.isValid = true;
+      // this.feedback.region.text = '';
     },
     isShow(val) {
       if (val) {
@@ -244,17 +251,17 @@ export default {
 }
 @media screen and (min-width: 769px) {
   .modal-inner {
-    width: 60.4rem; height: auto;
+    width: 44.4rem; height: auto;
     margin: auto; top: 50%; left: 50%;
     position: absolute; transform: translate(-50%,-50%);
     box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
     .head { padding: 3.2rem 3.6rem; font-size: 2.4rem; }
     .body {
       max-height: 40.8rem;
-      padding: 2.4rem 3.6rem;
+      padding: 1.4rem 3.6rem;
       .content-wrap { background: rgba(235,235,235,0.4); overflow-y: auto; padding: 2.4rem; }
     }
-    .foot { position: static; padding: 0 3.2rem 3.6rem; margin-top: 3.6rem; }
+    .foot { position: static; padding: 0 3.2rem 3.6rem; margin-top: 2.5rem; }
   }
 }
 
@@ -297,5 +304,15 @@ export default {
 }
 .region-row .region-col {
   flex: 1;
+}
+
+.term-select {
+  button {
+    margin-right: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-u-primary);
+    line-height: 150%;
+  }
 }
 </style>

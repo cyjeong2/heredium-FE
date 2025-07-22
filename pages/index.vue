@@ -4,30 +4,31 @@
     <MarketingPop
       v-if="isShowMarketingPop && userInfo?.marketingPending && !userInfo.birthDate"
       :is-show="isShowMarketingPop"
-      @close="onMarketingPopClose"
-      @issued="onMarketingPopClose"
+      @close="handleMarketingSkipped"
     />
     <!-- 2. 멤버십1이나 멤버십3 등급 모달 -->
     <NotificationModal
       v-if="showNotificationModal && userInfo?.marketingPending"
       :is-show="showNotificationModal"
       :code="notificationCode"
+      :can-next="notificationCanNext"
       @next="openAdditionalInfo"
       @close="showNotificationModal = false"
     />
     <!-- @next="openAdditionalInfo" -->
     <!-- 3. 마케팅 정보 수집 모달 -->
     <AdditionalInfoModal
-      v-if="showAdditionalInfoModal && userInfo?.marketingPending"
+      v-if="showAdditionalInfoModal && userInfo?.marketingPending && userInfo.birthDate"
       :is-show="showAdditionalInfoModal"
       @close="showAdditionalInfoModal = false"
       @issued="onCouponIssued"
     />
     <!-- 4. 동의 회원 > 마케팅 동의 쿠폰 모달 -->
-    <MarketingCoupon
+    <!-- <MarketingCoupon
       :is-show="showCouponModal"
+      :coupons="issuedCoupons"
       @close="showCouponModal = false"
-    />
+    /> -->
     <client-only>
       <section>
         <Swiper ref="mainSwiper" :options="mainSwiperOption" class="main-slider" @slideChange="onMainSlideChange">
@@ -162,13 +163,14 @@ import UTag from '~/components/user/common/UTag';
 import { getDateCommonDateOutput, numberPad } from '~/assets/js/commons';
 import UPopupModal from '~/components/user/modal/UPopupModal.vue';
 import MarketingPop from '~/components/user/modal/UMarketingModal.vue';
-import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
+// import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
 import NotificationModal from '~/components/user/modal/NotificationModal.vue';
 import AdditionalInfoModal from '~/components/user/modal/AdditionalInfoModal.vue';
 
 export default {
   name: 'IndexPage',
-  components: { UPopupModal, UTag, MarketingPop, MarketingCoupon, NotificationModal, AdditionalInfoModal },
+  // MarketingCoupon
+  components: { UPopupModal, UTag, MarketingPop, NotificationModal, AdditionalInfoModal },
   async asyncData({ $axios, query, redirect, req, store }) {
     const mainData = await $axios.$get('/user/common/home');
 
@@ -183,7 +185,6 @@ export default {
 
     // 이미 birthDate 가 채워진 유저라면(=> 한 번 처리된 유저) EncodeData 분기 스킵
     const currentUser = store.getters['service/auth/getUserInfo'];
-    console.log('currentUser', currentUser)
     const needsAuth = query.EncodeData && !currentUser?.birthDate;
 
     // 2) EncodeData 쿼리 감지
@@ -275,6 +276,8 @@ export default {
       showNotificationModal: false,
       showAdditionalInfoModal: false,
       notificationCode: null,
+      notificationCanNext: true,
+      issuedCoupons: [],
     };
   },
   computed: {
@@ -341,8 +344,12 @@ export default {
     goExDetail(item) {
       this.$router.push(`/${item.kind.toLowerCase()}/${item.id}`);
     },
-    onCouponIssued() {
-      // when AdditionalInfoModal emits "issued", open the coupon modal
+    onCouponIssued(coupons) {
+      // 3번 팝업에서 넘어온 쿠폰 리스트 저장
+      this.issuedCoupons = coupons;
+      // 3번 팝업 닫고
+      this.showAdditionalInfoModal = false;
+      // 4번 쿠폰 모달 열기
       this.showCouponModal = true;
     },
     onMarketingPopClose(code) {
@@ -369,13 +376,16 @@ export default {
       const today = this.$dayjs();
       let age = today.year() - birth.year();
       if (today.isBefore(birth.add(age, 'year'))) age--;
-
-      console.log('this.userInfo', this.userInfo)
-
       // ③ 알림 코드 결정
       this.notificationCode = age < 19 ? 3 : 1;
       // ④ 알림 모달 열기
       this.showNotificationModal = true;
+    },
+    // 1‑1. 팝업에서 "취소/닫기" 눌렀을 때
+    handleMarketingSkipped() {
+      this.isShowMarketingPop = false;
+      this.notificationCanNext  = false;           // 다음 버튼 숨김
+      this.showNotificationModal = true;           // NotificationModal 열기
     },
   },
 };

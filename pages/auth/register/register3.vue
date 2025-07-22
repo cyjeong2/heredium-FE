@@ -74,54 +74,53 @@
           <p class="p2">추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!</p>
         </div>
         <div class="grid-wrap"></div>
-
-        <div class="input region-input">
-          <label>직업</label>
-          <div style="margin-top: 1.2rem;">
-            <USelect
-              v-model="form.job"
-              :option-list="jobOptions"
-              default-text="선택"
-              w-size="full"
-            />
-          </div>
+        <div>
+          <UCheckbox v-model="form.additionalInfoAgreed">
+            <strong>(선택)</strong>&nbsp;추가 개인정보 수집 및 활용에 동의합니다.
+          </UCheckbox>
         </div>
-
-        <div class="input region-input">
-          <label>지역</label>
-          <div class="region-row">
-            <div class="region-col">
+        <div v-if="form.additionalInfoAgreed" class="add-input">
+          <div class="input region-input">
+            <label>직업</label>
+            <div style="margin-top: 1.2rem;">
               <USelect
-                v-model="form.region.state"
-                :option-list="cityOptions"
+                v-model="form.job"
+                :option-list="jobOptions"
+                default-text="선택"
                 w-size="full"
-                default-text="시/도 선택"
-              />
-            </div>
-            <div class="region-col">
-              <USelect
-                v-model="form.region.district"
-                :option-list="districtOptions"
-                w-size="full"
-                default-text="시/군/구 선택"
               />
             </div>
           </div>
-          <p v-if="!feedback.region.isValid" class="error-msg">
-            {{ feedback.region.text }}
-          </p>
+
+          <div class="input region-input">
+            <label>지역</label>
+            <div class="region-row">
+              <div class="region-col">
+                <USelect
+                  v-model="form.region.state"
+                  :option-list="cityOptions"
+                  w-size="full"
+                  default-text="시/도 선택"
+                />
+              </div>
+              <div class="region-col">
+                <USelect
+                  v-model="form.region.district"
+                  :option-list="districtOptions"
+                  w-size="full"
+                  default-text="시/군/구 선택"
+                />
+              </div>
+            </div>
+            <!-- <p v-if="!feedback.region.isValid" class="error-msg">
+              {{ feedback.region.text }}
+            </p> -->
+          </div>
         </div>
         <div class="terms-area">
           <div class="each-terms">
-            <!-- <UCheckbox v-model="isTerms.MARKETING">
-              <strong>[선택]</strong>
-              <button @click="showTerm('MARKETING')">마케팅 활용 동의 및 광고 수집</button> 동의
-            </UCheckbox> -->
-            <UCheckbox v-model="form.additionalInfoAgreed">
-              <strong>(선택)</strong> 추가 개인정보 수집 및 활용에 동의합니다.
-            </UCheckbox>
             <UCheckbox v-model="isTerms.MARKETING">
-              <strong>(선택)</strong> 마케팅 정보 활용에 동의합니다.
+              <strong>(선택)</strong>&nbsp;마케팅 정보 활용에 동의합니다.
             </UCheckbox>
           </div>
           <div class="marketing-info">
@@ -208,7 +207,7 @@ export default {
           isValid: true,
           text: ''
         },
-        region: { isValid: true, text: '' }
+        // region: { isValid: true, text: '' }
       },
       form: {
         region: { state: null, district: null },
@@ -262,8 +261,8 @@ export default {
       this.form.region.district = region && region.districts.length
         ? region.districts[0]
         : '';
-      this.feedback.region.isValid = true;
-      this.feedback.region.text = '';
+      // this.feedback.region.isValid = true;
+      // this.feedback.region.text = '';
     }
   },
   beforeMount() {
@@ -375,14 +374,14 @@ export default {
       }
 
       // region 검증
-      if (!this.form.region.state) {
-        this.feedback.region.isValid = false;
-        this.feedback.region.text = '시/도를 선택해주세요.';
-      }
-      else if (!this.form.region.district) {
-        this.feedback.region.isValid = false;
-        this.feedback.region.text = '시/군/구를 선택해주세요.';
-      }
+      // if (!this.form.region.state) {
+      //   this.feedback.region.isValid = false;
+      //   this.feedback.region.text = '시/도를 선택해주세요.';
+      // }
+      // else if (!this.form.region.district) {
+      //   this.feedback.region.isValid = false;
+      //   this.feedback.region.text = '시/군/구를 선택해주세요.';
+      // }
 
       return isClearForm();
     },
@@ -461,7 +460,7 @@ p {
     grid-template-columns: 1fr 1fr;
     margin-top: 1.4rem;
     border-top: 1px solid black;
-    padding-top: 3.2rem;
+    padding-top: 2.2rem;
     row-gap: 3.2rem;
     column-gap: 1.6rem;
 
@@ -637,7 +636,6 @@ p {
   }
 
   strong {
-    margin-right: 0.5rem;
     font-size: 1.4rem;
     font-weight: 700;
     line-height: 100%;
@@ -647,10 +645,11 @@ p {
   .each-terms {
     display: flex;
     flex-direction: column;
-    padding: 2.4rem 0;
+    padding: 2.0rem 0;
     margin-bottom: 2rem;
     border-top: 1px solid var(--color-grey-1);
     border-bottom: 1px solid var(--color-grey-1);
+    margin-top: 2rem;
 
     label + label {
       margin-top: 2rem;
@@ -668,7 +667,6 @@ p {
   }
 
   button {
-    margin-right: 0.5rem;
     font-size: 1.4rem;
     font-weight: 700;
     color: var(--color-u-primary);
@@ -706,5 +704,9 @@ p {
       text-align: left;
     }
   }
+}
+
+.add-input {
+  margin-top: 20px;
 }
 </style>

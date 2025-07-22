@@ -4,11 +4,26 @@
       <div class="head">{{ title }}</div>
       <div class="body" body-scroll-lock-ignore>
         <div class="content-wrap">
-          <!-- <img src="~assets/img/pc/logo.svg" alt="HEREDIUM 로고" class="logo" width="130" height="120" /> -->
-          <p class="coupon-name">{{ couponName }}</p>
-          <p class="market-note">{{ marketNote }}</p>
-          <p class="note">{{ note }}</p>
+          <!-- coupons 배열을 v-for 로 반복 -->
+          <div
+            v-for="coupon in coupons"
+            :key="coupon.id"
+            class="coupon-item"
+          >
+            <img
+              :src="`${$store.state.BASE_URL}${coupon?.imageUrl}`"
+              :alt="coupon?.name"
+              class="coupon-card"
+              style="width: 65px; height: 65px;"
+            />
+            <p class="coupon-name">[{{ coupon?.name }}] 쿠폰 발급!</p>
+            <!-- <img src="~assets/img/pc/logo.svg" alt="HEREDIUM 로고" class="logo" width="130" height="120" /> -->
+          </div>
         </div>
+        <p style='font-size: 2.0rem; font-weight: 600; text-align: center;' class="note">
+          발급된 쿠폰은 [Mypage → 쿠폰함] 에서 <br/> 확인 가능합니다.
+        </p>
+        <p style='text-align: center; margin-top: 15px;' class="market-note">{{ marketNote }}</p>
       </div>
       <div class="foot">
         <UButton @click="close">{{ confirmText }}</UButton>
@@ -25,15 +40,12 @@ export default {
   components: { UButton },
   props: {
     isShow: { type: Boolean, default: false },
-    title: { type: String, default: '쿠폰 발급 완료' },
+    title: { type: String, default: '마케팅 동의 쿠폰 발급 완료' },
+    coupons: { type: Array, default: () => [] },
     couponName: { type: String, default: '커피 1잔 무료' },
-    note: {
-      type: String,
-      default: '발급된 쿠폰은 [MYPAGE > 쿠폰함]에서 확인 가능합니다.'
-    },
     marketNote: {
       type: String,
-      default: '마케팅정보 수집이용동의에 따라 쿠폰이 발급되었습니다.'
+      default: '*본 쿠폰은 마케팅 수신동의에 따른 혜택입니다.'
     },
     confirmText: { type: String, default: '확인' }
   },
@@ -73,11 +85,11 @@ export default {
     padding: 2rem;
 
     .content-wrap {
+      border-radius: 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
-      padding-bottom: 4rem;
+      gap: 1.6rem; /* 아이템 간 간격 */
 
       .logo {
         width: 8rem;
@@ -86,7 +98,7 @@ export default {
       .coupon-name {
         font-size: 1.8rem;
         font-weight: 700;
-        margin-bottom: 4rem;
+        margin-bottom: 1.2rem;
       }
       .note .market-note {
         font-size: 1.4rem;
@@ -119,23 +131,19 @@ export default {
     box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
 
     .head {
-      padding: 3.2rem 3.6rem;
+      padding: 2.2rem 3.6rem;
       font-size: 2.4rem;
     }
     .body {
-      max-height: 40rem;
+      max-height: 49rem;
       padding: 2.4rem 3.6rem;
 
       .content-wrap {
-        padding: 2.4rem;
-        background: rgba(235,235,235,0.4);
-        border: 1px solid var(--color-u-grey-1);
         border-radius: 0.8rem;
       }
     }
     .foot {
-      padding: 0 3.2rem 3.6rem;
-      margin-top: 3.6rem;
+      padding: 1.4rem 3.2rem 1.4rem;
       justify-content: space-between;
 
       button {
@@ -144,5 +152,48 @@ export default {
       }
     }
   }
+}
+
+/* 각 쿠폰 아이템 박스 스타일 */
+.coupon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f0f0f0;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.8rem;
+  padding: 1.6rem 2rem;
+  width: 100%;
+  max-width: 32rem; /* 원하시는 최대 너비 */
+  box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+/* 쿠폰 이미지 */
+.coupon-card {
+  width: 8rem;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+/* 쿠폰 이름 */
+.coupon-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+/* 설명 텍스트 */
+.market-note {
+  font-size: 1.4rem;
+  color: var(--color-u-grey-3);
+  margin-bottom: 0;
+}
+
+/* 최하단 일반 안내 */
+.note {
+  font-size: 1.4rem;
+  color: var(--color-u-grey-5);
+  margin-top: 2rem;
 }
 </style>
