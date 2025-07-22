@@ -47,7 +47,6 @@
                   <UButton w-size="100" @click="signIn">로그인</UButton>
                 </div>
                 <div v-else class="sns-login">
-                  {{ $axios.defaults.baseURL }}
                   <a :href="`${$axios.defaults.baseURL}/oauth2/kakao/authorization`" class="kakao">
                     {{ isRegister ? '카카오로 1초 시작' : '카카오로 로그인' }}
                   </a>
