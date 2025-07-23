@@ -11,14 +11,11 @@
             <i class="pc uic-info" />
             <p>현재 적용된 멤버십</p>
           </div>
-          <NuxtLink v-if="dataMembership?.code !== 3" :to="'/mypage/purchase/membership/coupon-history'" class="only-pc-flex">
-            <span>마일리지 적립 내역 </span> <i class="pc uic-arrow_next" />
-          </NuxtLink>
         </div>
         <div class="head">멤버십</div>
         <div class="box-contents">
           <div class="box-membership">
-            <MembershipInfor :data-merbership="dataMembership" />
+            <MembershipInfor :data-membership="dataMembership" />
           </div>
         </div>
       </div>
@@ -41,9 +38,9 @@ export default {
     return {
       dataMembership: null,
       availableCouponsList: null,
-      baseUrl: '/mypage/purchase/membership/coupon-histoty'
+      baseUrl: '/mypage/purchase/membership/coupon-history'
     };
-  },
+  }
 };
 </script>
 
@@ -170,9 +167,9 @@ export default {
 
   .box-contents {
     width: 100%;
-    display: flex;               // <-- 추가!
-    justify-content: center;     // 가로 중앙 정렬
-    align-items: center;         // 세로 중앙 정렬 (필요 시)
+    display: flex; // <-- 추가!
+    justify-content: center; // 가로 중앙 정렬
+    align-items: center; // 세로 중앙 정렬 (필요 시)
 
     .box-membership {
       max-width: 35%;

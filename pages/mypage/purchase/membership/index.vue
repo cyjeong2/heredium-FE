@@ -8,14 +8,15 @@
           <div class="box-membership only-mobile">
             <div class="head-mobile only-mobile">
               <div class="head">멤버십</div>
-              <NuxtLink v-if="dataMembership.code !== 3" to="/mypage/purchase/membership/coupon-history">
+              <NuxtLink v-if="dataMembership.code !== 3" :to="`/mypage/purchase/membership/mileages-history?accountId=${dataMembership.account_id}`">
                 <span>마일리지 적립 내역</span>
                 <i class="m umic-arrow_forward" />
               </NuxtLink>
             </div>
-            <MembershipInfor :data-merbership="dataMembership" />
+            <MembershipInfor :data-membership="dataMembership" class="only-mobile"/>
           </div>
-          <div v-if="availableCouponsList" class="box-coupon">
+          <!-- <div v-if="availableCouponsList" class="box-coupon only-mobile"> -->
+          <div class="box-coupon only-mobile">
             <div class="head-mobile only-mobile">
               <div class="head">쿠폰함</div>
               <NuxtLink to="/mypage/purchase/membership/coupon-history">
@@ -23,7 +24,7 @@
                 <i class="m umic-arrow_forward" />
               </NuxtLink>
             </div>
-            <p class="only-mobile note-mobile">사용 가능한 쿠폰 리스트입니다.</p>
+            <p v-if="availableCouponsList" class="only-mobile note-mobile">사용 가능한 쿠폰 리스트입니다.</p>
 
             <div class="contents">
               <CouponList
@@ -48,8 +49,8 @@ export default {
   components: { SideBarMyPage, MembershipInfor, CouponList },
   async asyncData({ $axios }) {
     const dataMembership = await $axios.$get('/user/membership/info');
-    dataMembership.code = 3
-    return { dataMembership};
+    console.log(dataMembership.account_id)
+    return { dataMembership };
   },
   data() {
     return {

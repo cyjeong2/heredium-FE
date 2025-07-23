@@ -1,7 +1,7 @@
 <template>
   <KeepAlive>
     <div class="center">
-      <div class="membership-image-box">
+      <div class="membership-image-box" @click="handleOpenModal">
         <img src="~assets/img/membership-logo-icon.png" />
       </div>
       <div class="content">
@@ -11,7 +11,7 @@
         </div>
       </div>
       <!-- <UButton class="button" @click="handleOpenModal">멤버십 QR코드 </UButton> -->
-      <modal-membership-infor :data-merbership="dataMembership" :open="openModalQr" @close="handleCloseModal" />
+      <modal-membership-infor v-model="openModal" :data-membership="dataMembership" />
     </div>
   </KeepAlive>
 </template>
@@ -27,7 +27,6 @@ export default {
   props: {
     dataMembership: {
       type: Object,
-      required: false,
       default: () => {}
     },
     open: {
@@ -38,14 +37,10 @@ export default {
   },
   data() {
     return {
-      openModalQr: false
+      openModal: false
     };
   },
   computed: {
-    createQrValue() {
-      const { id, uuid } = this.dataMembership;
-      return uuid ? JSON.stringify({ id, uuid }) : '';
-    },
     membershipNameDisplay() {
       const defaultMembershipName = '회사 멤버십';
       const registrationType = this.dataMembership?.registration_type;
@@ -65,11 +60,8 @@ export default {
       return getDateCommonDateOutput(startDate, endDate);
     },
     handleOpenModal() {
-      this.openModalQr = true;
+      this.openModal = true;
     },
-    handleCloseModal() {
-      this.openModalQr = false;
-    }
   }
 };
 </script>
@@ -86,6 +78,14 @@ export default {
     font-weight: bold;
     color: #4c5540;
   }
+}
+.membership-image-box {
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.membership-image-box:hover {
+  border: 1px solid black
 }
 
 .button {

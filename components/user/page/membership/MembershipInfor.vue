@@ -1,11 +1,11 @@
 <template>
   <KeepAlive>
     <div class="center box">
-      <!-- <div v-if="!dataMerbership">
+      <!-- <div v-if="!dataMembership">
         <no-membership />
       </div> -->
       <div>
-        <has-membership :data-membership="dataMerbership" />
+        <has-membership :data-membership="dataMembership" />
       </div>
     </div>
   </KeepAlive>
@@ -20,7 +20,7 @@ export default {
   // NoMembership
   components: { HasMembership },
   props: {
-    dataMerbership: {
+    dataMembership: {
       type: Object,
       required: false,
       default: () => {}
