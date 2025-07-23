@@ -62,9 +62,10 @@
               <th>적립일시</th>
               <th>일련번호</th>
               <th>결제금액</th>
-              <th>적립마일리지</th>
+              <th>적립<br/>마일리지</th>
               <th>결제방법</th>
               <th>작성자</th>
+              <th>비고</th>
               <th></th>
             </tr>
           </thead>
@@ -72,10 +73,20 @@
             <tr v-if="!data || !data[0]">
               <td colspan="100%"><div>리스트가 없습니다.</div></td>
             </tr>
-            <tr v-for="(item, index) in data" :key="item.id">
+            <tr
+              v-for="(item, index) in data"
+              :key="item.id"
+              :class="{
+                'child-row': item.relatedMileageId !== null,
+                'has-child': data.some(d => d.relatedMileageId === item.id)
+              }"
+            >
               <!-- NO -->
               <td>
-                <div>{{ tableData.startCount - index }}</div>
+                <div :style="{ paddingLeft: item.relatedMileageId ? '1.5rem' : '0' }">
+                  <span v-if="item.relatedMileageId">└</span>
+                  {{ tableData.startCount - index }}
+                </div>
               </td>
               <!-- 구분 -->
               <td>
@@ -87,7 +98,12 @@
               </td>
               <!-- 제목 -->
               <td>
-                <div class="text-left">{{ item.title }}</div>
+                <div
+                  class="text-left"
+                  :style="{ paddingLeft: item.relatedMileageId ? '2rem' : '0' }"
+                >
+                  {{ item.title }}
+                </div>
               </td>
               <!-- 적립일시 -->
               <td>
@@ -114,7 +130,10 @@
                 <div>{{ item.createdName }}</div>
               </td>
               <td>
-                <div class="flex justify-center" style="margin-left: 5px;">
+                <div>{{ item.remark }}</div>
+              </td>
+              <td>
+                <div class="flex justify-center">
                   <SButton
                     v-if="item.type === 0"
                     button-type="standard"
@@ -136,17 +155,22 @@
         <SLink button-type="primary" :to="baseUrl">확인</SLink>
       </template>
     </SDialogModal>
-     <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
+     <!-- <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
       <template #content>취소 하시겠습니까?</template>
       <template #modal-btn1>
         <SButton button-type="primary" @click="handleRefund">확인</SButton>
       </template>
-    </SDialogModal>
+    </SDialogModal> -->
     <MileageForm
       :account-id="id"
       :is-show="modal.isMileageModal"
       @close="modal.isMileageModal = false"
       @save="handleSaveMileage"
+    />
+    <CancelReasonForm
+      :is-show="modal.isReasonModal"
+      @close="modal.isReasonModal = false"
+      @confirm="handleRefund"
     />
   </div>
 </template>
@@ -162,10 +186,11 @@ import SProgressTab from '~/components/admin/commons/SProgressTab';
 import { CATEGORY_TYPE, PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 import MileageForm from '~/components/admin/page/membership/MileageForm.vue';
+import CancelReasonForm from '~/components/admin/page/membership/CancelReasonForm.vue';
 
 export default {
   name: 'UserDetail',
-  components: { SDialogModal, SProgressTab, SPageable, SLink, SButton, MileageForm },
+  components: { SDialogModal, SProgressTab, SPageable, SLink, SButton, MileageForm, CancelReasonForm },
   props: {
     detailData: {
       type: Object,
@@ -187,7 +212,8 @@ export default {
       modal: {
         isSave: false,
         isMileageModal: false,
-        isConfirmSave: false
+        // isConfirmSave: false
+        isReasonModal: false,
       },
       isConfirmPending: false,
       pendingRefundItem: null,
@@ -223,14 +249,16 @@ export default {
     },
     handleBeforeRefund(item) {
       this.pendingRefundItem = item;
-      this.modal.isConfirmSave = true;
+      this.modal.isReasonModal = true;
     },
-    async handleRefund() {
+    async handleRefund(reason) {
       try {
         const recordId = this.pendingRefundItem.id;
-        this.modal.isConfirmSave = false;
+        this.modal.isReasonModal = false;
         // 백엔드에 취소 API 엔드포인트가 있다면 호출
-        await this.$axios.$post(`/admin/membershipMileage/${recordId}/refund`);
+        await this.$axios.$post(`/admin/membershipMileage/${recordId}/refund`,
+          { reason }
+        );
 
         // 성공 후 테이블 새로고침
         const currentPage = this.tableData.pageable.pageNumber;
@@ -321,6 +349,9 @@ export default {
       &:nth-of-type(10) {
         width: 10rem;
       }
+      &:nth-of-type(11) {
+        width: 17rem;
+      }
       &:last-of-type {
         width: 10rem;
       }
@@ -336,4 +367,32 @@ export default {
 .single-tab ::v-deep .tab:nth-child(2) {
   display: none !important;
 }
+
+.child-row {
+  /* 전체 줄 색을 살짝 다르게 */
+  background-color: #fafafa;
+
+  /* 만약 첫 번째 셀만 들여쓰기 하고 싶다면
+  td:first-of-type {
+    padding-left: 1.5rem !important;
+  }
+  */
+}
+
+/* 기본 테이블 행은 흰색 */
+.edit .admin-table tbody tr {
+  background-color: #fff !important;
+}
+
+/* .edit 를 루트로 해서 specificity ↑ */
+.edit .admin-table tbody > tr.child-row,
+.edit .admin-table tbody > tr.has-child {
+  background-color: #eeeeee !important;
+}
+
+.edit .admin-table tbody > tr.child-row div,
+.edit .admin-table tbody > tr.has-child div {
+  color: #555 !important;
+}
+
 </style>

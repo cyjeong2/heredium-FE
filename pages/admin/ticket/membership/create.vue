@@ -89,7 +89,7 @@
       </section>
       <!-- ④–⑥ 하단 버튼 -->
       <div class="button-row">
-        <SButton v-if="selectedMembershipId" @click="onDelete">삭제</SButton>
+        <!-- <SButton v-if="selectedMembershipId" @click="onDelete">삭제</SButton> -->
         <SButton button-type="primary" :disabled="isSubmitted" @click="beforeOnSave">저장</SButton>
       </div>
     </div>
@@ -312,12 +312,12 @@ export default {
         await this.onMembershipSelect(this.selectedMembershipId);
       }
     },
-    onDelete() {
-      if (confirm('정말 삭제하시겠습니까?')) {
-        // TODO: 삭제 API 호출
-        this.$router.back();
-      }
-    },
+    // onDelete() {
+    //   if (confirm('정말 삭제하시겠습니까?')) {
+    //     // TODO: 삭제 API 호출
+    //     this.$router.back();
+    //   }
+    // },
     handleUpdateCoupon(newCouponData, couponIndex) {
       this.coupons[couponIndex] = cloneDeep(newCouponData);
     },

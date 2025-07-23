@@ -176,7 +176,6 @@ export default {
   },
   methods: {
     onGoDetail(id) {
-      console.log('id', id)
       this.$router.push(`/admin/user/membership/detail/${id}`);
     },
     onChangePage(page) {
