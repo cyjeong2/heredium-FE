@@ -66,7 +66,7 @@ export default {
   methods: {
     async getMileageList(accountId, page = 0) {
       try {
-        const res = await this.$axios.$get(`/git user/membershipMileage/${accountId}`, {
+        const res = await this.$axios.$get(`/user/membershipMileage/${accountId}`, {
           params: { page, size: this.pageSize }
         });
 

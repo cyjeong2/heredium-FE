@@ -6,16 +6,14 @@
         <h2 class="only-pc">멤버십</h2>
       </div>
       <div class="ticketing-body">
-        <div class="ticketing-info only-pc-flex">
-          <div class="left">
-            <i class="pc uic-info" />
-            <p>현재 적용된 멤버십</p>
-          </div>
-        </div>
-        <div class="head">멤버십</div>
-        <div class="box-contents">
-          <div class="box-membership">
-            <MembershipInfor :data-membership="dataMembership" />
+        <div class="membership_info">
+          <div class="name_membership">
+            <span>{{ dataMembership.name }}님의 현재 등급은 <br />
+              {{ dataMembership.membership_name }} 입니다</span><br />
+            </div>
+          <div class="mileage_summary">
+            <span>현재 나의 마일리지</span>
+            <span>현재 나의 마일리지</span>
           </div>
         </div>
       </div>
@@ -24,14 +22,14 @@
 </template>
 
 <script>
-import MembershipInfor from '~/components/user/page/membership/MembershipInfor.vue';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { SideBarMyPage, MembershipInfor },
+  components: { SideBarMyPage },
   async asyncData({ $axios }) {
     const dataMembership = await $axios.$get('/user/membership/info');
+    console.log('[asyncData] dataMembership:', dataMembership);
     return { dataMembership };
   },
   data() {
@@ -133,7 +131,6 @@ export default {
 
   .ticketing-body {
     margin-top: 2.6rem;
-    border-top: 0.1rem solid var(--color-black);
 
     .ticketing-info {
       display: flex;
@@ -183,5 +180,11 @@ export default {
     border-left: 5px solid var(--color-u-primary);
     margin-bottom: 2rem;
   }
+}
+.membership_info {
+  border-top: 0.1rem solid var(--color-black);
+  border-left: 0.1rem solid var(--color-black);
+  border-right: 0.1rem solid var(--color-black);
+  border-bottom: 0.1rem solid var(--color-black);
 }
 </style>
