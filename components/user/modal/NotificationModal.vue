@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="guide-text">
-              <p>나이 기준에 따라 {{ code === 3 ? 'Green'  : 'Brown' }} 회원으로 전환됩니다.</p>
+              <p>{{ code === 3 ? 'Green'  : 'Brown' }} 회원으로 전환됩니다.</p>
               <p>Mypage에서 혜택을 확인할 수 있습니다.</p>
             </div>
           </div>

@@ -8,13 +8,13 @@
       </div>
       <div class="body" body-scroll-lock-ignore>
         <h3 style="text-align: center; margin-bottom: 3rem; margin-top: 3.0rem;">멤버십 전환을 위해
-        <br/>핸드폰 인증이 필요합니다.</h3>
+        <br/>본인 인증이 필요합니다.</h3>
 
         <div class="term-select" style="text-align: center;">
           <UCheckbox v-model="isTerms.AGREE">
             <strong>[필수]</strong>
-            <button @click="showTerm('AGREE')">&nbsp;개인정보 수집 및 이용동의서</button> 동의</UCheckbox
-          >
+            <button @click="showTerm('AGREE')">&nbsp;개인정보 수집 및 활용</button>에 동의합니다.
+          </UCheckbox>
         </div>
         <!-- <form class="content-wrap" @submit.prevent="submitForm">
           <div class="input mb-13">

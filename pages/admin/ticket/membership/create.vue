@@ -30,7 +30,7 @@
               v-model="membershipImage"
               type="PROJECT_DETAIL_IMAGE"
               :image-src="membershipImage"
-              :class="{ 'is-error': isSubmitted && !membershipImage }"
+              :class="{ 'is-error': isSubmitted && feedback.thumbnailUrl }"
               @image-uploaded="updateThumbnail"
               @image-removed="removeThumbnail"
             />
@@ -39,10 +39,11 @@
           <!-- ② 멤버십명 / 이용실적을 세로로 쌓기 -->
           <div class="meta-fields">
             <div class="meta-row">
-              <label>멤버십명</label>
+              <label>멤버십명<b class="must">*</b></label>
               <SInput
                 v-model="form.name"
                 w-size="large"
+                :class="{ 'is-error': isSubmitted && feedback.name }"
                 placeholder="멤버십 이름을 입력하세요"
               />
             </div>
@@ -90,10 +91,15 @@
       <!-- ④–⑥ 하단 버튼 -->
       <div class="button-row">
         <!-- <SButton v-if="selectedMembershipId" @click="onDelete">삭제</SButton> -->
-        <SButton button-type="primary" :disabled="isSubmitted" @click="beforeOnSave">저장</SButton>
+        <SButton button-type="primary" :disabled="isSaving" @click="beforeOnSave">저장</SButton>
       </div>
     </div>
-
+    <SDialogModal :is-show="isShowErrorModal" @close="isShowErrorModal = false">
+      <template #content>{{ errorMsg }}</template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="isShowErrorModal = false">확인</SButton>
+      </template>
+    </SDialogModal>
     <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
       <template #content>저장하시겠습니까?</template>
       <template #modal-btn1>
@@ -121,6 +127,14 @@ import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import SImageUploadRepresentative from '~/components/admin/commons/SImageUploadRepresentative.vue';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 
+// ① 공통 초기 피드백 상태 정의
+const INITIAL_FEEDBACK = {
+  name: false,
+  thumbnailUrl: false,
+  minMileage: false,
+  coupons: []
+};
+
 export default {
   name: 'MembershipCreate',
   components: {
@@ -144,7 +158,7 @@ export default {
     return {
       coupons: [],
       deletedCoupons: [],
-      feedback: {},
+      feedback: { ...INITIAL_FEEDBACK },
       membershipOptions: [],
       couponTypeOptions: [
         { value: 'EXHIBITION', label: '전시' },
@@ -158,6 +172,7 @@ export default {
       ],
       selectedMembershipId: null,
       showForm: false,
+      isSaving: false,
       isSubmitted: false,
       form: {
         name: '',
@@ -170,6 +185,7 @@ export default {
         isConfirmSave: false,
         isSave: false,
       },
+      isShowErrorModal: false,
     };
   },
   async mounted() {
@@ -183,6 +199,9 @@ export default {
       this.selectedMembershipId = null
       this.resetForm()
       this.showForm = true
+      this.isSaving = false
+      this.isSubmitted = false
+      this.feedback    = { ...INITIAL_FEEDBACK }
     },
     updateThumbnail(e) {
       this.membershipImage = e.resizeImage.large;
@@ -205,6 +224,9 @@ export default {
     },
     async onMembershipSelect(id) {
       if (!id) return
+      this.isSaving = false
+      this.isSubmitted = false;
+      this.feedback    = { ...INITIAL_FEEDBACK };
       this.mode = 'update'
       this.showForm = true
 
@@ -236,6 +258,9 @@ export default {
             }))
           : [ cloneDeep(COUPON_DEFAULT) ]
         this.deletedCoupons = []
+
+        this.isSubmitted = false;
+        this.feedback    = { ...INITIAL_FEEDBACK };
       } catch (e) {
         console.error('멤버십 상세 조회 실패', e)
       }
@@ -246,18 +271,21 @@ export default {
       this.membershipImage = ''
       this.coupons = [cloneDeep(COUPON_DEFAULT)]
       this.deletedCoupons = []
-      this.feedback = {}
+      this.feedback        = { ...INITIAL_FEEDBACK };
       this.isSubmitted = false
+      this.isShowErrorModal = false;
     },
     beforeOnSave() {
+      this.isSubmitted = true;
       if (!this.validateForm()) {
-        this.isSubmitted = false;
+        this.errorMsg = '필수 입력 항목을 모두 채워주세요.';
+        this.isShowErrorModal = true;
         return;
       }
       this.modal.isConfirmSave = true;
     },
     async onSave() {
-      this.saving = true;
+      this.isSaving = true;
       this.modal.isConfirmSave = false;
 
        // 1) tempId 제거
@@ -295,9 +323,8 @@ export default {
 
       } catch (err) {
         console.error(err)
-        // TODO: 에러 토스트 띄우기 등
       } finally {
-        this.saving = false
+        this.isSaving = false;
       }
     },
     async afterSaveConfirm() {
@@ -359,7 +386,7 @@ export default {
     validateForm() {
       let isValid = true;
 
-      const feedback = {
+      const fb = {
         name: false,
         thumbnailUrl: false,
         minMileage: false,
@@ -368,39 +395,31 @@ export default {
 
       // 1) 멤버십명
       if (!this.form.name || !this.form.name.trim()) {
-        feedback.name = true;
+        fb.name = true;
         isValid = false;
       }
-
       // 2) 대표 이미지
       if (!this.membershipImage) {
-        feedback.thumbnailUrl = true;
+        fb.thumbnailUrl = true;
         isValid = false;
       }
-
       // 3) 이용실적 (숫자)
-      if (
-        this.form.minMileage == null ||
-        this.form.minMileage === '' ||
-        isNaN(Number(this.form.minMileage))
-      ) {
-        feedback.minMileage = true;
-        isValid = false;
-      }
+      // if (
+      //   this.form.minMileage == null ||
+      //   this.form.minMileage === '' ||
+      //   isNaN(Number(this.form.minMileage))
+      // ) {
+      //   fb.minMileage = true;
+      //   isValid = false;
+      // }
+      // 4) 쿠폰들
+      this.coupons.forEach((coupon, idx) => {
+        const couponFb = this.validateCouponItem(coupon);
+        fb.coupons[idx] = couponFb;
+        if (couponFb) isValid = false;
+      });
 
-      for (let couponIndex = 0; couponIndex < this.coupons.length; couponIndex++) {
-        const couponItem = this.coupons[couponIndex];
-        const couponFeedback = this.validateCouponItem(couponItem);
-        feedback.coupons[couponIndex] = couponFeedback;
-      }
-      const emptyErrorCoupon = feedback.coupons.every((couponFeedback) => !couponFeedback);
-
-      if (!emptyErrorCoupon) {
-        isValid = false;
-      } else {
-        feedback.coupons = [];
-      }
-      this.feedback = feedback;
+      this.feedback = fb;
       return isValid;
     },
 
@@ -499,5 +518,12 @@ export default {
 
 .coupon-section {
   margin-top: 2rem;
+}
+.must {
+  color: var(--color-blue);
+  margin-left: 5px;
+}
+.is-error {
+  border-color: #d93025 !important;
 }
 </style>

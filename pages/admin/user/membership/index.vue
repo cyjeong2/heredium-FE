@@ -19,8 +19,8 @@
       </div>
     </div>
     <div class="top-menus mb-16">
-      <SButton w-size="large" class="mr-16" @click="downloadExcel">엑셀 다운로드</SButton>
-      <SButton w-size="large" class="mr-16" @click="downloadMileage">마일리지 내역<br>다운로드</SButton>
+      <SButton w-size="large" class="mr-16" @click="downloadExcel">다운로드</SButton>
+      <!-- <SButton w-size="large" class="mr-16" @click="downloadMileage">마일리지 내역<br>다운로드</SButton> -->
       <SDropdown v-model="queryOptions.size" :option-list="pageSizeList" @change="onSelectSizeChange"
         >리스트 수:</SDropdown
       >
@@ -40,7 +40,7 @@
               <th>프로그램<br>사용횟수</th>
               <th>커피<br>사용횟수</th>
               <th>마일리지<br>내역</th>
-              <th>마케팅<br>수신동의</th>
+              <!-- <th>마케팅<br>수신동의</th> -->
             </tr>
           </thead>
           <tbody>
@@ -86,12 +86,12 @@
               </td>
               <!-- 마일리지 내역 -->
               <td>
-                <div>{{ item.number_of_coffee_used }}</div>
+                <div>{{ item.mileage_sum }}</div>
               </td>
               <!-- 마케팅 수신동의 -->
-              <td>
+              <!-- <td>
                 <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
-              </td>
+              </td> -->
             </tr>
           </tbody>
         </table>
@@ -171,7 +171,7 @@ export default {
       this.tableData.startCount = this.tableData.number * this.tableData.size;
       this.queryOptionsSaved = cloneDeep(this.queryOptions);
     } catch (error) {
-      alert(API_ERROR);
+      console.error(API_ERROR, error)
     }
   },
   methods: {
@@ -230,9 +230,9 @@ export default {
           URL.revokeObjectURL(href);
         });
     },
-    downloadMileage(){
-      alert('마일리지 내역 다운로드')
-    },
+    // downloadMileage(){
+    //   alert('마일리지 내역 다운로드')
+    // },
     formatPhone(phone) {
       if (!phone) return '';
       // 1) 숫자만 추출
@@ -327,14 +327,14 @@ export default {
       min-width: 80px;
     }
      /* 마일리지 내역 */
-    &:nth-of-type(10) {
-      width: 80px;
-      min-width: 80px;
-    }
+    // &:nth-of-type(10) {
+    //   width: 80px;
+    //   min-width: 80px;
+    // }
     /* Agree to receive marketing */
     &:last-of-type {
-      width: 100px;
-      min-width: 100px;
+      width: 80px;
+      min-width: 80px;
     }
   }
 }

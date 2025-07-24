@@ -149,12 +149,12 @@
         </table>
       </template>
     </SPageable>
-    <SDialogModal :is-show="modal.isSave" @close="$router.push(baseUrl)">
+    <!-- <SDialogModal :is-show="modal.isSave" @close="$router.push(baseUrl)">
       <template #content>회원정보가 수정되었습니다.</template>
       <template #modal-btn2>
         <SLink button-type="primary" :to="baseUrl">확인</SLink>
       </template>
-    </SDialogModal>
+    </SDialogModal> -->
      <!-- <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
       <template #content>취소 하시겠습니까?</template>
       <template #modal-btn1>
@@ -184,13 +184,14 @@ import SButton from '~/components/admin/commons/SButton';
 import SPageable from '~/components/admin/commons/SPageable';
 import SProgressTab from '~/components/admin/commons/SProgressTab';
 import { CATEGORY_TYPE, PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
-import SDialogModal from '~/components/admin/modal/SDialogModal';
+// import SDialogModal from '~/components/admin/modal/SDialogModal';
 import MileageForm from '~/components/admin/page/membership/MileageForm.vue';
 import CancelReasonForm from '~/components/admin/page/membership/CancelReasonForm.vue';
 
 export default {
   name: 'UserDetail',
-  components: { SDialogModal, SProgressTab, SPageable, SLink, SButton, MileageForm, CancelReasonForm },
+  // SDialogModal
+  components: { SProgressTab, SPageable, SLink, SButton, MileageForm, CancelReasonForm },
   props: {
     detailData: {
       type: Object,
@@ -207,7 +208,7 @@ export default {
     return {
       id: this.$route.params.id,
       titleText: '계정 정보',
-      baseUrl: '',
+      baseUrl: '/admin/user/membership',
       cloneDetailData: cloneDeep(this.detailData),
       modal: {
         isSave: false,

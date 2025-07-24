@@ -15,7 +15,8 @@
         @focusout="toggleOff"
         @change="onSelected"
       >
-        <option v-for="item in optionList" :key="item.value" :value="item.value">{{ item.label }}</option>
+      <option disabled :value="null">{{ defaultText }}</option>
+      <option v-for="item in optionList" :key="item.value" :value="item.value">{{ item.label }}</option>
       </select>
       <div class="dropdown-icon">
         <i class="ic-expand-more" />
