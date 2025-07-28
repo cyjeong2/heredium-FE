@@ -281,11 +281,9 @@ export default {
         isMarketingReceive: this.isTerms.MARKETING
       };
 
-      // (선택) 마케팅 수신 시에만 gender/birthDate 전달
-      if (this.isTerms.MARKETING) {
-        payload.gender    = this.userInfo.gender === 'MAN' ? 'M' : 'W';
-        payload.birthDate = this.$dayjs(this.userInfo.birthDate).format('YYYY-MM-DD');
-      }
+      payload.gender    = this.userInfo.gender === 'MAN' ? 'M' : 'W';
+      payload.birthDate = this.$dayjs(this.userInfo.birthDate).format('YYYY-MM-DD');
+
       payload.marketingPending  = false;
       payload.isLocalResident   = this.form.region.state === '대전광역시';
       payload.encodeData        = this.encodeData;

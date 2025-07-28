@@ -50,7 +50,7 @@ export default {
   watch: {
     isShow(newValue) {
       if (newValue) {
-        disableBodyScroll(document);
+        disableBodyScroll(document, { reserveScrollBarGap: true });
       } else {
         clearAllBodyScrollLocks();
       }

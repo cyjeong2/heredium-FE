@@ -41,7 +41,7 @@
     </div>
     <div class="history-header mb-24">
       <SProgressTab :label="['마일리지 내역']" class="single-tab"/>
-      <SButton button-type="primary" @click="onPointRegister">마일리지 등록</SButton>
+      <SButton v-if="cloneDetailData.code !== 3" button-type="primary" @click="onPointRegister">마일리지 등록</SButton>
     </div>
     <SPageable
       :table-data="tableData"
@@ -222,6 +222,10 @@ export default {
   },
   methods: {
     onPointRegister(){
+      if (this.cloneDetailData.code === 3) {
+        return;
+      }
+
       this.modal.isMileageModal = true;
     },
     async handleSaveMileage(payload) {
@@ -394,6 +398,10 @@ export default {
 .edit .admin-table tbody > tr.child-row div,
 .edit .admin-table tbody > tr.has-child div {
   color: #555 !important;
+}
+/* 마일리지 내역 테이블 로우 기본 커서 유지 */
+.edit .admin-table tbody tr {
+  cursor: default !important;
 }
 
 </style>

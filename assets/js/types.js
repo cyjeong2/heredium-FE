@@ -386,8 +386,8 @@ export const CATEGORY_TYPE = Object.freeze({
 });
 
 export const PAYMENT_METHOD_TYPE = Object.freeze({
-  0: '온라인',
-  1: '오프라인',
+  1: '온라인',
+  2: '오프라인',
 });
 
 export const MILEAGE_EVENT_TYPE = Object.freeze({
@@ -395,7 +395,8 @@ export const MILEAGE_EVENT_TYPE = Object.freeze({
   1: '승급',
   2: '소멸(유효기간 경과)',
   3: '소멸(취소)',
-  4: '취소완료'
+  4: '소멸완료(유효기간 경과)',
+  5: '소멸완료(취소)',
 });
 
 /**
