@@ -397,6 +397,7 @@ export const MILEAGE_EVENT_TYPE = Object.freeze({
   3: '소멸(취소)',
   4: '소멸완료(유효기간 경과)',
   5: '소멸완료(취소)',
+  6: '승급취소',
 });
 
 /**

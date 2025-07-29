@@ -127,21 +127,29 @@
               </td>
               <!-- 작성자 -->
               <td>
-                <div>{{ item.createdName }}</div>
+                <div>{{ item.lastModifiedName }}</div>
+                <!-- <div>{{ item.createdName }}</div> -->
               </td>
               <td>
                 <div>{{ item.remark }}</div>
               </td>
               <td>
                 <div class="flex justify-center">
+                  <!-- 일반 적립 취소 -->
                   <SButton
-                    v-if="item.type === 0"
+                    v-if="item.type === 0 && item.relatedMileageId == null"
                     button-type="standard"
                     size="small"
                     @click="handleBeforeRefund(item)"
-                  >
-                    취소
-                  </SButton>
+                  >취소</SButton>
+
+                  <!-- 승급으로 소진된 적립 → 승급취소 흐름 -->
+                  <SButton
+                    v-else-if="item.type === 0 && item.relatedMileageId != null"
+                    button-type="standard"
+                    size="small"
+                    @click="handleBeforeUpgradeCancel(item)"
+                  >취소</SButton>
                 </div>
               </td>
             </tr>
@@ -172,6 +180,15 @@
       @close="modal.isReasonModal = false"
       @confirm="handleRefund"
     />
+    <SDialogModal :is-show="modal.isUpgradeCancelModal" @close="modal.isUpgradeCancelModal = false">
+      <template #content>현재 마일리지를 취소하시면 멤버십 승급이 취소됩니다. 계속 진행하시겠습니까?</template>
+      <template #modal-btn1>
+        <SButton button-type="standard" @click="modal.isUpgradeCancelModal = false">아니요</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="confirmUpgradeCancel">예</SButton>
+      </template>
+    </SDialogModal>
   </div>
 </template>
 
@@ -184,14 +201,14 @@ import SButton from '~/components/admin/commons/SButton';
 import SPageable from '~/components/admin/commons/SPageable';
 import SProgressTab from '~/components/admin/commons/SProgressTab';
 import { CATEGORY_TYPE, PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
-// import SDialogModal from '~/components/admin/modal/SDialogModal';
+import SDialogModal from '~/components/admin/modal/SDialogModal';
 import MileageForm from '~/components/admin/page/membership/MileageForm.vue';
 import CancelReasonForm from '~/components/admin/page/membership/CancelReasonForm.vue';
 
 export default {
   name: 'UserDetail',
   // SDialogModal
-  components: { SProgressTab, SPageable, SLink, SButton, MileageForm, CancelReasonForm },
+  components: { SProgressTab, SPageable, SLink, SButton, MileageForm, CancelReasonForm, SDialogModal },
   props: {
     detailData: {
       type: Object,
@@ -215,9 +232,11 @@ export default {
         isMileageModal: false,
         // isConfirmSave: false
         isReasonModal: false,
+        isUpgradeCancelModal: false,
       },
       isConfirmPending: false,
       pendingRefundItem: null,
+      isUpgradeCancelFlow: false,
     };
   },
   methods: {
@@ -253,7 +272,46 @@ export default {
       return MILEAGE_EVENT_TYPE[code] ?? '-';
     },
     handleBeforeRefund(item) {
+      this.isUpgradeCancelFlow = false;
       this.pendingRefundItem = item;
+      this.modal.isReasonModal = true;
+    },
+    handleBeforeUpgradeCancel(item) {
+
+      this.isUpgradeCancelFlow = false;
+      this.pendingUpgradeItem = { ...item };
+
+      const payload = {
+        accountId: item.accountId,
+        relatedMileageId: item.relatedMileageId,
+        mileageAmount: item.mileageAmount
+      };
+
+      this.$axios
+        .post('/admin/membershipMileage/cancel/check', payload)
+        .then(({ data }) => {
+          if (data.canCancel) {
+            this.modal.isUpgradeCancelModal = true;
+            this.isUpgradeCancelFlow = true;
+          } else {
+            this.confirmUpgradeCancel();
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          this.$q.notify({
+            type: 'negative',
+            message: '서버 오류가 발생했습니다. 다시 시도해주세요.'
+          });
+        });
+    },
+    /**
+     * 2차: 확인 모달에서 '예' 클릭 → 취소사유 모달로 이어감
+     */
+    confirmUpgradeCancel() {
+      this.modal.isUpgradeCancelModal = false;
+      // 그대로 취소사유 모달로 넘어가기
+      this.pendingRefundItem = this.pendingUpgradeItem;
       this.modal.isReasonModal = true;
     },
     async handleRefund(reason) {
@@ -261,13 +319,27 @@ export default {
         const recordId = this.pendingRefundItem.id;
         this.modal.isReasonModal = false;
         // 백엔드에 취소 API 엔드포인트가 있다면 호출
-        await this.$axios.$post(`/admin/membershipMileage/${recordId}/refund`,
-          { reason }
-        );
 
+        if (this.isUpgradeCancelFlow) {
+          // └ 승급 취소 전용 엔드포인트 혹은 플래그 전달
+          await this.$axios.$post(
+            `/admin/membershipMileage/${recordId}/refund?upgradeCancel=true`,
+            { reason }
+          );
+        }else{
+          // └ 일반 환불
+          await this.$axios.$post(
+            `/admin/membershipMileage/${recordId}/refund`,
+            { reason }
+          );
+        }
+
+        // 플래그 초기화
+        this.isUpgradeCancelFlow = false;
         // 성공 후 테이블 새로고침
         const currentPage = this.tableData.pageable.pageNumber;
         this.$emit('changePage', currentPage);
+
       } catch (err) {
         console.error(err);
         alert('취소 처리에 실패했습니다.');

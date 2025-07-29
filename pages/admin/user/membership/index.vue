@@ -35,7 +35,7 @@
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
-              <th>멤버십<br>횟수</th>
+              <!-- <th>멤버십<br>횟수</th> -->
               <th>전시<br>사용횟수</th>
               <th>프로그램<br>사용횟수</th>
               <th>커피<br>사용횟수</th>
@@ -69,9 +69,9 @@
                 <div>{{ formatPhone(item.phone) }}</div>
               </td>
               <!-- 멤버십횟수 -->
-              <td>
+              <!-- <td>
                 <div>{{ item.number_of_memberships }}</div>
-              </td>
+              </td> -->
               <!-- 전시 사용횟수 -->
               <td>
                 <div>{{ item.number_of_exhibitions_used }}</div>
@@ -306,23 +306,18 @@ export default {
       width: 130px;
       min-width: 130px;
     }
-    /* Number of membership */
+    /* Number of display uses */
     &:nth-of-type(6) {
       width: 80px;
       min-width: 80px;
     }
-    /* Number of display uses */
+    /* Number of program uses */
     &:nth-of-type(7) {
       width: 80px;
       min-width: 80px;
     }
-    /* Number of program uses */
-    &:nth-of-type(8) {
-      width: 80px;
-      min-width: 80px;
-    }
     /* Number of drink uses */
-    &:nth-of-type(9) {
+    &:nth-of-type(8) {
       width: 80px;
       min-width: 80px;
     }
