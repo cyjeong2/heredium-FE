@@ -775,9 +775,9 @@ header {
         display: flex !important;
       }
 
-      .logo {
-        margin-right: 6.925rem;
-      }
+      // .logo {
+      //   margin-right: 6.925rem;
+      // }
 
       &.is-active {
         .nav-wrap {

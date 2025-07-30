@@ -11,19 +11,24 @@
         <div class="body">
           <div class="guide-content">
             <div class="guide-icon-div">
-              <div
-                class="guide-icon"
-                :style="{ backgroundColor: code === 3 ? '#2c8e40' : '#6d4029' }"
-              >
-                <!-- ic-brown 아이콘 대신 동일하게 사용해도 되고, ic-green 아이콘을 따로 만들면 그걸로 교체 -->
-                <i :class="code === 3 ? 'ic-green' : 'ic-brown'" />
-              </div>
+              <template v-if="membership">
+                <img
+                  :src="getImage(membership.image_url)"
+                  class="guide-icon-img"
+                  :alt="membership.name"
+                />
+              </template>
+              <template v-else>
+                <div class="guide-icon" :style="{ backgroundColor: fallbackColor }">
+                  <i :class="fallbackIconClass" />
+                </div>
+              </template>
               <div class="guide-label">
-                {{ code === 3 ? 'Green' : 'Brown' }}
+                {{ membership?.name || fallbackName }}
               </div>
             </div>
             <div class="guide-text">
-              <p>{{ code === 3 ? 'Green'  : 'Brown' }} 회원으로 전환됩니다.</p>
+              <p>{{ membership?.name }} 회원으로 전환됩니다.</p>
               <p>Mypage에서 혜택을 확인할 수 있습니다.</p>
             </div>
           </div>
@@ -49,10 +54,34 @@ export default {
     isShow: { type: Boolean, required: true },
     title: { type: String, default: '등급 전환 안내' },
     code: { type: Number, required: true },
-    canNext:  { type: Boolean, default: false }
+    canNext:  { type: Boolean, default: false },
   },
   emits: ['close', 'next'],
+  data(){
+    return {
+      membership: null,  // API 호출로 채워질 객체
+    };
+  },
+  created() {
+    // 컴포넌트가 생성되면 code 기반으로 한 번만 호출
+    this.fetchMembership();
+  },
   methods: {
+    async fetchMembership() {
+      console.log("this.code", this.code)
+      try {
+        // 여기에 실제 API 경로를 맞춰주세요.
+        // 예: GET /user/memberships/{code} 또는 /api/membership/code/{code}
+        this.membership = await this.$axios.$get(
+          `/user/membership/code/${this.code}`
+        );
+
+        console.log('this.membership', this.membership)
+      } catch (err) {
+        console.warn('멤버십 정보 조회 실패', err);
+        this.membership = null;
+      }
+    },
     async skipMarketing() {
       try {
         // 마케팅 동의 안 함(0)
@@ -68,6 +97,15 @@ export default {
       } finally {
         this.$emit('close');
       }
+    },
+    getImage(imageUrl) {
+      if (imageUrl) {
+        return `${this.$store.state.BASE_URL}${imageUrl}`;
+      }
+      // fallback: code 3 → green, else brown 아이콘
+      return this.code === 3
+        ? require('~/assets/img/membership_green.png')
+        : require('~/assets/img/membership_brown.png');
     },
   },
 };
@@ -194,5 +232,12 @@ export default {
     background: var(--color-u-primary);
     color: #fff;
   }
+}
+
+.guide-icon-img {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+  border-radius: 50%;
 }
 </style>

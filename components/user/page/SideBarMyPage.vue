@@ -130,6 +130,9 @@ h1 {
       &.nuxt-link-active {
         color: var(--color-u-primary);
         font-weight: 700;
+        border-bottom: 2px solid var(--color-u-primary);
+        padding-bottom: 0.4rem; /* 밑줄과 텍스트 간 적당한 여백 */
+        margin-bottom: 1.8rem;  /* 기존 마진에서 밑줄 두께(2px)+여백(4px)만큼 줄여줍니다 */
       }
 
       &.big-tab {

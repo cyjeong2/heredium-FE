@@ -11,12 +11,12 @@
 
       <section class="container">
         <div class="grid-content membership-content-editor">
-          <h2>멤버십 소개</h2>
+          <!-- <h2>멤버십 소개</h2> -->
           <div v-html="postDetail.content_detail"></div>
         </div>
       </section>
 
-      <section class="container">
+      <!-- <section class="container">
         <div class="grid-content top-border">
           <h2>멤버십 종류</h2>
           <div class="membership-form-content">
@@ -33,7 +33,7 @@
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <section v-if="postImageNote" class="note container">
         <div class="grid-content top-border">
@@ -109,7 +109,7 @@ import UExistedMembershipDialog from '~/components/user/modal/dialog/UExistedMem
 import UWarningDialog from '~/components/user/modal/dialog/UWarningDialog.vue';
 import URegisterModal from '~/components/user/modal/URegisterModal.vue';
 import UTermModal from '~/components/user/modal/UTermModal.vue';
-import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
+// import MembershipOption from '~/components/user/page/membership/MembershipOption.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { userMixin } from '~/mixins/userMixin';
 import tosspaymentsMixin from '~/store/tosspaymentsMixin';
@@ -117,7 +117,7 @@ import tosspaymentsMixin from '~/store/tosspaymentsMixin';
 export default {
   name: 'MembershipRegistrationPage',
   components: {
-    MembershipOption,
+    // MembershipOption,
     URefundPolicy,
     UButton,
     UNoticePolicy,
@@ -543,15 +543,16 @@ h2 {
   .grid-content > h2 {
     margin: 0;
     padding: 0;
-    width: 34.0176%;
+    width: 18.0176%;
     padding-right: 3.2rem;
   }
   .grid-content > div {
     width: 65.9824%;
-    margin-left: auto;
   }
 
   .membership-content-editor {
+    display: flex;
+    justify-content: center;
     margin-top: 40px;
   }
 

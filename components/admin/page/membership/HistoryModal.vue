@@ -73,17 +73,15 @@
 
             <div class="edit-area">
               <div>
-                <section class="membership-coupon has-title-side-btn">
+                <!-- <section class="membership-coupon has-title-side-btn">
                   <h3 class="mb-24">멤버십 정보<b class="must">*</b></h3>
                   <div>
                     <div class="grid-table">
-                      <!-- HEADER -->
+
                       <div class="grid-table-header">노출</div>
                       <div class="grid-table-header">멤버십 이름</div>
-                      <!-- <div class="grid-table-header">가격</div> -->
-                      <!-- <div class="grid-table-header">결제버튼 활성화</div> -->
                       <div class="grid-table-header">세부내용</div>
-                      <!-- BODY -->
+
                       <template v-for="(membership, membershipIndex) in historyItem.memberships">
                         <div
                           v-show="!membership.is_deleted"
@@ -114,7 +112,7 @@
                             <i class="ic-arrow-next"></i>
                           </div>
                         </div>
-                        <!-- BENEFIT -->
+
                         <CouponEditor
                           v-for="coupon in membership.coupons"
                           v-show="membershipIndexExpanded === membershipIndex"
@@ -126,19 +124,19 @@
                       </template>
                     </div>
                   </div>
-                </section>
+                </section> -->
                 <section class="editor mb-16">
                   <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
                   <SummernoteEditor v-model.trim="historyItem.content_detail" disabled />
                 </section>
-                <section class="mb-16">
+                <!-- <section class="mb-16">
                   <h3 class="mb-16">Note</h3>
                   <SImageUploadRepresentative
                     :image-src="historyItem?.note_image?.note_image_url"
                     type="PROJECT_DETAIL_IMAGE"
                     disabled
                   />
-                </section>
+                </section> -->
               </div>
             </div>
           </div>
@@ -149,13 +147,13 @@
 </template>
 
 <script>
-import SCheckbox from '../../commons/SCheckbox.vue';
+// import SCheckbox from '../../commons/SCheckbox.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
 // import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
 import SToggle from '../../commons/SToggle.vue';
-import CouponEditor from './CouponEditor.vue';
+// import CouponEditor from './CouponEditor.vue';
 import SummernoteEditor from '~/components/admin/commons/Summernote';
 
 export default {
@@ -164,10 +162,10 @@ export default {
     SDatepicker,
     SImageUploadRepresentative,
     SInput,
-    CouponEditor,
+    // CouponEditor,
     SToggle,
     // SFlexInputGrid,
-    SCheckbox,
+    // SCheckbox,
     SummernoteEditor
   },
   props: {

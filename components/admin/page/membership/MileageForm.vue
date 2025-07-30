@@ -36,7 +36,7 @@
               <SRadio
                 v-for="opt in paymentMethodOptions"
                 :key="opt.value"
-                v-model="form.paymentMethod"
+                v-model.number="form.paymentMethod"
                 :value="opt.value"
                 :class="{ 'is-error': error?.paymentMethod || feedback?.paymentMethod }"
               >
@@ -113,7 +113,7 @@ export default {
     const initialForm = {
       category:      null,
       categoryId:    null,
-      paymentMethod: null,
+      paymentMethod: 1,
       serialNumber:  '',
       paymentAmount:  null,
       mileageAmount: null,
@@ -137,7 +137,7 @@ export default {
     paymentMethodOptions() {
       return Object.entries(PAYMENT_METHOD_TYPE).map(([value, label]) => ({
         label,
-        value
+        value: Number(value),
       }));
     }
   },

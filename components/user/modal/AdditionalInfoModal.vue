@@ -69,8 +69,8 @@
 
         <!-- Footer -->
         <div class="foot">
-          <UButton button-type="secondary" @click="skipMarketing">다음에 하기</UButton>
-          <UButton :disabled="!isFormValid" @click="submitForm">완료하고 혜택받기</UButton>
+          <UButton button-type="secondary" class="secondary-btn" @click="skipMarketing">다음에 하기</UButton>
+          <UButton :disabled="!isFormValid" class="primary-btn" @click="submitForm">완료하고 혜택받기</UButton>
         </div>
       </div>
     </div>
@@ -251,19 +251,32 @@ export default {
       margin-top: 3.6rem;
     }
   }
-  button[button-type="secondary"] {
-    background:transparent; border:1px solid var(--color-u-grey-1);
-    color:var(--color-black);
-  }
-  button:not([button-type="secondary"]) {
-    background:var(--color-u-primary); color:#fff;
-  }
 
-  ::v-deep button:disabled {
-    background-color: var(--color-u-grey-2) !important;
-    border-color: var(--color-u-grey-3) !important;
+  /* ── “다음에 하기” 버튼 (항상 흰 배경, 회색 텍스트) ── */
+  .secondary-btn {
+    background-color: #ffffff !important;
+    border: 1px solid var(--color-u-grey-2) !important;
+    color: var(--color-u-grey-3) !important;
+    cursor: pointer;
+  }
+  // .secondary-btn:hover {
+    /* 필요하면 hover 스타일 추가 */
+  // }
+
+  /* ── “완료하고 혜택받기” 버튼 ── */
+  .primary-btn {
+    background-color: var(--color-u-primary);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
+  /* → 비활성화 상태 */
+  .primary-btn:disabled {
+    background-color: var(--color-u-grey-3) !important;
+    color: var(--color-u-grey-6) !important;
     cursor: not-allowed;
   }
+
 }
   /* 모바일에서 지역 셀렉트가 컨테이너에 맞춰 축소되도록 */
   .form-group.region .region-selects {

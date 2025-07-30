@@ -2,13 +2,13 @@
   <div>
     <!-- 1. 기존회원 초기 휴대폰 인증 모달 -->
     <MarketingPop
-      v-if="isShowMarketingPop && userInfo?.marketingPending && !userInfo.birthDate"
+      v-if="isShowMarketingPop && userInfo?.marketingPending && !userInfo?.birthDate"
       :is-show="isShowMarketingPop"
       @close="handleMarketingSkipped"
     />
     <!-- 2. 멤버십1이나 멤버십3 등급 모달 -->
     <NotificationModal
-      v-if="showNotificationModal && userInfo?.marketingPending"
+      v-if="showNotificationModal && userInfo?.marketingPending && notificationCode !== null"
       :is-show="showNotificationModal"
       :code="notificationCode"
       :can-next="notificationCanNext"
@@ -18,7 +18,7 @@
     <!-- @next="openAdditionalInfo" -->
     <!-- 3. 마케팅 정보 수집 모달 -->
     <AdditionalInfoModal
-      v-if="showAdditionalInfoModal && userInfo?.marketingPending && userInfo.birthDate"
+      v-if="showAdditionalInfoModal && userInfo?.marketingPending && userInfo?.birthDate"
       :is-show="showAdditionalInfoModal"
       @close="showAdditionalInfoModal = false"
       @issued="onCouponIssued"
@@ -204,7 +204,7 @@ export default {
           // 2‑2) 유저 정보 업데이트 (PUT)
           const payload = {
             gender: userPhoneInfo.gender,
-            birthDate: userPhoneInfo.birthDate,
+            birthDate: userPhoneInfo?.birthDate,
             // …필요한 다른 필드
             phone: userPhoneInfo.mobileNo,            // 새로 받은 번호
             isLocalResident: false,
@@ -385,6 +385,7 @@ export default {
     handleMarketingSkipped() {
       this.isShowMarketingPop = false;
       this.notificationCanNext  = false;           // 다음 버튼 숨김
+      this.notificationCode       = 1;
       this.showNotificationModal = true;           // NotificationModal 열기
     },
   },

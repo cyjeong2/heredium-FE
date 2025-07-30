@@ -3,10 +3,19 @@
     <div v-if="isShow" class="modal-wrap">
       <div class="modal-inner">
         <div class="modal">
-          <div v-if="isHasSlotTitle" class="head">
-            <h1 class="tm-1b"><slot name="title" /></h1>
+          <div v-if="title || isHasSlotTitle" class="head" :style="{ textAlign: titleAlign }">
+            <h1 class="tm-1b">
+              <!-- 우선 prop -->
+              <template v-if="title">{{ title }}</template>
+              <!-- 없으면 slot -->
+              <template v-else><slot name="title" /></template>
+            </h1>
+            <!-- 우측 닫기 버튼 -->
+            <button type="button" class="close-btn" @click="$emit('close')">
+              <i class="ic-close"/>
+            </button>
           </div>
-          <div class="body tm-1m">
+          <div class="body tm-1m" :style="{ textAlign: contentAlign }">
             <slot name="content" />
           </div>
           <div v-if="isHasSlotButtons" class="foot">
@@ -34,6 +43,17 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    title:  { type: String,  default: '' },
+    // 제목(text-align)에 들어갈 CSS 값: 'left' | 'center' | 'right' 등
+    titleAlign: {
+      type: String,
+      default: 'left'
+    },
+    // 본문(text-align)에 들어갈 CSS 값
+    contentAlign: {
+      type: String,
+      default: 'left'
     }
   },
   computed: {
@@ -116,8 +136,19 @@ export default {
       font-weight: 700;
       line-height: 100%;
     }
+    .close-btn {
+      position: absolute;
+      top: 1.6rem;
+      right: 1.6rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      i {
+        font-size: 3.0rem;      /* ← 아이콘 크기 업 */
+        color: var(--color-u-grey-6);
+      }
+    }
   }
-
   .body {
     text-align: center;
     font-weight: 500;
@@ -139,6 +170,43 @@ export default {
     justify-content: center;
     margin-bottom: 3.6rem;
     padding: 0 2rem;
+    /* 슬롯으로 들어오는 버튼 모두에 기본 border를 줍니다 */
+    ::v-deep > button {
+      /* 기본 스타일 */
+      border: 1px solid var(--color-u-grey-2);
+      border-radius: 0.3rem;
+      padding: 0.8rem 2rem;
+      font-weight: 500;
+      min-width: 8rem;
+
+      &.is-disabled,
+      &:disabled {
+        border-color: var(--color-u-grey-3);
+        background-color: var(--color-u-grey-3) !important;
+        color: var(--color-u-grey-6) !important;
+        cursor: not-allowed;
+      }
+
+      /* primary 버튼만 배경색 적용 */
+      &[button-type="primary"] {
+        background-color: var(--color-u-primary);
+        transition: filter 0.2s ease;
+        &:hover:not(.is-disabled):not(:disabled) {
+          /* 95% 밝기로 어둡게 표현 */
+          filter: brightness(95%);
+        }
+      }
+
+      /* standard / secondary 버튼 */
+      &[button-type="standard"],
+      &[button-type="secondary"] {
+        background-color: #fff;
+        color: var(--color-black);
+        &:hover:not(.is-disabled):not(:disabled) {
+          background-color: var(--color-u-grey-1);
+        }
+      }
+    }
   }
 }
 

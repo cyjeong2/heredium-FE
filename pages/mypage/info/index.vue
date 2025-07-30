@@ -93,11 +93,11 @@
             <td>휴대폰 번호</td>
             <td>
               {{ getPhone(account.phone) }}
-              <div v-if="currentUser.birthDate == null">
-                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 번호 변경</UButton>
+              <div v-if="currentUser?.birthDate == null">
+                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 인증</UButton>
               </div>
               <div v-else>
-                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 인증</UButton>
+                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 번호 변경</UButton>
               </div>
             </td>
           </tr>
@@ -184,10 +184,57 @@
           <UButton w-size="100" button-type="primary" @click="modal.isError = false">확인</UButton>
         </template>
       </UDialogModal>
-      <UDialogModal no-scroll-lock :is-show="modal.isSave">
-        <template #content>저장 완료</template>
+      <UDialogModal
+        no-scroll-lock
+        :is-show="modal.isSave"
+        title="저장 완료"
+        @close="modal.isSave = false"
+      >
+        <template #content>
+          저장이 완료되었습니다.
+        </template>
         <template #modal-btn2>
-          <UButton w-size="100" button-type="primary" @click="onConfirmModal">확인</UButton>
+          <UButton
+            w-size="100"
+            button-type="primary"
+            @click="onConfirmModal"
+          >
+            확인
+          </UButton>
+        </template>
+      </UDialogModal>
+      <UDialogModal
+        no-scroll-lock
+        title="선택 동의 해지 안내"
+        title-align="center"
+        content-align="center"
+        :is-show="showCancelWarning"
+        @close="showCancelWarning = false"
+      >
+        <template #content>
+          선택 약관 동의를 해지하면<br/>
+          추가 혜택이 제한될 수 있어요.<br/>
+          그래도 해지하시겠어요?
+        </template>
+        <template #modal-btn1>
+          <UButton button-type="standard" @click="showCancelWarning = false">
+            아니요
+          </UButton>
+        </template>
+        <template #modal-btn2>
+          <UButton button-type="primary" @click="onConfirmCancelWarning">
+            네
+          </UButton>
+        </template>
+      </UDialogModal>
+      <UDialogModal
+        no-scroll-lock
+        :is-show="modal.noChange"
+        @close="modal.noChange = false"
+      >
+        <template #content>변경된 정보가 없습니다.</template>
+        <template #modal-btn2>
+          <UButton w-size="100" button-type="primary" @click="modal.noChange = false">확인</UButton>
         </template>
       </UDialogModal>
       <!-- 발급 쿠폰 모달 -->
@@ -237,7 +284,8 @@ export default {
       modify: false,
       modal: {
         isSave: false,
-        isError: false
+        isError: false,
+        noChange:  false,
       },
       feedback: {
         email: {
@@ -259,6 +307,16 @@ export default {
         additionalInfoAgreed: false,
         marketingAgreedDate: null,
       },
+      originalInfo: {
+        job: null,
+        state: null,
+        district: null,
+        additionalInfoAgreed: false,
+        marketingAgreed: false,
+      },
+      // 경고 모달 표시용
+      showCancelWarning: false,
+      pendingPayload: null,
       jobOptions: JOB_OPTIONS,
       regionData: REGION_DATA,
       isTerms: { MARKETING: false },
@@ -323,6 +381,15 @@ export default {
       this.isTerms.MARKETING         = this.currentUser.isMarketingReceive
       this.account.isLocalResident   = this.currentUser.isLocalResident
       this.form.marketingAgreedDate  = this.currentUser.marketingAgreedDate
+
+      // ② originalInfo 에도 똑같이 복사
+      Object.assign(this.originalInfo, {
+        job: this.currentUser.job,
+        state: this.currentUser.state,
+        district: this.currentUser.district,
+        additionalInfoAgreed: this.currentUser.additionalInfoAgreed,
+        marketingAgreed: this.currentUser.isMarketingReceive,
+      });
     }
 
     this.$nextTick(() => {
@@ -438,45 +505,92 @@ export default {
       if (this.isValidate()) {
         const isLocal = (this.form.region.state === '대전광역시');
 
-        const res = await this.$axios
-          .$put('/user/account', {
-            email: this.account.email,
-            password: this.passwordChange ? this.newPassword1 : null,
-            isLocalResident: isLocal,
-            // isMarketingReceive: this.account.isMarketingReceive,
-            encodeData: this.$route.params.EncodeData,
-            job: this.form.job,
-            state: this.form.region.state,
-            district: this.form.region.district,
-            additionalInfoAgreed: this.form.additionalInfoAgreed,
-            isMarketingReceive: this.isTerms.MARKETING,
-            marketingAgreedDate: this.form.marketingAgreedDate,
-            marketingPending: false,
-          })
-          .catch((err) => {
-            const errorMessage = err.response.data?.MESSAGE || '';
-            if (errorMessage === 'DUPLICATE_EMAIL') {
-              this.feedback.email.isValid = false;
-              this.feedback.email.text = '중복된 이메일 입니다.';
-            }
-          });
-
-        if (res) {
-          this.account.email = res.email;
-
-          // 추가 정보
-          this.form.job                      = res.job;
-          this.form.region.state             = res.state;
-          this.form.region.district          = res.district;
-          this.form.additionalInfoAgreed     = res.additionalInfoAgreed;
-          this.isTerms.MARKETING             = res.isMarketingReceive;
-
-          this.issuedCoupons = res.coupons || [];
-          this.modal.isSave = true;
-          this.$store.commit('service/auth/setUserInfo', res);
-
+        const payload = {
+          email: this.account.email,
+          password: this.passwordChange ? this.newPassword1 : null,
+          isLocalResident: isLocal,
+          // isMarketingReceive: this.account.isMarketingReceive,
+          encodeData: this.$route.params.EncodeData,
+          job: this.form.job,
+          state: this.form.region.state,
+          district: this.form.region.district,
+          additionalInfoAgreed: this.form.additionalInfoAgreed,
+          isMarketingReceive: this.isTerms.MARKETING,
+          marketingAgreedDate: this.form.marketingAgreedDate,
+          marketingPending: false,
         }
+
+        // ─── 1) “아무 것도 바뀐 게 없으면” 체크 ──────────────────
+        const noChange =
+          payload.job                  === this.originalInfo.job &&
+          payload.state                === this.originalInfo.state &&
+          payload.district             === this.originalInfo.district &&
+          payload.additionalInfoAgreed === this.originalInfo.additionalInfoAgreed &&
+          payload.isMarketingReceive   === this.originalInfo.marketingAgreed;
+
+        if (noChange) {
+          // show a simple “no changes” dialog
+          this.modal.noChange = true;
+          return;
+        }
+        // ────────────────────────────────────────────────────
+
+        const wasComplete = Object.values(this.originalInfo).every(v => !!v);
+
+        // 2) 지금도 모두 채워져 있는지
+        const isCompleteNow = [
+          this.form.job,
+          this.form.region.state,
+          this.form.region.district,
+          this.form.additionalInfoAgreed,
+          this.isTerms.MARKETING
+        ].every(v => !!v);
+
+        // 3) “원래 완전 → 지금 빠짐” 일 때만 경고 모달
+        if (wasComplete && !isCompleteNow) {
+          this.pendingPayload = payload;
+          this.showCancelWarning = true;
+          return;
+        }
+
+        console.log('payload', payload)
+
+        // 아니라면 바로 저장
+        await this.doSave(payload);
       }
+    },
+    // 실제 PUT 호출
+    async doSave(payload) {
+      const res = await this.$axios
+        .$put('/user/account', payload)
+        .catch((err) => {
+          const errorMessage = err.response.data?.MESSAGE || '';
+          if (errorMessage === 'DUPLICATE_EMAIL') {
+            this.feedback.email.isValid = false;
+            this.feedback.email.text = '중복된 이메일 입니다.';
+          }
+        });
+
+      if (res) {
+        this.account.email = res.email;
+
+        // 추가 정보
+        this.form.job                      = res.job;
+        this.form.region.state             = res.state;
+        this.form.region.district          = res.district;
+        this.form.additionalInfoAgreed     = res.additionalInfoAgreed;
+        this.isTerms.MARKETING             = res.isMarketingReceive;
+
+        this.issuedCoupons = res.coupons || [];
+        this.modal.isSave = true;
+        this.$store.commit('service/auth/setUserInfo', res);
+      }
+    },
+    // 모달에서 “네” 눌렀을 때
+    async onConfirmCancelWarning() {
+      this.showCancelWarning = false;
+      await this.doSave(this.pendingPayload);
+      this.pendingPayload = null;
     },
     onEmailChange() {
       this.emailChange = true;
