@@ -70,7 +70,8 @@
         <!-- Footer -->
         <div class="foot">
           <UButton button-type="secondary" class="secondary-btn" @click="skipMarketing">다음에 하기</UButton>
-          <UButton :disabled="!isFormValid" class="primary-btn" @click="submitForm">완료하고 혜택받기</UButton>
+          <!-- <UButton :disabled="!isFormValid" class="primary-btn" @click="submitForm">완료하고 혜택받기</UButton> -->
+          <UButton class="primary-btn" @click="submitForm">완료</UButton>
         </div>
       </div>
     </div>
@@ -131,9 +132,9 @@ export default {
         state: this.form.region.state,
         district: this.form.region.district,
         isLocalResident: isLocal,
-        isMarketingReceive: true,
+        isMarketingReceive: this.form.agreeMarketing,
         marketingPending: false,
-        additionalInfoAgreed: true,
+        additionalInfoAgreed: this.form.additionalInfoAgreed,
       };
 
       const res = await this.$axios.$put('/user/account/marketing', payload);
@@ -273,7 +274,7 @@ export default {
   /* → 비활성화 상태 */
   .primary-btn:disabled {
     background-color: var(--color-u-grey-3) !important;
-    color: var(--color-u-grey-6) !important;
+    color: #fff !important;
     cursor: not-allowed;
   }
 

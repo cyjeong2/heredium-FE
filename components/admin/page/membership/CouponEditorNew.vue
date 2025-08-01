@@ -421,9 +421,11 @@ export default {
       grid-column: 1 / -1;
       align-items: center;
 
+      label{
+        width: 101px;
+      }
       .field-value{
         width: 80%;
-        margin-left: 60px;
       }
     }
 

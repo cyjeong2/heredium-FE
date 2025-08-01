@@ -224,7 +224,7 @@
         </client-only>
       </div>
     </div>
-    <UDialogModal :is-show="modal.isToday" :hide-edge-close-btn="true" :hide-head="true" @close="modal.isToday = false">
+    <UDialogModal ref="todayModal" :is-show="modal.isToday" :hide-edge-close-btn="true" :hide-head="true" @close="modal.isToday = false">
       <template #content>
         당일 예매한 {{ type === 'COFFEE' ? '커피는' : '관람권은' }} 환불되지 않아요.<br />
         계속 예매하시겠어요?
@@ -293,6 +293,7 @@
 </template>
 
 <script>
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { isEmpty } from 'lodash/lang';
 import cloneDeep from 'lodash/cloneDeep';
 import UOrderCoupon from '../common/UOrderCoupon.vue';
@@ -449,6 +450,18 @@ export default {
       return this.rawPrice - this.totalDiscount;
     }
   },
+  watch: {
+    'modal.isToday'(isOpen) {
+      // modal.isToday 가 true 되면 잠그고, false 되면 풀어준다
+      const modalEl = this.$refs.todayModal?.$el;
+      if (!modalEl) return;
+      if (isOpen) {
+        disableBodyScroll(modalEl);
+      } else {
+        enableBodyScroll(modalEl);
+      }
+    }
+  },
   created() {
     this.detailData = this.initDetailData;
     this.selectedDate = this.initSelectedDate;
@@ -473,6 +486,7 @@ export default {
     if (this.isHana) {
       window.removeEventListener('beforeunload', this.beforeUnloadEvent);
     }
+    clearAllBodyScrollLocks();
   },
   methods: {
     beforeUnloadEvent(e) {
@@ -571,7 +585,9 @@ export default {
             await this.$axios
               .$post('/user/tickets/user/free', {
                 ticketOrderInfo,
-                couponUuid: this.coupon?.uuid || null
+                ...(this.coupon?.isMembership
+                  ? { membershipCouponId: this.coupon.id }
+                  : { couponUuid: this.coupon?.uuid ?? null })
               })
               .then((res) => {
                 this.$router.push({
@@ -622,17 +638,19 @@ export default {
           } else {
             const failUrl = `${window.location.origin}${this.$route.fullPath}`;
 
+            const payload = {
+              ticketOrderInfo,
+              // 멤버십 쿠폰이면 ID, 아니면 UUID
+              ...(this.coupon?.isMembership
+                ? { membershipCouponId: this.coupon.id }
+                : { couponUuid: this.coupon?.uuid ?? null })
+            };
+
             await this.requestPayment(
-              {
-                ticketOrderInfo,
-                couponUuid: this.coupon?.uuid ?? null
-              },
+              payload,
               this.paymentPrice,
               failUrl,
-              {
-                id: this.id,
-                type: this.type
-              },
+              { id: this.id, type: this.type },
               'member'
             );
           }

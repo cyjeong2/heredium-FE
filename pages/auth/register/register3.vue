@@ -158,6 +158,11 @@ import URegisterModal from '~/components/user/modal/URegisterModal';
 export default {
   name: 'Register3Page',
   components: { UInput, UButton, USelect, UCheckbox, URegisterModal },
+  beforeRouteLeave(to, from, next) {
+    // 페이지를 떠날 때 지우고 싶은 키들
+    localStorage.removeItem('snsInfo');
+    next();
+  },
   async asyncData({ query, $axios, $dayjs, redirect }) {
     const userInfo = await $axios
       .$get('/nice/decrypt', {
@@ -244,6 +249,7 @@ export default {
     },
     isSocialFlow() {
       const { snsToken, provider } = this.snsInfo
+      console.log('this.snsInfo', this.snsInfo)
       return Boolean(snsToken && provider)
     },
     cityOptions() {

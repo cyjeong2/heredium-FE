@@ -225,7 +225,7 @@ export default {
       deep: true,
       handler(newValue) {
         this.isAllChecked = !Object.values(newValue).some((item) => !item);
-        localStorage.setItem('isMarketing', JSON.stringify(newValue.MARKETING));
+        // localStorage.setItem('isMarketing', JSON.stringify(newValue.MARKETING));
       }
     },
     'form.region.state'(newState) {
@@ -239,7 +239,7 @@ export default {
   },
   mounted() {
     // 마케팅 동의 초기화
-    localStorage.removeItem('isMarketing');
+    // localStorage.removeItem('isMarketing');
   },
   created() {
     if (this.authErrorMsg) {

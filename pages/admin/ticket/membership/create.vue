@@ -15,12 +15,13 @@
           w-size="x-large"
           @input="onMembershipSelect"
         />
-        <SButton icon="ic-arrow-down" @click="onClickCreate">멤버십 등록하기</SButton>
+        <SButton v-if="isShowByAuthLevel(['ADMIN'])" icon="ic-arrow-down" @click="onClickCreate">멤버십 등록하기</SButton>
       </div>
     </div>
 
     <!-- ② 선택 시 폼 표시 -->
     <div v-if="showForm" class="membership-form">
+      <fieldset :disabled="!isAdmin">
       <h3 class="section-title">멤버십 정보</h3>
       <section class="section membership-info mb-24">
         <div class="fields">
@@ -91,8 +92,9 @@
       <!-- ④–⑥ 하단 버튼 -->
       <div class="button-row">
         <!-- <SButton v-if="selectedMembershipId" @click="onDelete">삭제</SButton> -->
-        <SButton button-type="primary" :disabled="isSaving" @click="beforeOnSave">저장</SButton>
+        <SButton v-if="isAdmin" button-type="primary" :disabled="isSaving" @click="beforeOnSave">저장</SButton>
       </div>
+      </fieldset>
     </div>
     <SDialogModal :is-show="isShowErrorModal" @close="isShowErrorModal = false">
       <template #content>{{ errorMsg }}</template>
@@ -187,6 +189,15 @@ export default {
       },
       isShowErrorModal: false,
     };
+  },
+  computed: {
+    adminInfo() {
+      return this.$store.getters['service/auth/getAdminUserInfo'];
+    },
+    isAdmin() {
+      // ADMIN 권한만 true
+      return this.isShowByAuthLevel(['ADMIN']);
+    }
   },
   async mounted() {
     await this.fetchMembershipOptions()
@@ -422,7 +433,9 @@ export default {
       this.feedback = fb;
       return isValid;
     },
-
+    isShowByAuthLevel(allowAuthTypes) {
+      return allowAuthTypes.includes(this.adminInfo?.auth);
+    }
   },
 };
 </script>
@@ -525,5 +538,10 @@ export default {
 }
 .is-error {
   border-color: #d93025 !important;
+}
+.membership-form fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 </style>

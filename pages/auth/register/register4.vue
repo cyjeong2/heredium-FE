@@ -36,7 +36,7 @@ export default {
     if (isMarketing === 'true') {
       this.showCouponModal = true;
     }
-    localStorage.removeItem('isMarketing');
+    localStorage.removeItem('snsInfo');
   },
   // created() {
   //   // 1) 쿼리로 넘어온 coupons(JSON)를 파싱

@@ -509,7 +509,6 @@ export default {
           email: this.account.email,
           password: this.passwordChange ? this.newPassword1 : null,
           isLocalResident: isLocal,
-          // isMarketingReceive: this.account.isMarketingReceive,
           encodeData: this.$route.params.EncodeData,
           job: this.form.job,
           state: this.form.region.state,
@@ -552,8 +551,6 @@ export default {
           this.showCancelWarning = true;
           return;
         }
-
-        console.log('payload', payload)
 
         // 아니라면 바로 저장
         await this.doSave(payload);
