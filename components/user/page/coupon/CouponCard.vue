@@ -209,6 +209,7 @@ export default {
     .img-wrap {
       height: 10rem;
       width: 10rem;
+      padding: 2.5rem;
 
       > img {
         width: 100%;
