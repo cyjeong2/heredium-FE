@@ -10,14 +10,25 @@
     </div>
     <div class="coupon-detail">
       <p class="name">{{ couponDisplayName }}</p>
+      <div class="type-discount">
+        <span class="type">{{ couponTypeLabel }} &nbsp;</span>
+        <span class="discount-text">
+          {{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }} 할인 쿠폰
+        </span>
+      </div>
       <div class="discount">
         <!-- <div v-if="!isSelection" class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
         </div> -->
         <div class="date">
-          사용기간:
-          <span v-if="isMembershipCoupon">상시할인</span>
+          유효기간:
+          <span v-if="isMembershipCoupon">
+            {{ getFormattedDate(
+                detailCoupon.membership_start_date,
+                detailCoupon.membership_end_date
+              ) }}
+          </span>
           <span v-else-if="firstUnused">
             {{ getFormattedDate(
                 firstUnused.delivered_date,
@@ -25,13 +36,6 @@
               ) }}
           </span>
           <span v-else>기간 정보 없음</span>
-        </div>
-      </div>
-      <div>
-        <div class="date">
-          사용여부:
-          <span v-if="remainingCount > 0">사용가능</span>
-          <span v-else>사용완료</span>
         </div>
       </div>
       <div class="coupon-remaining">
@@ -75,6 +79,7 @@ import UButton from '../../common/UButton.vue';
 import ModalCouponInfor from '../../modal/coupon/ModalCouponInfor.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
+import { COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 
 export default {
   name: 'CouponCard',
@@ -114,6 +119,10 @@ export default {
     };
   },
   computed: {
+    couponTypeLabel() {
+      const opt = COUPON_TYPE_OPTION_LIST.find(o => o.value === this.detailCoupon.coupon_type);
+      return opt ? opt.label : this.detailCoupon.coupon_type;
+    },
     couponDisplayName() {
       // 멤버십 쿠폰인지 체크하는 기존 로직 재활용
       if (this.isMembershipCoupon) {
@@ -220,7 +229,7 @@ export default {
 
     .name {
       font-weight: 600;
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       color: var(--color-default);
     }
 
@@ -247,7 +256,7 @@ export default {
     display: flex;
     flex: 1;
     flex-direction: column;
-    row-gap: 8px;
+    row-gap: 3px;
     color: var(--color-u-placeholder);
   }
 
@@ -363,6 +372,26 @@ export default {
 @media screen and (min-width: 769px) {
   .coupon-card {
     max-width: 400px;
+  }
+}
+
+.coupon-card {
+  .coupon-detail {
+    .type-discount {
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      color: black;
+      margin-bottom: -5px;
+      margin-top: 5px;
+
+      .type {
+        font-weight: 500;
+      }
+      .discount-text {
+        font-weight: 500;
+      }
+    }
   }
 }
 </style>

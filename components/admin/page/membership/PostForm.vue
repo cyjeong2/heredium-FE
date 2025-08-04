@@ -140,9 +140,15 @@
           </div>
         </section> -->
         <section class="editor mb-16">
-          <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
+          <h3 class="mb-16">멤버십 콘텐츠(PC)<b class="must">*</b></h3>
           <div class="editor-wrap" :class="{ 'is-error': feedback?.contentDetail }">
             <SummernoteEditor v-model.trim="detailData.content_detail" />
+          </div>
+        </section>
+        <section class="editor mb-16">
+          <h3 class="mb-16">멤버십 콘텐츠(Mobile)</h3>
+          <div class="editor-wrap">
+            <SummernoteEditor v-model.trim="detailData.content_detail_mobile" />
           </div>
         </section>
         <!-- <section class="mb-16">
@@ -226,7 +232,7 @@
         <SButton button-type="primary" @click="$router.go(0)">확인</SButton>
       </template>
     </SDialogModal>
-    <HistoryModal :is-show="modal.isShowHistory" :history-item="historyItem" @close="modal.isShowHistory = false" />
+    <HistoryModal v-if="historyItem" :is-show="modal.isShowHistory" :history-item="historyItem" @close="modal.isShowHistory = false" />
   </div>
 </template>
 
@@ -553,6 +559,7 @@ export default {
       // }
 
       try {
+        console.log('detailData', detailData)
         if (this.mode === 'create') {
           await this.$axios.post('/admin/posts', detailData);
         } else {
@@ -625,7 +632,7 @@ export default {
           };
         });
         transformData.memberships = memberships;
-        transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
+        // transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
 
         this.historyItem = transformData;
         this.modal.isShowHistory = true;

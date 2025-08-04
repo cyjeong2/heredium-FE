@@ -126,8 +126,12 @@
                   </div>
                 </section> -->
                 <section class="editor mb-16">
-                  <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
+                  <h3 class="mb-16">멤버십 콘텐츠(PC)<b class="must">*</b></h3>
                   <SummernoteEditor v-model.trim="historyItem.content_detail" disabled />
+                </section>
+                <section class="editor mb-16">
+                  <h3 class="mb-16">멤버십 콘텐츠(Mobile)</h3>
+                  <SummernoteEditor v-model.trim="historyItem.content_detail_mobile" disabled />
                 </section>
                 <!-- <section class="mb-16">
                   <h3 class="mb-16">Note</h3>
