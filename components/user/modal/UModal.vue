@@ -1,11 +1,11 @@
 <template>
   <transition name="fade">
     <div v-if="isShow" class="modal-wrap">
-      <div ref="scrollTarget" class="modal-inner">
+      <div class="modal-inner">
         <div class="modal">
           <div v-if="!hideHead" class="head">
             <h1 class="tm-1b"><slot name="title"></slot></h1>
-            <button v-if="!hideEdgeCloseBtn" type="button" class="close-btn" @click.stop="$emit('close')">
+            <button v-if="!hideEdgeCloseBtn" type="button" class="close-btn" @click="$emit('close')">
               <i class="ic-close" />
             </button>
           </div>
@@ -53,7 +53,7 @@ export default {
   watch: {
     isShow(newValue) {
       if (newValue) {
-        disableBodyScroll(this.$refs.scrollTarget);
+        disableBodyScroll(document);
       } else {
         clearAllBodyScrollLocks();
       }
@@ -73,6 +73,7 @@ export default {
   width: 100vw;
   height: 100vh;
   z-index: 500;
+  background-color: rgba(17, 17, 17, 0.8);
 }
 
 .modal-inner {
@@ -82,7 +83,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: var(--color-white);
-  border: 1px solid #000;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
 }
 
 .modal {

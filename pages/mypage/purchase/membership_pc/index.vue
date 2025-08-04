@@ -7,37 +7,320 @@
       </div>
       <div class="ticketing-body">
         <div class="membership_info">
+          <div class="membership_icon">
+            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" />
+            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" />
+            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" />
+          </div>
           <div class="name_membership">
-            <span>{{ dataMembership.name }}님의 현재 등급은 <br />
-              {{ dataMembership.membership_name }} 입니다</span><br />
+            <div>
+              <p class="name_class">
+                {{ dataMembership.name }} 님의 현재 등급은 <B>{{ dataMembership.membership_name }}</B> 입니다.
+              </p>
+              <div class="mileage_condition">
+                <p v-if="dataMembership.code === 1">
+                  마일리지 <B>{{ 70 - mileageList.totalMileage }}점</B> 적립시 업그레이드 됩니다.
+                </p>
+                <p v-if="dataMembership.code === 2">
+                  업그레이드 등급 유지기간
+                  <b
+                    >{{ formatDate(dataMembership.registration_date) }}~{{
+                      formatDate(dataMembership.expiration_date)
+                    }}</b
+                  >
+                </p>
+                <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
+                <button class="membership_benefit" @click="openModal">등급혜택보기</button>
+              </div>
+
+              <div class="mileage_description">
+                <p v-if="dataMembership.code !== 3">
+                  마일리지는 <B>멤버십 등급 산정용</B>으로만 사용되며, <br />
+                  적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
+                </p>
+                <p v-if="dataMembership.code === 3">
+                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
+                  Green 회원의 경우 마일리지 적립이 불가합니다.
+                </p>
+              </div>
             </div>
+          </div>
           <div class="mileage_summary">
-            <span>현재 나의 마일리지</span>
-            <span>현재 나의 마일리지</span>
+            <div>현재 나의 마일리지</div>
+            <div>소멸 예정 마일리지</div>
+          </div>
+          <div class="show_mileage">
+            <div class="mileage_total">
+              <span style="font-size: 28px">{{ mileageList.totalMileage }}</span
+              >M
+            </div>
+            <div class="mileage_expire">
+              <span style="font-size: 28px">{{ mileageList.expiringMileage }}</span
+              >M
+            </div>
           </div>
         </div>
       </div>
+      <!-- Tab UI -->
+      <div class="mileage-section">
+        <!-- 탭 버튼 영역 -->
+        <div class="tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            :class="{ active: activeTab === tab.key }"
+            @click="activeTab = tab.key"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+        <!-- 기간 필터 영역 -->
+        <div class="filter-area">
+          <div class="filter-buttons">
+            <button
+              v-for="option in filterOptions"
+              :key="option"
+              :class="{ selected: selectedFilter === option }"
+              @click="selectFilter(option)"
+            >
+              {{ option }}
+            </button>
+          </div>
+
+          <div class="date-range">
+            <input v-model="startDate" type="date" />
+            <span>~</span>
+            <input v-model="endDate" type="date" />
+          </div>
+
+          <button class="filter-submit" @click="applyPeriodFilter">조회</button>
+        </div>
+
+        <!-- 테이블 -->
+        <SPageable :table-data="mileage_list" @getTableData="loadMileageList">
+          <template #data="{ data }">
+            <table class="mileage-table">
+              <thead>
+                <tr>
+                  <th>승인일자</th>
+                  <th>적립내역</th>
+                  <th>유효기간</th>
+                  <th>적립</th>
+                  <th>사용</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!data || data.length === 0">
+                  <td colspan="5">
+                    <no-mileage />
+                  </td>
+                </tr>
+                <tr v-for="item in data" :key="item.id">
+                  <td>{{ formatDate(item.createdDate) }}</td>
+                  <td>{{ formatTypeCategory(item.type, item.category) }}</td>
+                  <td>{{ formatDate(item.expirationDate) }}</td>
+                  <td>
+                    <b>{{ [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
+                  </td>
+                  <td>
+                    <b>{{ [1, 2, 3].includes(item.type) ? `${item.mileageAmount}M` : '-' }}</b>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
+        </SPageable>
+      </div>
+      <ModalMembershipInfor
+        v-if="showModal"
+        v-model="showModal"
+        :is-modal-visible="showModal"
+        :data-membership="dataMembership"
+        class="transparent-modal"
+        @close="showModal = false"
+      />
     </section>
   </main>
 </template>
 
 <script>
+import dayjs from 'dayjs';
+
+import ModalMembershipInfor from '~/components/user/modal/membership/ModalMembershipInfor.vue';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
+import SPageable from '~/components/admin/commons/SPageable';
+import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { SideBarMyPage },
+  components: { SideBarMyPage, SPageable, NoMileage, ModalMembershipInfor },
   async asyncData({ $axios }) {
+    const initialPageSize = 4;
+
     const dataMembership = await $axios.$get('/user/membership/info');
-    console.log('[asyncData] dataMembership:', dataMembership);
-    return { dataMembership };
+    const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
+      params: { page: 0, size: initialPageSize }
+    });
+
+    const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
+    return {
+      dataMembership,
+      mileageList: mileageListRes,
+      mileage_list: {
+        content: mileageListRes.content,
+        totalElements: mileageListRes.totalElements,
+        totalPages,
+        number: mileageListRes.number,
+        size: initialPageSize,
+        first: mileageListRes.number === 0,
+        last: mileageListRes.number === totalPages - 1
+      }
+    };
   },
   data() {
     return {
-      dataMembership: null,
-      availableCouponsList: null,
-      baseUrl: '/mypage/purchase/membership/coupon-history'
+      activeTab: 'total',
+      tabs: [
+        { key: 'total', label: '전체' },
+        { key: 'added', label: '적립 마일리지' },
+        { key: 'used', label: '사용 마일리지' }
+      ],
+      filterOptions: ['1개월', '3개월', '6개월', '1년'],
+      selectedFilter: '1개월',
+      startDate: null,
+      endDate: null,
+      pageSizeForLoad: 4,
+      showModal: false
     };
+  },
+  watch: {
+    activeTab(newTab, oldTab) {
+      this.loadMileageList(0);
+    }
+  },
+  methods: {
+    async loadMileageList(pageIndex = 0) {
+      if (!this.dataMembership) return;
+      try {
+        const params = {
+          page: pageIndex,
+          size: this.pageSizeForLoad
+        };
+
+        // 탭 필터 추가
+        if (this.activeTab === 'added') {
+          params.types = [0, 4, 5]; // 적립 타입들
+        } else if (this.activeTab === 'used') {
+          params.types = [1, 2, 3]; // 사용 타입들
+        }
+
+        // 날짜 필터 추가
+        if (this.startDate) {
+          params.startDate = dayjs(this.startDate).format('YYYY-MM-DD HH:mm:ss');
+        }
+        if (this.endDate) {
+          params.endDate = dayjs(this.endDate).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        const res = await this.$axios.$get(`/user/membershipMileage/${this.dataMembership.account_id}`, {
+          params
+        });
+
+        const totalPages = Math.ceil(res.totalElements / this.pageSizeForLoad);
+
+        this.mileage_list = {
+          content: res.content,
+          totalElements: res.totalElements,
+          totalPages,
+          number: res.number,
+          size: this.pageSizeForLoad,
+          first: res.number === 0,
+          last: res.number === totalPages - 1
+        };
+
+        this.mileageList = {
+          ...this.mileageList,
+          totalMileage: res.totalMileage
+        };
+      } catch (error) {
+        console.error('마일리지 목록 불러오기 실패:', error);
+        this.mileage_list = {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          number: 0,
+          size: this.pageSizeForLoad,
+          first: true,
+          last: true
+        };
+        this.mileageList = { totalMileage: 0 };
+      }
+    },
+    formatTypeCategory(type, category) {
+      const categoryMap = {
+        0: '헤레디움 전시',
+        1: '헤레디움 프로그램',
+        2: '헤레디움 커피',
+        3: '헤레디움 아트숍'
+      };
+      if (type === 1) {
+        return '[사용]CN PASS PLUS 등급 업그레이드';
+      }
+      const isAdded = [0, 4, 5].includes(type);
+      const prefix = isAdded ? '[적립]' : '[소멸]';
+      return `${prefix}${categoryMap[category]}`;
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    },
+    selectFilter(option) {
+      this.selectedFilter = option;
+    },
+    applyPeriodFilter() {
+      const now = new Date();
+      let start = new Date();
+
+      switch (this.selectedFilter) {
+        case '1개월':
+          start.setMonth(now.getMonth() - 1);
+          break;
+        case '3개월':
+          start.setMonth(now.getMonth() - 3);
+          break;
+        case '6개월':
+          start.setMonth(now.getMonth() - 6);
+          break;
+        case '1년':
+          start.setFullYear(now.getFullYear() - 1);
+          break;
+        case 'custom':
+          this.loadMileageList(0);
+          return;
+        default:
+          start = null;
+      }
+
+      if (start) {
+        const pad = (num) => (num < 10 ? '0' + num : num);
+        const formatDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+        this.startDate = formatDate(start);
+        this.endDate = formatDate(now);
+      }
+
+      this.loadMileageList(0);
+    },
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    }
   }
 };
 </script>
@@ -51,6 +334,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 6rem;
 
   h2 {
     font-size: 1.8rem;
@@ -68,8 +352,12 @@ export default {
 }
 
 .ticketing-body {
+  width: 2300px;
+  height: 200px !important;
+
   .ticketing-info {
     display: flex;
+    flex-direction: row;
     align-items: center;
     margin-bottom: 4rem;
     padding: 1.6rem 1.6rem 1.7rem;
@@ -99,12 +387,6 @@ export default {
   }
 }
 
-.box {
-  &-membership {
-    margin-bottom: 3.2rem;
-  }
-}
-
 @media screen and (min-width: 769px) {
   .container {
     display: flex;
@@ -131,11 +413,11 @@ export default {
 
   .ticketing-body {
     margin-top: 2.6rem;
-
+    margin-bottom: 6.5rem;
     .ticketing-info {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: flex-start;
       margin-bottom: 2rem;
       padding: 1.6rem 2rem;
 
@@ -164,9 +446,9 @@ export default {
 
   .box-contents {
     width: 100%;
-    display: flex; // <-- 추가!
-    justify-content: center; // 가로 중앙 정렬
-    align-items: center; // 세로 중앙 정렬 (필요 시)
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     .box-membership {
       max-width: 35%;
@@ -182,9 +464,171 @@ export default {
   }
 }
 .membership_info {
-  border-top: 0.1rem solid var(--color-black);
-  border-left: 0.1rem solid var(--color-black);
-  border-right: 0.1rem solid var(--color-black);
-  border-bottom: 0.1rem solid var(--color-black);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+
+  width: 80%;
+  max-width: 1000px;
+  height: 100%;
+  max-height: 300px;
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 1px solid #e6e6e6;
+  background-color: #fff;
 }
+.membership_icon {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 20px;
+  margin-left: 1.2rem;
+}
+.name_membership {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 40px;
+}
+.name_membership > div > p,
+.name_membership > div > div {
+  margin-bottom: 1rem;
+}
+.name_class {
+  font-size: 1.5em;
+  margin-bottom: 2rem !important;
+}
+.mileage_condition {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+.membership_benefit {
+  background-color: #111111 !important;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  min-width: 90px;
+  min-height: 30px;
+  cursor: pointer;
+}
+.modal_title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.modal_icon {
+  display: flex;
+  flex-direction: row;
+}
+.modal_name {
+  font-size: 17px;
+  display: flex;
+  flex-direction: row;
+}
+.mileage_summary {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+  padding-left: 30px;
+  border-left: 1px solid #ccc;
+  margin-top: 20px;
+}
+.show_mileage {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+  padding-left: 30px;
+  margin-top: 20px;
+  margin-left: 60px;
+  font-weight: bold;
+  font-size: 16px;
+}
+.mileage-section {
+  width: 80%;
+  max-width: 1000px;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+}
+.tabs {
+  display: flex;
+}
+.tabs button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: #fff;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 1px solid #d9d9d9;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  border-bottom: 2px solid #000;
+  background: #fff;
+}
+.filter-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  margin-bottom: 3.5rem;
+  padding: 8px 0;
+  gap: 4px;
+}
+.filter-area button {
+  flex: 1;
+  min-width: 90px;
+  padding: 6px 12px;
+  text-align: center;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.filter-area button.selected {
+  background: #ffffff;
+  border-color: #111111;
+}
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.date-range input[type='date'] {
+  padding: 4px 8px;
+  min-width: 227.5px;
+  border: 1px solid #7b7a7d;
+}
+.filter-submit {
+  background-color: #111111 !important;
+  color: #ffffff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  max-width: 50px;
+  cursor: pointer;
+}
+.mileage-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    border-top: 1px solid #111111;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 12px;
+    text-align: center;
+  }
+  td {
+    border-top: 1px solid #d9d9d9;
+    padding: 12px;
+    text-align: center;
+  }
+}
+
 </style>

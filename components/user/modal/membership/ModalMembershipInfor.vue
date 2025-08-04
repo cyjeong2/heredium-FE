@@ -3,16 +3,59 @@
   <UModal v-if="isPCUrl" :is-show="value" class="modal-custom" :hide-edge-close-btn="true" @close="handleClose">
     <template #content>
       <div @mouseleave="handleMouseLeave" @mouseenter="handleMouseEnter">
-        <p class="name-membership">{{ dataMembership.membership_name }}</p>
-        <p class="title-modal">{{ dataMembership.short_name }}</p>
-        <!-- 대상 부분은 v-if 사용해서 처리-->
-        <p v-if="dataMembership.code === 1" class="title">대상: 만 19세 이상 회원</p>
-        <p v-if="dataMembership.code === 2" class="title"></p>
-        <p v-if="dataMembership.code === 3" class="title">대상: 만 19세 미만 회원</p>
+        <div class="title-modal">
+          <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
+          <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
+          <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
+          <span class="name-membership">
+            {{ dataMembership.name }} 님의 현재 등급은 <B>{{ dataMembership.membership_name }}</B> 입니다.
+          </span>
+        </div>
         <div class="benefit">
           <div class="benefit-box">
-            <!-- coupon 테이블 참조해서 멤버십에 따라 내용 채워지도록 설정 필요. CN PASS / CN PASS+ 는 5 & 6 항목 공통 / STUDENT는 5까지만 존재 -->
-            <p v-for="(line, idx) in fullBenefits" :key="idx" class="benefit-content" v-html="`${idx + 1}. ${line}`" />
+            <div class="benefit-box">
+              <div class="benefit-row">
+                <div class="left">
+                  <img src="~assets/img/Brown.png" class="membership-icon2" />
+                  <div class="name_target">
+                    <p class="membership-name">CN PASS</p>
+                    <p class="membership-target">만 19세 이상 회원</p>
+                  </div>
+                </div>
+                <div class="right">
+                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
+                  <p class="benefit-discount"><b>10%</b> 할인</p>
+                </div>
+              </div>
+
+              <div class="benefit-row">
+                <div class="left">
+                  <img src="~assets/img/Terracotta.png" class="membership-icon2" />
+                  <div class="name_target">
+                    <p class="membership-name">CN PASS PLUS</p>
+                    <p class="membership-target">마일리지 70점 달성 CN PASS 회원</p>
+                  </div>
+                </div>
+                <div class="right">
+                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
+                  <p class="benefit-discount"><b>15%</b> 할인</p>
+                </div>
+              </div>
+
+              <div class="benefit-row">
+                <div class="left">
+                  <img src="~assets/img/Green.png" class="membership-icon2" />
+                  <div class="name_target">
+                    <p class="membership-name">CN PASS STUDENT</p>
+                    <p class="membership-target">만 19세 미만 회원</p>
+                  </div>
+                </div>
+                <div class="right">
+                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
+                  <p class="benefit-discount"><b>10%</b> 할인</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -24,13 +67,8 @@
       <p class="name-membership">{{ dataMembership.membership_name }}</p>
       <p class="title-modal">{{ dataMembership.short_name }}</p>
       <!-- 대상 부분은 v-if 사용해서 처리-->
-      <p v-if="dataMembership.code === 1" class="title">대상: 만 19세 이상 회원</p>
-      <p v-if="dataMembership.code === 2" class="title"></p>
-      <p v-if="dataMembership.code === 3" class="title">대상: 만 19세 미만 회원</p>
       <div class="benefit">
-        <div class="benefit-box">
-          <p v-for="(line, idx) in fullBenefits" :key="idx" class="benefit-content" v-html="`${idx + 1}. ${line}`" />
-        </div>
+        <div class="benefit-box"></div>
       </div>
     </template>
   </UModal>
@@ -57,45 +95,12 @@ export default {
     };
   },
   computed: {
-    fullBenefits() {
-      const list = [];
-
-      // 1~4: 쿠폰 혜택
-      if (this.dataMembership.coffee) {
-        list.push(`${this.dataMembership.coffee}% 할인`);
-      }
-      if (this.dataMembership.artshop) {
-        list.push(`${this.dataMembership.artshop}% 할인`);
-      }
-      if (this.dataMembership.exhibition) {
-        list.push(`${this.dataMembership.exhibition}% 할인`);
-      }
-      if (this.dataMembership.program) {
-        list.push(`${this.dataMembership.program}% 할인`);
-      }
-
-      if (this.dataMembership.code === 3) {
-        // STUDENT
-        list.push(`만 19세 도래시 CN PASS 등급 전환`);
-      } else {
-        // CN PASS / CN PASS+
-        list.push(
-          `마일리지 적립 시스템<br/>
-           • 결제 시 1,000원당 마일리지 1점 적립(백단위 절사)<br/>
-           • 마일리지 70점 적립 시 등급 업그레이드`
-        );
-        list.push(
-          `마일리지 적립 방법<br/>
-           온라인 결제: 사용일(입장일 기준) 적립<br/>
-           현장 결제: 영수증 또는 QR코드 제시를 통한 현장 적립`
-        );
-      }
-
-      return list;
-    },
     isPCUrl() {
       return this.$route.path.includes('/mypage/purchase/membership_pc');
     }
+  },
+  mounted() {
+    console.log('[ModalMembershipInfor] dataMembership:', this.dataMembership);
   },
   beforeDestroy() {
     if (this.closeTimer) {
@@ -125,15 +130,26 @@ export default {
 <style lang="scss" scoped>
 .modal-custom {
   ::v-deep .modal-inner {
-    width: 470px !important;
-    height: 550px !important;
+    width: 530px !important;
+    height: 410px !important;
     max-width: 80vw;
     max-height: 80vh;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: row;
   }
   .title-modal {
-    font-size: 1.4rem;
-  }
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    column-gap: 1rem;
 
+    .membership-icon {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+  }
   .qr-box {
     color: var(--color-u-placeholder);
     border-bottom: 1px solid #d1d5d8;
@@ -151,17 +167,19 @@ export default {
 
   .benefit {
     margin-top: 2rem;
-    margin-bottom: 3.2rem;
 
     &-box {
       display: flex;
       justify-content: space-between;
       column-gap: 1.2rem;
+      background-color: #e6e6e6;
+      border-radius: 24px;
+      padding: 1.2rem;
     }
 
     &-card {
       padding: 7px 8px;
-      background-color: #f7f8f5;
+      background-color: solid #f7f8f5;
       flex: 1;
 
       &-name {
@@ -175,6 +193,61 @@ export default {
     }
   }
 }
+.benefit-box {
+  display: flex;
+  flex-direction: column;
+  background-color: #e6e6e6;
+  border-radius: 24px;
+  padding: 1.6rem;
+  row-gap: 1.6rem;
+
+  .benefit-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .membership-icon2 {
+    width: 24px;
+    height: 24px;
+    margin-top: 15px;
+    object-fit: contain;
+  }
+  .left {
+    display: flex;
+    column-gap: 0.8rem;
+
+    .membership-name {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: -0.7rem;
+    }
+
+    .membership-target {
+      font-size: 11px;
+      color: #7a7a7a;
+    }
+  }
+
+  .right {
+    flex: 1;
+    .benefit-info {
+      font-size: 14px;
+      margin-bottom: -0.7rem;
+    }
+
+    .benefit-discount {
+      font-size: 14px;
+      b {
+        font-weight: bold;
+      }
+    }
+  }
+}
+::v-deep .modal-wrap {
+  background-color: transparent !important;
+  z-index: 9999 !important;
+}
+
 .title {
   font-size: 1.3rem;
 }
