@@ -23,7 +23,12 @@ export default {
     }
     // iOS: Universal Link (웹 URL) 호출 → 앱 설치 시 자동 실행, 없으면 웹 이동
     else if (isIos) {
-      window.location.href = 'https://heredium.art/home';
+      // 1) 커스텀 스킴을 먼저 시도
+      window.location.href = 'herediumart://home';
+      // 2) (앱이 없으면) 1.2초 뒤 웹 Universal Link 로 대체
+      setTimeout(() => {
+        window.location.href = 'https://heredium.art/home';
+      }, 1200);
     }
     // 데스크톱·기타: SPA 라우터 네비게이션
     else {
