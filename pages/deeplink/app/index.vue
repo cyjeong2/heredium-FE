@@ -7,17 +7,27 @@ export default {
   name: 'DeeplinkApp',
   mounted() {
     const ua = navigator.userAgent || navigator.vendor;
-    const isMobile = /Android|iPhone|iPad|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    const isIos     = /iPhone|iPad|iPod/.test(ua);
 
-    // 1) 모바일 → 네이티브 앱 홈으로
-    if (isMobile) {
-      // 앱 내에서 처리할 스킴 URI (커스텀 스킴 또는 Universal Link)
-      window.location.href = 'herediumart://home';
-      // (필요 시 스토어로 포괄적 fallback 타이밍 추가)
+    // Android: Intent URL 사용 → 설치된 앱이 있으면 바로 실행, 없으면 play store
+    if (isAndroid) {
+      const intentUrl =
+        'intent://home' +
+        '#Intent;' +
+        'scheme=herediumart;' +                     // 커스텀 스킴
+        'package=heredium.art.app;' +               // 앱 패키지명
+        'S.browser_fallback_url=https%3A%2F%2Fheredium.art;' + // 설치 없으면 웹 이동
+        'end';
+      window.location.href = intentUrl;
     }
-    // 2) 그 외 → 웹으로
+    // iOS: Universal Link (웹 URL) 호출 → 앱 설치 시 자동 실행, 없으면 웹 이동
+    else if (isIos) {
+      window.location.href = 'https://heredium.art/home';
+    }
+    // 데스크톱·기타: SPA 라우터 네비게이션
     else {
-      window.location.replace('https://heredium.art');
+      this.$router.replace('/');
     }
   }
 }
