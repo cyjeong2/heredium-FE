@@ -199,6 +199,7 @@ export default {
   z-index: 500;
 }
 .modal-inner {
+  position: relative;        /* ← 추가 */
   display: flex;
   flex-direction: column;
   height: 100%; width: 100%;
@@ -237,12 +238,17 @@ export default {
     .checkbox-group { font-size: 1.4rem; }
   }
   .foot {
+    position: sticky;        /* ← 변경 */
+    bottom: 0;               /* ← 화면(모달) 맨 아래에 붙음 */
+    left: 0;
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.6rem;
     padding: 1.4rem 2rem;
     border-top: 1px solid var(--color-u-grey-1);
     background: #fff;
+    z-index: 10;             /* ← 본문 위에 떠 있도록 */
 
     button {
       margin-top: 2rem;
