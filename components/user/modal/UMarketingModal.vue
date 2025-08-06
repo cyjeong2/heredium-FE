@@ -48,7 +48,7 @@
           </div>
         </form> -->
       </div>
-      <div class="foot">
+      <div class="foot" body-scroll-lock-ignore>
         <!-- <UButton :disabled="!isTerms.MARKETING" @click="openPhoneModal">휴대폰 인증하고 혜택 받기</UButton> -->
         <UButton button-type="secondary" @click="skipMarketing">취소</UButton>
         <UButton :disabled="!isTerms.AGREE" @click="openPhoneModal">인증하기</UButton>
