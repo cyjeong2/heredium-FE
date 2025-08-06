@@ -18,13 +18,8 @@
                   :alt="membership.name"
                 />
               </template>
-              <template v-else>
-                <div class="guide-icon" :style="{ backgroundColor: fallbackColor }">
-                  <i :class="fallbackIconClass" />
-                </div>
-              </template>
               <div class="guide-label">
-                {{ membership?.name || fallbackName }}
+                {{ membership?.name }}
               </div>
             </div>
             <div class="guide-text">

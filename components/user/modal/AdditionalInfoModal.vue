@@ -200,7 +200,7 @@ export default {
 .body {
   flex: 1; overflow-y: auto; padding: 2rem;
   @media (min-width: 769px) {
-    max-height: 46.8rem;
+    max-height: 55.0rem;
     padding: 2.4rem 3.6rem;
   }
   .subtitle {
@@ -226,7 +226,7 @@ export default {
       border-radius: 0.3rem;
       font-size: 1.4rem;
       color: var(--color-grey-8);
-
+      margin-bottom: 5.0rem;
       p {
         font-size: 1.4rem;
         font-weight: 500;
@@ -247,9 +247,9 @@ export default {
   background:#fff; margin-top:auto;
 
   @media (min-width: 769px) {
-    padding:0 3.2rem 3.6rem; margin-top:0;
+    padding:0 3.2rem 1.5rem; margin-top:0;
     button {
-      margin-top: 3.6rem;
+      margin-top: 1.5rem;
     }
   }
 
