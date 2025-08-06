@@ -201,7 +201,7 @@ export default {
     top: 100%;
     left: 0;
     z-index: 10;
-    max-height: 30rem;
+    max-height: 22rem;
     margin: 0;
     padding: 0;
     list-style: none;

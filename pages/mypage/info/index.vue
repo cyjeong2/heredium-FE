@@ -308,6 +308,9 @@ export default {
         marketingAgreedDate: null,
       },
       originalInfo: {
+        encodeData: null,
+        email: null,
+        phone:  null,
         job: null,
         state: null,
         district: null,
@@ -384,12 +387,18 @@ export default {
 
       // ② originalInfo 에도 똑같이 복사
       Object.assign(this.originalInfo, {
-        job: this.currentUser.job,
-        state: this.currentUser.state,
+        email: this.currentUser.email,
+        job:    this.currentUser.job,
+        state:  this.currentUser.state,
         district: this.currentUser.district,
         additionalInfoAgreed: this.currentUser.additionalInfoAgreed,
-        marketingAgreed: this.currentUser.isMarketingReceive,
+        marketingAgreed:       this.currentUser.isMarketingReceive,
       });
+
+      // 인증 콜백으로 돌아왔으면 phoneChange 플래그 켜기
+      if (this.$route.params.EncodeData) {
+        this.phoneChange = true;
+      }
     }
 
     this.$nextTick(() => {
@@ -521,9 +530,15 @@ export default {
 
         // ─── 1) “아무 것도 바뀐 게 없으면” 체크 ──────────────────
         const noChange =
-          payload.job                  === this.originalInfo.job &&
-          payload.state                === this.originalInfo.state &&
-          payload.district             === this.originalInfo.district &&
+          !this.emailChange        &&                   // 이메일 변경 안 함
+          !this.passwordChange     &&                   // 비번 변경 안 함
+          payload.encodeData       === this.originalInfo.encodeData &&
+          payload.email            === this.originalInfo.email &&
+          payload.password         === null              &&  // 변경 안 했으므로 null
+          payload.phone            === this.originalInfo.phone &&
+          payload.job              === this.originalInfo.job &&
+          payload.state            === this.originalInfo.state &&
+          payload.district         === this.originalInfo.district &&
           payload.additionalInfoAgreed === this.originalInfo.additionalInfoAgreed &&
           payload.isMarketingReceive   === this.originalInfo.marketingAgreed;
 
