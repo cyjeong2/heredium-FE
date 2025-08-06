@@ -24,6 +24,7 @@
         <div class="dropdown-icon">
           <!-- PC / 모바일 대응 -->
           <i class="only-pc uic-arrow_bottom rotate" />
+          <i class="only-mobile uic-arrow_bottom rotate" />
        </div>
       </div>
 

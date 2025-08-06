@@ -252,7 +252,7 @@ export default {
   display: flex;
   justify-content: center;
   gap: 1.6rem;
-  padding: 1.4rem 2rem;
+  padding: 2rem 2rem;
   border-top: 1px solid var(--color-u-grey-1);
   background: #fff;
   z-index: 10;                /* ← 본문 위에 뜨도록 */
