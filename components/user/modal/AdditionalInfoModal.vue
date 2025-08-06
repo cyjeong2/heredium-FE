@@ -172,6 +172,7 @@ export default {
   z-index: 500;
 }
 .modal-inner {
+  position: relative;
   display: flex; flex-direction: column;
   width: 100%; height: 100%; background: #fff;
   @media screen and (min-width: 769px) {
@@ -199,9 +200,11 @@ export default {
 }
 .body {
   flex: 1; overflow-y: auto; padding: 2rem;
+  padding-bottom: 6rem;
   @media (min-width: 769px) {
     max-height: 55.0rem;
     padding: 2.4rem 3.6rem;
+    padding-bottom: 0;
   }
   .subtitle {
     font-size: 1.6rem; line-height:1.4; margin-bottom:2rem;
@@ -242,12 +245,20 @@ export default {
   }
 }
 .foot {
-  display:flex; justify-content:center; gap:1.6rem;
-  padding:1.4rem 2rem; border-top:1px solid var(--color-u-grey-1);
-  background:#fff; margin-top:auto;
+  position: sticky;           /* ← 변경 */
+  bottom: 0;                  /* ← 화면(모달) 맨 아래에 고정 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1.6rem;
+  padding: 1.4rem 2rem;
+  border-top: 1px solid var(--color-u-grey-1);
+  background: #fff;
+  z-index: 10;                /* ← 본문 위에 뜨도록 */
 
   @media (min-width: 769px) {
-    padding:0 3.2rem 1.5rem; margin-top:0;
+    padding: 0 3.2rem 1.5rem;
     button {
       margin-top: 1.5rem;
     }

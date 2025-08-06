@@ -70,8 +70,6 @@ export default {
         this.membership = await this.$axios.$get(
           `/user/membership/code/${this.code}`
         );
-
-        console.log('this.membership', this.membership)
       } catch (err) {
         console.warn('멤버십 정보 조회 실패', err);
         this.membership = null;
@@ -115,6 +113,7 @@ export default {
   z-index: 500;
 }
 .modal-inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%; height: 100%;
@@ -203,13 +202,17 @@ export default {
   }
 }
 .foot {
+  position: sticky;        /* ← 변경 */
+  bottom: 0;               /* ← 화면(모달) 맨 아래에 고정 */
+  left: 0;
+  width: 100%;
   display: flex;
   justify-content: center;
   gap: 1.6rem;
   padding: 1.4rem 2rem;
   border-top: 1px solid var(--color-u-grey-1);
   background: #fff;
-  margin-top: auto;
+  z-index: 10;             /* ← 본문 위에 떴다 내리도록 */
 
   @media screen and (min-width: 769px) {
     padding: 0 3.2rem 3.6rem;
