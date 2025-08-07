@@ -62,8 +62,9 @@
       @agree="termAgree"
     />
     <UPhoneModal
-      :is-show="showPhoneModal"
-      @close="showPhoneModal = false"
+      ref="phoneModal"
+      :is-show="false"
+      @close="$emit('close')"
     />
   </div>
   </transition>
@@ -184,7 +185,7 @@ export default {
       this.$emit('close')
     },
     openPhoneModal() {
-      this.showPhoneModal = true;
+      this.$refs.phoneModal.check()
     },
   }
 };
@@ -249,6 +250,16 @@ export default {
     border-top: 1px solid var(--color-u-grey-1);
     background: #fff;
     z-index: 10;             /* ← 본문 위에 떠 있도록 */
+
+    button {
+      flex: 1;                          /* 양쪽 버튼 동일 너비 */
+      height: 4.8rem;                   /* 적당한 높이 */
+      font-size: 1.6rem;
+      font-weight: 700;
+      border-radius: 0.3rem;            /* 높이의 절반으로 하면 완전 pill 형태 */
+      cursor: pointer;
+      transition: background-color .2s;
+    }
   }
 }
 @media screen and (min-width: 769px) {
@@ -263,7 +274,21 @@ export default {
       padding: 1.4rem 3.6rem;
       .content-wrap { background: rgba(235,235,235,0.4); overflow-y: auto; padding: 2.4rem; }
     }
-    .foot { position: static; padding: 0 3.2rem 3.6rem; margin-top: 2.5rem; }
+    .foot {
+      position: static;
+      padding: 2rem 3.2rem 2.0rem;
+      margin-top: 2.5rem;
+
+      button {
+        flex: 1;                          /* 양쪽 버튼 동일 너비 */
+        height: 4.8rem;                   /* 적당한 높이 */
+        font-size: 1.6rem;
+        font-weight: 700;
+        border-radius: 0.3rem;            /* 높이의 절반으로 하면 완전 pill 형태 */
+        cursor: pointer;
+        transition: background-color .2s;
+      }
+    }
   }
 }
 

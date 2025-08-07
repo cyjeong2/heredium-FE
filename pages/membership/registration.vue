@@ -10,14 +10,9 @@
       </section>
 
       <section class="container">
-        <div class="grid-content membership-content-editor only-pc">
+        <div class="grid-content membership-content-editor">
+          <!-- <h2>멤버십 소개</h2> -->
           <div v-html="postDetail.content_detail"></div>
-        </div>
-        <!-- 모바일에서만 보임: mobile 용이 없으면 pc용으로 fallback -->
-        <div class="grid-content membership-content-editor only-mobile">
-          <div
-            v-html="effectiveMobileContent"
-          ></div>
         </div>
       </section>
 
@@ -163,25 +158,6 @@ export default {
     };
   },
   computed: {
-    effectiveMobileContent() {
-      const mobile = this.postDetail?.content_detail_mobile || ''
-      const desktop = this.postDetail?.content_detail || ''
-
-      // 1) 모든 HTML 태그를 제거하고 남은 텍스트
-      const textOnly = mobile.replace(/<[^>]*?>/g, '').trim()
-      // 2) <br> 등 태그만 남았을 때 생기는 공백/줄바꿈 문자 제거
-      const cleanedText = textOnly.replace(/[\r\n\s ]+/g, '')
-
-      // 3) 이미지 태그가 있는지 체크
-      const hasImage = /<img[\s\S]*?>/i.test(mobile)
-
-      // 실제 내용이 있거나 이미지가 있으면 모바일 전용 콘텐츠로,
-      // 그렇지 않으면 데스크탑용으로 폴백
-      if (cleanedText.length > 0 || hasImage) {
-        return mobile
-      }
-      return desktop
-    },
     postImageDetail() {
       return this.getImage(this.postDetail?.thumbnail_urls?.large);
     },
@@ -571,7 +547,7 @@ h2 {
     padding-right: 3.2rem;
   }
   .grid-content > div {
-    width: 100%;
+    width: 65.9824%;
   }
 
   .membership-content-editor {

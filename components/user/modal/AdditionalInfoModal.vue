@@ -12,13 +12,13 @@
 
         <!-- Body -->
         <div class="body">
-          <div class="subtitle">
+          <!-- <div class="subtitle">
             추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!
-          </div>
-          <hr class="divider" />
+          </div> -->
+          <!-- <hr class="divider" /> -->
           <div>
             <UCheckbox v-model="form.additionalInfoAgreed">
-              <strong>(선택)</strong> 추가 개인정보 수집 및 활용에 동의합니다.
+              <strong style="margin-right: 5px;">(선택)</strong>추가 개인정보 수집 및 활용에 동의합니다.
             </UCheckbox>
           </div>
           <div v-if="form.additionalInfoAgreed" class="add-input">
@@ -31,6 +31,7 @@
                 :option-list="jobOptions"
                 default-text="선택"
                 w-size="full"
+                :searchable="true"
               />
             </div>
 
@@ -43,12 +44,14 @@
                   :option-list="stateOptions"
                   default-text="시/도 선택"
                   w-size="full"
+                  :searchable="true"
                 />
                 <USelect
                   v-model="form.region.district"
                   :option-list="districtOptions"
                   default-text="시/군/구 선택"
                   w-size="full"
+                  :searchable="true"
                 />
               </div>
             </div>
@@ -56,12 +59,12 @@
           <!-- 동의 항목 -->
           <div class="terms-area">
             <UCheckbox v-model="form.agreeMarketing">
-              <strong>(선택)</strong> 마케팅 정보 활용에 동의합니다.
+              <strong style="margin-right: 5px;">(선택)</strong> 마케팅 정보 수집에 동의합니다.
             </UCheckbox>
             <div class="marketing-info">
               <p>
                 고객(정보주체)의 개인정보보호 및 권리는
-                <strong>「개인정보 보호법」</strong> 및 관계 법령에 따라 헤레디움(사이트)에서 안전하게 관리하고 있습니다.
+                「개인정보 보호법」및 관계 법령에 따라 헤레디움(사이트)에서 안전하게 관리하고 있습니다.
               </p>
             </div>
           </div>
@@ -71,7 +74,7 @@
         <div class="foot">
           <UButton button-type="secondary" class="secondary-btn" @click="skipMarketing">다음에 하기</UButton>
           <!-- <UButton :disabled="!isFormValid" class="primary-btn" @click="submitForm">완료하고 혜택받기</UButton> -->
-          <UButton class="primary-btn" @click="submitForm">완료</UButton>
+          <UButton class="primary-btn" @click="submitForm">선택 내용 저장</UButton>
         </div>
       </div>
     </div>
@@ -176,7 +179,7 @@ export default {
   display: flex; flex-direction: column;
   width: 100%; height: 100%; background: #fff;
   @media screen and (min-width: 769px) {
-    width: 60.4rem; height: auto;
+    width: 51rem; height: auto;
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%,-50%);
     box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
@@ -199,7 +202,7 @@ export default {
   }
 }
 .body {
-  flex: 1; overflow-y: auto; padding: 2rem;
+  flex: 1; overflow: visible; padding: 2rem;
   padding-bottom: 6rem;
   @media (min-width: 769px) {
     max-height: 55.0rem;
@@ -229,10 +232,10 @@ export default {
       border-radius: 0.3rem;
       font-size: 1.4rem;
       color: var(--color-grey-8);
-      margin-bottom: 5.0rem;
+      margin-bottom: 3.0rem;
       p {
-        font-size: 1.4rem;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 400;
         margin: 0;
         line-height: 1.6;
         text-align: left; /* 기본 왼쪽 정렬 */
@@ -245,7 +248,7 @@ export default {
   }
 }
 .foot {
-  position: sticky;           /* ← 변경 */
+  position: static;           /* ← 변경 */
   bottom: 0;                  /* ← 화면(모달) 맨 아래에 고정 */
   left: 0;
   width: 100%;
@@ -257,11 +260,18 @@ export default {
   background: #fff;
   z-index: 10;                /* ← 본문 위에 뜨도록 */
 
+  button {
+    flex: 1;                          /* 양쪽 버튼 동일 너비 */
+    height: 4.8rem;                   /* 적당한 높이 */
+    font-size: 1.6rem;
+    font-weight: 700;
+    border-radius: 0.3rem;            /* 높이의 절반으로 하면 완전 pill 형태 */
+    cursor: pointer;
+    transition: background-color .2s;
+  }
+
   @media (min-width: 769px) {
-    padding: 0 3.2rem 1.5rem;
-    button {
-      margin-top: 1.5rem;
-    }
+    padding: 2.0rem 2.0rem 2.0rem;
   }
 
   /* ── “다음에 하기” 버튼 (항상 흰 배경, 회색 텍스트) ── */
@@ -290,13 +300,17 @@ export default {
   }
 
 }
-  /* 모바일에서 지역 셀렉트가 컨테이너에 맞춰 축소되도록 */
-  .form-group.region .region-selects {
-    display: flex;
-    gap: 1.6rem;
-  }
-  .form-group.region .region-selects > * {
-    flex: 1 1 0;
-    min-width: 0;
-  }
+/* 모바일에서 지역 셀렉트가 컨테이너에 맞춰 축소되도록 */
+.form-group.region .region-selects {
+  display: flex;
+  gap: 1.6rem;
+}
+.form-group.region .region-selects > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+::v-deep .dropdown-menu {
+  z-index: 100 !important;
+}
 </style>

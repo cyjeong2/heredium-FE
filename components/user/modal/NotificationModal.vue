@@ -118,6 +118,7 @@ export default {
   flex-direction: column;
   width: 100%; height: 100%;
   background: #fff;
+
   @media screen and (min-width: 769px) {
     width: 45.4rem;
     height: auto;
@@ -202,7 +203,7 @@ export default {
   }
 }
 .foot {
-  position: sticky;        /* ← 변경 */
+  position: static;        /* ← 변경 */
   bottom: 0;               /* ← 화면(모달) 맨 아래에 고정 */
   left: 0;
   width: 100%;
@@ -214,12 +215,19 @@ export default {
   background: #fff;
   z-index: 10;             /* ← 본문 위에 떴다 내리도록 */
 
+  button {
+    flex: 1;                          /* 양쪽 버튼 동일 너비 */
+    height: 4.8rem;                   /* 적당한 높이 */
+    font-size: 1.6rem;
+    font-weight: 700;
+    border-radius: 0.3rem;            /* 높이의 절반으로 하면 완전 pill 형태 */
+    cursor: pointer;
+    transition: background-color .2s;
+  }
+
   @media screen and (min-width: 769px) {
-    padding: 0 3.2rem 3.6rem;
+    padding: 2.0rem 2.0rem 2.0rem;
     margin-top: 0;
-    button {
-      margin-top: 3.6rem;
-    }
   }
   button[button-type="secondary"] {
     background: transparent;

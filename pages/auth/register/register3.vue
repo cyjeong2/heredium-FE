@@ -76,7 +76,7 @@
         <div class="grid-wrap"></div>
         <div>
           <UCheckbox v-model="form.additionalInfoAgreed">
-            <strong>(선택)</strong>&nbsp;추가 개인정보 수집 및 활용에 동의합니다.
+            <strong style="margin-right: 5px;">(선택)</strong>추가 개인정보 수집 및 활용에 동의합니다.
           </UCheckbox>
         </div>
         <div v-if="form.additionalInfoAgreed" class="add-input">
@@ -120,13 +120,13 @@
         <div class="terms-area">
           <div class="each-terms">
             <UCheckbox v-model="isTerms.MARKETING">
-              <strong>(선택)</strong>&nbsp;마케팅 정보 활용에 동의합니다.
+              <strong style="margin-right: 5px;">(선택)</strong>마케팅 정보 수집에 동의합니다.
             </UCheckbox>
           </div>
           <div class="marketing-info">
             <p>
               고객(정보주체)의 개인정보보호 및 권리는
-              <strong>「개인정보 보호법」</strong> 및 관계 법령에 따라 헤레디움(사이트)에서 안전하게 관리하고 있습니다.
+              「개인정보 보호법」및 관계 법령에 따라 헤레디움(사이트)에서 안전하게 관리하고 있습니다.
             </p>
           </div>
         </div>
@@ -249,7 +249,6 @@ export default {
     },
     isSocialFlow() {
       const { snsToken, provider } = this.snsInfo
-      console.log('this.snsInfo', this.snsInfo)
       return Boolean(snsToken && provider)
     },
     cityOptions() {

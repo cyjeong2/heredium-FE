@@ -30,6 +30,15 @@
 
       <!-- 커스텀 옵션 리스트 -->
       <ul v-if="isOpen" class="dropdown-menu" :style="{ width }">
+        <!-- 검색창 -->
+        <li v-if="searchable" class="dropdown-item search-input">
+          <input
+            v-model="searchTerm"
+            type="text"
+            placeholder="검색"
+            @click.stop
+          />
+        </li>
         <!-- 기본 힌트 옵션 -->
         <li
           v-if="defaultText"
@@ -40,7 +49,7 @@
         </li>
         <!-- 실제 옵션 -->
         <li
-          v-for="item in optionList"
+          v-for="item in filteredOptions"
           :key="item.value"
           class="dropdown-item"
           :class="{ selected: item.value === selected }"
@@ -80,16 +89,31 @@ export default {
     isCalIcon: {
       type: Boolean,
       default: false
+    },
+    searchable: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       width: '40rem',
       isOpen: false,
-      selected: this.value
+      selected: this.value,
+      searchTerm: ''
     };
   },
   computed: {
+    // 검색어가 있을 때 옵션 필터
+    filteredOptions() {
+      if (!this.searchable || !this.searchTerm) {
+        return this.optionList;
+      }
+      const term = this.searchTerm.toLowerCase();
+      return this.optionList.filter(o =>
+        o.label.toLowerCase().includes(term)
+      );
+    },
     isHasSlotText() {
       return !!this.$slots.default;
     },
@@ -106,7 +130,7 @@ export default {
     this.calcWidth();
     document.addEventListener('click', this.onClickOutside);
   },
-  beforeUnmount() {
+  beforeDestroy() {
     document.removeEventListener('click', this.onClickOutside);
   },
   methods: {
@@ -128,7 +152,11 @@ export default {
       this.isOpen = false;
     },
     onClickOutside(e) {
-      if (!this.$refs.root.contains(e.target)) {
+      const root = this.$refs.root;
+      // ref 가 없거나, 이미 언마운트된 상태라면 그냥 무시
+      if (!root || !root.contains) return;
+
+      if (!root.contains(e.target)) {
         this.isOpen = false;
       }
     }
@@ -201,7 +229,7 @@ export default {
     top: 100%;
     left: 0;
     z-index: 10;
-    max-height: 22rem;
+    max-height: 22.1rem;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -239,5 +267,33 @@ i.only-mobile {
 /* 회전 토글은 그대로 */
 .dropdown.is-open .dropdown-icon i.rotate {
   transform: rotate(-270deg);
+}
+
+/* dropdown.vue 아래쪽에 추가 */
+.dropdown-item.search-input {
+  padding: 0.8rem 1.6rem;       /* 위아래 0.8rem, 좌우 1.6rem 패딩 */
+  box-sizing: border-box;      /* padding 포함해서 width 계산 */
+
+  input {
+    display: block;            /* 블록 레벨로 만들어서 */
+    width: 100%;               /* li 너비 가득 채우기 */
+    padding: 0.6rem 0.8rem;     /* 입력창 안쪽 여백 */
+    border: 1px solid var(--color-u-grey-2);
+    border-radius: 0.3rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    outline: none;
+
+    /* 포커스 시 테두리 강조 */
+    &:focus {
+      border-color: var(--color-u-primary);
+      box-shadow: 0 0 0 2px rgba(var(--color-u-primary-rgb), 0.2);
+    }
+  }
+}
+
+/* 만약 li 높이가 너무 크면 이렇게 최소 높이만 잡아줄 수도 있습니다 */
+.dropdown-item.search-input {
+  min-height: auto;
 }
 </style>

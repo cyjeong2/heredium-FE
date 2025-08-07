@@ -9,33 +9,27 @@
       <img :src="couponImageSrc" />
     </div>
     <div class="coupon-detail">
-      <p class="name">{{ couponDisplayName }}</p>
-      <div class="type-discount">
-        <span class="type">{{ couponTypeLabel }} &nbsp;</span>
-        <span class="discount-text">
-          {{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }} 할인 쿠폰
-        </span>
-      </div>
+      <p class="name">{{ detailCoupon.name }}</p>
       <div class="discount">
         <!-- <div v-if="!isSelection" class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
         </div> -->
         <div class="date">
-          유효기간:
-          <span v-if="isMembershipCoupon">
-            {{ getFormattedDate(
-                detailCoupon.membership_start_date,
-                detailCoupon.membership_end_date
-              ) }}
-          </span>
-          <span v-else-if="firstUnused">
-            {{ getFormattedDate(
-                firstUnused.delivered_date,
-                firstUnused.expiration_date
-              ) }}
-          </span>
-          <span v-else>기간 정보 없음</span>
+          사용기간:
+          <span>{{
+            getFormattedDate(
+              detailCoupon.unused_coupons[0].delivered_date,
+              detailCoupon.unused_coupons[0].expiration_date
+            )
+          }}</span>
+        </div>
+      </div>
+      <div>
+        <div class="date">
+          사용여부:
+          <span v-if="detailCoupon.unused_coupons.length > 0">사용가능</span>
+          <span v-else>사용완료</span>
         </div>
       </div>
       <div class="coupon-remaining">
@@ -43,7 +37,7 @@
           <UButton
             class="reservation-btn"
             w-size="100"
-            :disabled="isExpired || isCouponAwaitingStart || remainingCount === 0"
+            :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
             @click="handleOpenModal"
           >
             QR코드
@@ -79,7 +73,6 @@ import UButton from '../../common/UButton.vue';
 import ModalCouponInfor from '../../modal/coupon/ModalCouponInfor.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
-import { COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 
 export default {
   name: 'CouponCard',
@@ -119,35 +112,6 @@ export default {
     };
   },
   computed: {
-    couponTypeLabel() {
-      const opt = COUPON_TYPE_OPTION_LIST.find(o => o.value === this.detailCoupon.coupon_type);
-      return opt ? opt.label : this.detailCoupon.coupon_type;
-    },
-    couponDisplayName() {
-      // 멤버십 쿠폰인지 체크하는 기존 로직 재활용
-      if (this.isMembershipCoupon) {
-        return this.detailCoupon.display_name + " 멤버십 전용 상시 할인 쿠폰"
-      }
-      return this.detailCoupon.name;
-    },
-    // 1) used/unused 배열이 비어 있으면 '멤버십 쿠폰' 으로 간주
-    isMembershipCoupon() {
-      const used   = this.detailCoupon.used_coupons   || [];
-      const unused = this.detailCoupon.unused_coupons || [];
-      return used.length === 0 && unused.length === 0;
-    },
-    // 2) 남은 개수: membership 쿠폰은 1장, 아니면 unused.filter(!expired).length
-    remainingCount() {
-      if (this.isMembershipCoupon) return 1;
-      return (this.detailCoupon.unused_coupons || [])
-        .filter(u => !u.is_expired).length;
-    },
-    // 3) 첫 unused 아이템 (없으면 null)
-    firstUnused() {
-      return this.isMembershipCoupon
-        ? null
-        : (this.detailCoupon.unused_coupons || [])[0] || null;
-    },
     couponImageSrc() {
       return this.getImage(this.detailCoupon.image_url);
     },
@@ -155,11 +119,14 @@ export default {
       return this.modelValue === this.value;
     },
     isCouponAwaitingStart() {
-      if (this.isMembershipCoupon) return false;
-      if (!this.firstUnused) return true;
+      const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
+      if (!deliveredDate) return true;
       const today = this.$dayjs();
-      const start = this.$dayjs(this.firstUnused.delivered_date, 'YYYY-MM-DD HH:mm:ss', true);
-      return today.isBefore(start);
+      const startDate = this.$dayjs(deliveredDate, 'YYYY-MM-DD HH:mm:ss', true);
+      if (!startDate.isValid()) {
+        return true;
+      }
+      return today.isBefore(startDate);
     },
     showCoupon() {
       if (this.isExpired) {
@@ -194,8 +161,7 @@ export default {
       this.$emit('refresh-coupon-list');
     },
     checkExpiration() {
-      // this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
-      this.isExpired = this.remainingCount === 0;
+      this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
     }
   }
 };
@@ -218,7 +184,6 @@ export default {
     .img-wrap {
       height: 10rem;
       width: 10rem;
-      padding: 2.5rem;
 
       > img {
         width: 100%;
@@ -229,7 +194,7 @@ export default {
 
     .name {
       font-weight: 600;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       color: var(--color-default);
     }
 
@@ -256,7 +221,7 @@ export default {
     display: flex;
     flex: 1;
     flex-direction: column;
-    row-gap: 3px;
+    row-gap: 8px;
     color: var(--color-u-placeholder);
   }
 
@@ -372,26 +337,6 @@ export default {
 @media screen and (min-width: 769px) {
   .coupon-card {
     max-width: 400px;
-  }
-}
-
-.coupon-card {
-  .coupon-detail {
-    .type-discount {
-      display: flex;
-      align-items: center;
-      font-size: 1.4rem;
-      color: black;
-      margin-bottom: -5px;
-      margin-top: 5px;
-
-      .type {
-        font-weight: 500;
-      }
-      .discount-text {
-        font-weight: 500;
-      }
-    }
   }
 }
 </style>
