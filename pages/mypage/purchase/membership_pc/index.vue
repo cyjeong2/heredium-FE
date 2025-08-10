@@ -30,7 +30,20 @@
                   >
                 </p>
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
-                <button class="membership_benefit" @click="openModal">등급혜택보기</button>
+                <!-- 등급 혜택 모달 -->
+                <div class="benefit-hover-wrapper">
+                  <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
+                    등급 혜택보기
+                  </button>
+
+                  <ModalMembershipInfor
+                    v-if="showModal"
+                    v-model="showModal"
+                    :is-modal-visible="showModal"
+                    :data-membership="dataMembership"
+                    class="transparent-modal"
+                  />
+                </div>
               </div>
 
               <div class="mileage_description">
@@ -51,11 +64,10 @@
           </div>
           <div class="show_mileage">
             <div class="mileage_total">
-              <span style="font-size: 28px">{{ mileageList.totalMileage }}</span
-              >M
+              <span style="font-size: 28px"> {{ dataMembership.code === 3 ? '-' : mileageList.totalMileage }} </span>M
             </div>
             <div class="mileage_expire">
-              <span style="font-size: 28px">{{ mileageList.expiringMileage }}</span
+              <span style="font-size: 28px"> {{ dataMembership.code === 3 ? '-' : mileageList.expiringMileage }} </span
               >M
             </div>
           </div>
@@ -86,18 +98,27 @@
               {{ option }}
             </button>
           </div>
-
+          <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <input v-model="startDate" type="date" />
+            <UDatepicker v-model="startDate" :max="endDate ? $dayjs(endDate).toDate() : null" style="width: 227.5px" />
             <span>~</span>
-            <input v-model="endDate" type="date" />
+            <UDatepicker
+              v-model="endDate"
+              :min="startDate ? $dayjs(startDate).toDate() : null"
+              style="width: 227.5px"
+            />
           </div>
 
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
         </div>
 
         <!-- 테이블 -->
-        <SPageable :table-data="mileage_list" @getTableData="loadMileageList">
+        <UPageable
+          :list-data="mileage_list"
+          :show-prev-page="true"
+          :show-next-page="true"
+          @getListData="(pageIndex) => loadMileageList(pageIndex, false)"
+        >
           <template #data="{ data }">
             <table class="mileage-table">
               <thead>
@@ -110,35 +131,36 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="!data || data.length === 0">
+                <tr v-if="!data || data.length === 0 || dataMembership.code === 3">
                   <td colspan="5">
                     <no-mileage />
                   </td>
                 </tr>
-                <tr v-for="item in data" :key="item.id">
-                  <td>{{ formatDate(item.createdDate) }}</td>
-                  <td>{{ formatTypeCategory(item.type, item.category) }}</td>
-                  <td>{{ formatDate(item.expirationDate) }}</td>
-                  <td>
-                    <b>{{ [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
-                  </td>
-                  <td>
-                    <b>{{ [1, 2, 3].includes(item.type) ? `${item.mileageAmount}M` : '-' }}</b>
-                  </td>
-                </tr>
+                <template v-if="dataMembership.code !== 3">
+                  <tr v-for="item in data" :key="item.id">
+                    <td>{{ formatDate(item.createdDate) }}</td>
+                    <td>{{ formatTypeCategory(item.type, item.category) }}</td>
+                    <td>{{ item.expirationDate ? formatDate(item.expirationDate) : '-' }}</td>
+                    <td>
+                      <b>{{ [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
+                    </td>
+                    <td>
+                      <b>{{
+                        item.type === 1 ? '초기화' : [2, 3, 6].includes(item.type) ? `${item.mileageAmount}M` : '-'
+                      }}</b>
+                    </td>
+                  </tr>
+                </template>
+                <template v-if="data.length > 0">
+                  <tr v-for="n in 5 - data.length" :key="'empty-' + n" class="placeholder-row">
+                    <td colspan="5" style="height: 47px; border: none; background: transparent"></td>
+                  </tr>
+                </template>
               </tbody>
             </table>
           </template>
-        </SPageable>
+        </UPageable>
       </div>
-      <ModalMembershipInfor
-        v-if="showModal"
-        v-model="showModal"
-        :is-modal-visible="showModal"
-        :data-membership="dataMembership"
-        class="transparent-modal"
-        @close="showModal = false"
-      />
     </section>
   </main>
 </template>
@@ -148,14 +170,15 @@ import dayjs from 'dayjs';
 
 import ModalMembershipInfor from '~/components/user/modal/membership/ModalMembershipInfor.vue';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
-import SPageable from '~/components/admin/commons/SPageable';
+import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
+import UDatepicker from '~/components/user/common/UDatepicker';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { SideBarMyPage, SPageable, NoMileage, ModalMembershipInfor },
+  components: { SideBarMyPage, UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
   async asyncData({ $axios }) {
-    const initialPageSize = 4;
+    const initialPageSize = 5;
 
     const dataMembership = await $axios.$get('/user/membership/info');
     const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
@@ -174,7 +197,9 @@ export default {
         size: initialPageSize,
         first: mileageListRes.number === 0,
         last: mileageListRes.number === totalPages - 1
-      }
+      },
+      startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
+      endDate: dayjs().format('YYYY-MM-DD')
     };
   },
   data() {
@@ -187,19 +212,20 @@ export default {
       ],
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
-      startDate: null,
-      endDate: null,
-      pageSizeForLoad: 4,
+      pageSizeForLoad: 5,
       showModal: false
     };
   },
   watch: {
-    activeTab(newTab, oldTab) {
+    activeTab() {
       this.loadMileageList(0);
     }
   },
+  mounted() {
+    this.applyPeriodFilter();
+  },
   methods: {
-    async loadMileageList(pageIndex = 0) {
+    async loadMileageList(pageIndex = 0, usePeriodFilter = false) {
       if (!this.dataMembership) return;
       try {
         const params = {
@@ -207,18 +233,14 @@ export default {
           size: this.pageSizeForLoad
         };
 
-        // 탭 필터 추가
         if (this.activeTab === 'added') {
-          params.types = [0, 4, 5]; // 적립 타입들
+          params.types = [0, 4, 5];
         } else if (this.activeTab === 'used') {
-          params.types = [1, 2, 3]; // 사용 타입들
+          params.types = [1, 2, 3, 6];
         }
 
-        // 날짜 필터 추가
-        if (this.startDate) {
-          params.startDate = dayjs(this.startDate).format('YYYY-MM-DD HH:mm:ss');
-        }
-        if (this.endDate) {
+        if (usePeriodFilter && this.startDate && this.endDate) {
+          params.startDate = dayjs(this.startDate).startOf('day').format('YYYY-MM-DD HH:mm:ss');
           params.endDate = dayjs(this.endDate).endOf('day').format('YYYY-MM-DD HH:mm:ss');
         }
 
@@ -264,56 +286,49 @@ export default {
         3: '헤레디움 아트숍'
       };
       if (type === 1) {
-        return '[사용]CN PASS PLUS 등급 업그레이드';
+        return '[사용] CN PASS PLUS 등급 업그레이드';
+      }
+      if (type === 6) {
+        return '[소멸] 승급취소';
       }
       const isAdded = [0, 4, 5].includes(type);
       const prefix = isAdded ? '[적립]' : '[소멸]';
-      return `${prefix}${categoryMap[category]}`;
+      return `${prefix} ${categoryMap[category]}`;
     },
     formatDate(dateStr) {
       if (!dateStr) return '';
-      const date = new Date(dateStr);
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const dd = String(date.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
+      return dayjs(dateStr).format('YYYY-MM-DD');
     },
     selectFilter(option) {
       this.selectedFilter = option;
-    },
-    applyPeriodFilter() {
-      const now = new Date();
-      let start = new Date();
+      const now = dayjs();
+      let start;
 
-      switch (this.selectedFilter) {
+      switch (option) {
         case '1개월':
-          start.setMonth(now.getMonth() - 1);
+          start = now.subtract(1, 'month');
           break;
         case '3개월':
-          start.setMonth(now.getMonth() - 3);
+          start = now.subtract(3, 'month');
           break;
         case '6개월':
-          start.setMonth(now.getMonth() - 6);
+          start = now.subtract(6, 'month');
           break;
         case '1년':
-          start.setFullYear(now.getFullYear() - 1);
+          start = now.subtract(1, 'year');
           break;
-        case 'custom':
-          this.loadMileageList(0);
-          return;
         default:
-          start = null;
+          return;
       }
 
-      if (start) {
-        const pad = (num) => (num < 10 ? '0' + num : num);
-        const formatDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      this.startDate = start.format('YYYY-MM-DD');
+      this.endDate = now.format('YYYY-MM-DD');
 
-        this.startDate = formatDate(start);
-        this.endDate = formatDate(now);
-      }
-
-      this.loadMileageList(0);
+      this.loadMileageList(0, true);
+    },
+    applyPeriodFilter() {
+      this.selectedFilter = 'custom';
+      this.loadMileageList(0, true);
     },
     openModal() {
       this.showModal = true;
@@ -324,7 +339,6 @@ export default {
   }
 };
 </script>
-
 <style lang="scss" scoped>
 .container {
   margin-bottom: 12rem;
@@ -334,7 +348,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 6rem;
 
   h2 {
     font-size: 1.8rem;
@@ -413,7 +426,7 @@ export default {
 
   .ticketing-body {
     margin-top: 2.6rem;
-    margin-bottom: 6.5rem;
+    margin-bottom: 2.6rem;
     .ticketing-info {
       display: flex;
       flex-direction: column;
@@ -492,18 +505,25 @@ export default {
   margin-left: 10px;
   margin-right: 40px;
 }
-.name_membership > div > p,
-.name_membership > div > div {
-  margin-bottom: 1rem;
-}
+// .name_membership > div > p,
+// .name_membership > div > div {
+//   margin-bottom: 1rem;
+// }
 .name_class {
   font-size: 1.5em;
-  margin-bottom: 2rem !important;
+  margin-bottom: 3rem !important;
 }
 .mileage_condition {
   display: flex;
   flex-direction: row;
-  gap: 30px;
+  gap: 50px;
+  color: #111111;
+}
+.mileage_description {
+  color: #666666;
+}
+.benefit-hover-wrapper {
+  position: relative;
 }
 .membership_benefit {
   background-color: #111111 !important;
@@ -513,6 +533,15 @@ export default {
   min-width: 90px;
   min-height: 30px;
   cursor: pointer;
+}
+.transparent-modal {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  margin-top: 10px;
+  pointer-events: none;
 }
 .modal_title {
   display: flex;
@@ -599,11 +628,19 @@ export default {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-.date-range input[type='date'] {
-  padding: 4px 8px;
-  min-width: 227.5px;
-  border: 1px solid #7b7a7d;
+  ::v-deep(.date-picker) {
+    .data-input {
+      padding: 0 3rem 0 1.6rem;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      font-size: 1.4rem;
+      max-height: 32.8px;
+    }
+
+    &.is-active .data-input {
+      border-color: #111111;
+    }
+  }
 }
 .filter-submit {
   background-color: #111111 !important;
@@ -617,18 +654,50 @@ export default {
 .mileage-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+
+  th,
+  td {
+    padding: 12px;
+    text-align: center;
+    word-wrap: break-word;
+  }
 
   th {
     border-top: 1px solid #111111;
     border-bottom: 1px solid #d9d9d9;
-    padding: 12px;
-    text-align: center;
   }
+
   td {
     border-top: 1px solid #d9d9d9;
-    padding: 12px;
-    text-align: center;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 200px;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 400px;
+  }
+  td:nth-child(2) {
+    text-align: left;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 200px;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 80px;
   }
 }
-
+::v-deep(.pagination) {
+  margin-top: 2.6rem !important;
+}
 </style>

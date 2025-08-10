@@ -1,6 +1,6 @@
 <template>
   <!-- PC 전용 -->
-  <UModal v-if="isPCUrl" :is-show="value" class="modal-custom" :hide-edge-close-btn="true" @close="handleClose">
+  <UModal v-if="isPCUrl" :is-show="value" class="modal-custom" :hide-edge-close-btn="true" :background-white="true" @close="handleClose">
     <template #content>
       <div @mouseleave="handleMouseLeave" @mouseenter="handleMouseEnter">
         <div class="title-modal">
@@ -64,11 +64,62 @@
   <!-- 모바일 전용 -->
   <UModal v-else :is-show="value" class="modal-custom only-mobile" @close="handleClose">
     <template #content>
-      <p class="name-membership">{{ dataMembership.membership_name }}</p>
-      <p class="title-modal">{{ dataMembership.short_name }}</p>
-      <!-- 대상 부분은 v-if 사용해서 처리-->
-      <div class="benefit">
-        <div class="benefit-box"></div>
+      <div @mouseleave="handleMouseLeave" @mouseenter="handleMouseEnter">
+        <div class="title-modal">
+          <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
+          <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
+          <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
+          <span class="name-membership">
+            {{ dataMembership.name }} 님의 현재 등급은 <B>{{ dataMembership.membership_name }}</B> 입니다.
+          </span>
+        </div>
+        <div class="benefit">
+          <div class="benefit-box">
+            <div class="benefit-box">
+              <div class="benefit-row">
+                <div class="left">
+                  <img src="~assets/img/Brown.png" class="membership-icon2" />
+                  <div class="name_target">
+                    <p class="membership-name">CN PASS</p>
+                    <p class="membership-target">만 19세 이상 회원</p>
+                  </div>
+                </div>
+                <div class="right">
+                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
+                  <p class="benefit-discount"><b>10%</b> 할인</p>
+                </div>
+              </div>
+
+              <div class="benefit-row">
+                <div class="left">
+                  <img src="~assets/img/Terracotta.png" class="membership-icon2" />
+                  <div class="name_target">
+                    <p class="membership-name">CN PASS PLUS</p>
+                    <p class="membership-target">마일리지 70점 달성 CN PASS 회원</p>
+                  </div>
+                </div>
+                <div class="right">
+                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
+                  <p class="benefit-discount"><b>15%</b> 할인</p>
+                </div>
+              </div>
+
+              <div class="benefit-row">
+                <div class="left">
+                  <img src="~assets/img/Green.png" class="membership-icon2" />
+                  <div class="name_target">
+                    <p class="membership-name">CN PASS STUDENT</p>
+                    <p class="membership-target">만 19세 미만 회원</p>
+                  </div>
+                </div>
+                <div class="right">
+                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
+                  <p class="benefit-discount"><b>10%</b> 할인</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </template>
   </UModal>
@@ -98,9 +149,6 @@ export default {
     isPCUrl() {
       return this.$route.path.includes('/mypage/purchase/membership_pc');
     }
-  },
-  mounted() {
-    console.log('[ModalMembershipInfor] dataMembership:', this.dataMembership);
   },
   beforeDestroy() {
     if (this.closeTimer) {
@@ -135,8 +183,12 @@ export default {
     max-width: 80vw;
     max-height: 80vh;
     border-radius: 24px;
-    display: flex;
+    position: absolute;
     flex-direction: row;
+
+    top: 60% !important;
+    left: 60% !important;
+    transform: translateX(-50%, 50%) !important;
   }
   .title-modal {
     display: flex;
@@ -242,10 +294,6 @@ export default {
       }
     }
   }
-}
-::v-deep .modal-wrap {
-  background-color: transparent !important;
-  z-index: 9999 !important;
 }
 
 .title {

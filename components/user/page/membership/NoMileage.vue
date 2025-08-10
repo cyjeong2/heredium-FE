@@ -19,7 +19,7 @@ export default {
 <style lang="scss" scoped>
 .no-mileage {
   padding: 1.5rem 0;
-
+  min-height: 211px;
   .content {
     font-size: 1.6rem;
     font-weight: 500;

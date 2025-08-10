@@ -68,12 +68,12 @@ export default {
       default: false
     },
     min: {
-      type: String,
+      type: [ String || Date ],
       required: false,
       default: null
     },
     max: {
-      type: String,
+      type: [ String || Date ],
       required: false,
       default: null
     },

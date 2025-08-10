@@ -14,7 +14,7 @@
             <i class="ic-arrow-first" />
           </button>
           <button
-            v-show="!listData.first && listData.totalPages > 4"
+            v-show="(!listData.first && listData.totalPages > 4) || showPrevPage"
             type="button"
             class="pagination--prev"
             :disabled="listData.first"
@@ -34,7 +34,7 @@
             </li>
           </ul>
           <button
-            v-show="!listData.last && listData.totalPages > 4"
+            v-show="(!listData.last && listData.totalPages > 4) || showNextPage"
             type="button"
             class="pagination--next"
             :disabled="listData.last"
@@ -85,7 +85,15 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
+    },
+    showPrevPage: {
+      type: Boolean,
+      default: false
+    },
+    showNextPage: {
+      type: Boolean,
+      default: false
+    },
   },
   computed: {
     firstPageIndex() {
