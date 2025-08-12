@@ -53,7 +53,7 @@ export default {
             recvMethodType: 'get',
             EncodeData: res
           });
-          document.querySelector('body').append(form);
+          document.querySelector('body').appendChild(form);
           form.submit();
           form.remove();
         })
