@@ -84,6 +84,7 @@
             <label>직업</label>
             <div style="margin-top: 1.2rem;">
               <USelect
+                v-if="hydrated"
                 v-model="form.job"
                 :option-list="jobOptions"
                 default-text="선택"
@@ -138,6 +139,7 @@
       </div>
     </div>
     <URegisterModal
+      v-if="hydrated"
       :is-show="modal.isTerms"
       :term-target="termTarget"
       :terms-data="termsData"
@@ -269,7 +271,7 @@ export default {
       // this.feedback.region.text = '';
     }
   },
-  beforeMount() {
+  mounted() {
     this.hydrated = true
   },
   methods: {
