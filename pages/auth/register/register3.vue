@@ -1,7 +1,7 @@
 <template>
   <main class="container">
     <div class="m progress-bar">
-      <div class="fill" />
+      <div class="fill"></div>
     </div>
     <div class="title-area">
       <div class="logo-area">
@@ -16,7 +16,7 @@
         <h2>더 깊은 예술을 경험해보세요!</h2>
       </div>
       <div class="pc progress-bar">
-        <div class="fill" />
+        <div class="fill"></div>
       </div>
       <p style="font-size: 1.4rem; text-align: center;">헤레디움에서 사용할 정보를 입력해주세요.</p>
     </div>
