@@ -10,19 +10,33 @@
       <div class="ticketing-body">
         <div class="membership_info">
           <div class="membership_icon">
-            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" />
-            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" />
-            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" />
+            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" style="width: 48px; height: 48px"/>
+            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" style="width: 48px; height: 48px"/>
+            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" style="width: 48px; height: 48px"/>
           </div>
           <div class="name_membership">
             <div>
               <p class="name_class">
                 {{ dataMembership.name }} 님의 현재 등급은<br />
-                <B>{{ dataMembership.membership_name }}</B> 입니다.
+                <B>{{
+                  dataMembership.membership_name === 'CN PASS PLUS' ? 'CN PASS+' : dataMembership.membership_name
+                }}</B>
+                입니다.
               </p>
+              <div class="mileage_description">
+                <p v-if="dataMembership.code !== 3">
+                  마일리지는 <B>멤버십 등급 산정용</B>으로만 사용되며, <br />
+                  적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
+                </p>
+                <p v-if="dataMembership.code === 3">
+                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
+                  Green 회원의 경우 마일리지 적립이 불가합니다.
+                </p>
+              </div>
               <div class="mileage_condition">
                 <p v-if="dataMembership.code === 1">
-                  마일리지 <B>{{ 70 - mileageList.totalMileage }}점</B> 적립시 업그레이드 됩니다.
+                  마일리지 <B>{{ 70 - mileageList.totalMileage }}점</B> 적립시 <br />
+                  업그레이드 됩니다.
                 </p>
                 <p v-if="dataMembership.code === 2">
                   업그레이드 등급 유지기간 <br />
@@ -35,7 +49,7 @@
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
                 <div class="benefit-hover-wrapper">
-                  <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
+                  <button class="membership_benefit" @click="showModal = true">
                     등급 혜택보기
                   </button>
 
@@ -48,32 +62,25 @@
                   />
                 </div>
               </div>
-
-              <div class="mileage_description">
-                <p v-if="dataMembership.code !== 3">
-                  마일리지는 <B>멤버십 등급 산정용</B>으로만 사용되며, <br />
-                  적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
-                </p>
-                <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
-                  Green 회원의 경우 마일리지 적립이 불가합니다.
-                </p>
-              </div>
             </div>
           </div>
-          <div class="mileage_summary">
-            <div>현재 나의 마일리지</div>
-            <div>소멸 예정 마일리지</div>
-          </div>
-          <div class="show_mileage">
-            <div class="mileage_total">
-              <span style="font-size: 28px"> {{ dataMembership.code === 3 ? '-' : mileageList.totalMileage }} </span>M
-            </div>
-            <div class="mileage_expire">
-              <span style="font-size: 28px"> {{ dataMembership.code === 3 ? '-' : mileageList.expiringMileage }} </span
-              >M
-            </div>
-          </div>
+        </div>
+        <div class="mileage_summary_table">
+          <table>
+            <tr>
+              <th>현재 나의 마일리지</th>
+              <td>
+                <span style="font-size: 19px">{{ dataMembership.code === 3 ? '-' : mileageList.totalMileage }}</span> M
+              </td>
+            </tr>
+            <tr>
+              <th>소멸 예정 마일리지</th>
+              <td>
+                <span style="font-size: 19px">{{ dataMembership.code === 3 ? '-' : mileageList.expiringMileage }}</span>
+                M
+              </td>
+            </tr>
+          </table>
         </div>
       </div>
       <!-- Tab UI -->
@@ -120,43 +127,51 @@
           :list-data="mileage_list"
           :show-prev-page="true"
           :show-next-page="true"
-          @getListData="(pageIndex) => loadMileageList(pageIndex, false)"
+          @getListData="(pageIndex) => loadMileageList(pageIndex, true)"
         >
           <template #data="{ data }">
             <table class="mileage-table">
               <thead>
                 <tr>
-                  <th>승인일자</th>
                   <th>적립내역</th>
-                  <th>유효기간</th>
-                  <th>적립</th>
-                  <th>사용</th>
+                  <th>적립/사용</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!data || data.length === 0 || dataMembership.code === 3">
-                  <td colspan="5">
+                  <td colspan="2">
                     <no-mileage />
                   </td>
                 </tr>
                 <template v-if="dataMembership.code !== 3">
                   <tr v-for="item in data" :key="item.id">
-                    <td>{{ formatDate(item.createdDate) }}</td>
-                    <td>{{ formatTypeCategory(item.type, item.category) }}</td>
-                    <td>{{ item.expirationDate ? formatDate(item.expirationDate) : '-' }}</td>
                     <td>
-                      <b>{{ [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
+                      <div class="mileage-details">
+                        <p class="created-date">{{ formatDate(item.createdDate) }}</p>
+                        <p class="category">{{ formatTypeCategory(item.type, item.category) }}</p>
+                        <p v-if="item.expirationDate" class="expiration-date">
+                          (유효기간: {{ formatDate(item.expirationDate) }})
+                        </p>
+                      </div>
                     </td>
                     <td>
-                      <b>{{
-                        item.type === 1 ? '초기화' : [2, 3, 6].includes(item.type) ? `${item.mileageAmount}M` : '-'
-                      }}</b>
+                      <b>
+                        {{
+                          [0, 4, 5].includes(item.type)
+                            ? `+${item.mileageAmount}M`
+                            : item.type === 1
+                            ? '초기화'
+                            : [2, 3, 6].includes(item.type)
+                            ? `-${item.mileageAmount}M`
+                            : '-'
+                        }}
+                      </b>
                     </td>
                   </tr>
                 </template>
                 <template v-if="data.length > 0">
                   <tr v-for="n in 5 - data.length" :key="'empty-' + n" class="placeholder-row">
-                    <td colspan="5" style="height: 47px; border: none; background: transparent"></td>
+                    <td colspan="2" style="height: 47px; border: none; background: transparent"></td>
                   </tr>
                 </template>
               </tbody>
@@ -178,7 +193,7 @@ import UDatepicker from '~/components/user/common/UDatepicker';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
+  components: {UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
@@ -220,7 +235,7 @@ export default {
   },
   watch: {
     activeTab() {
-      this.loadMileageList(0);
+      this.loadMileageList(0, true);
     }
   },
   mounted() {
@@ -346,6 +361,7 @@ export default {
   margin-bottom: 12rem;
   min-height: 100vh !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 .mypage {
   margin-top: 2rem;
@@ -372,9 +388,6 @@ export default {
 }
 
 .ticketing-body {
-  width: 2300px;
-  height: 200px !important;
-
   .ticketing-info {
     display: flex;
     flex-direction: row;
@@ -407,88 +420,49 @@ export default {
   }
 }
 
-@media screen and (min-width: 769px) {
-  .container {
-    display: flex;
-    margin-bottom: 12.6rem;
-    margin-top: 4.8rem;
-
-    > div {
-      width: 34.8rem;
-      padding-right: 14.8rem;
-    }
-
-    > section {
-      flex: 1 0 0;
-    }
-  }
-
-  .ticketing-head {
-    h2 {
-      font-size: 3.2rem;
-      font-weight: 500;
-      line-height: 150%;
-    }
-  }
-
-  .ticketing-body {
-    margin-top: 2.6rem;
-    margin-bottom: 2.6rem;
-    .ticketing-info {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      margin-bottom: 2rem;
-      padding: 1.6rem 2rem;
-
-      i {
-        font-size: 2.4rem;
-      }
-
-      p {
-        font-size: 1.4rem;
-        font-weight: 500;
-        line-height: 160%;
-      }
-
-      a {
-        font-size: 1.4rem;
-        line-height: 160%;
-
-        i {
-          margin-left: 0.4rem;
-          margin-right: 0;
-          font-size: 2.4rem;
-        }
-      }
-    }
-  }
-
-  .box-contents {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .box-membership {
-      max-width: 35%;
-    }
-  }
-
-  .head {
+@media screen and (max-width: 768px) {
+  .mypage h1 {
     font-size: 2rem;
-    font-weight: 700;
-    padding-left: 8px;
-    border-left: 5px solid var(--color-u-primary);
-    margin-bottom: 2rem;
   }
+  .ticketing-head h2 {
+    font-size: 2rem;
+  }
+  .ticketing-body {
+    width: 100%;
+    height: auto !important;
+  }
+  .membership_info {
+    max-width: 100%;
+    padding: 1rem;
+  }
+  .name_membership {
+    width: 100%;
+  }
+}
+
+.box-contents {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .box-membership {
+    max-width: 35%;
+  }
+}
+
+.head {
+  font-size: 2rem;
+  font-weight: 700;
+  padding-left: 8px;
+  border-left: 5px solid var(--color-u-primary);
+  margin-bottom: 2rem;
 }
 .membership_info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 390px;
+  max-width: 100%;
   max-height: 800px;
   height: 100%;
   padding: 2rem;
@@ -500,15 +474,14 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
-  margin-left: 1.2rem;
-  width: 48px;
-  height: 48px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 .name_membership {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 500px;
+  text-align: center;
 }
 .name_class {
   font-size: 1.5em;
@@ -516,11 +489,18 @@ export default {
 }
 .mileage_condition {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  flex-direction: row;
   color: #111111;
+  border-top: solid #e6e6e6;
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  font-size: 1.2rem;
 }
 .mileage_description {
   color: #666666;
+  font-size: 1.2rem;
 }
 .benefit-hover-wrapper {
   position: relative;
@@ -535,12 +515,7 @@ export default {
   cursor: pointer;
 }
 .transparent-modal {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 10;
-  margin-top: 10px;
   pointer-events: none;
 }
 .modal_title {
@@ -557,31 +532,52 @@ export default {
   display: flex;
   flex-direction: row;
 }
-.mileage_summary {
-  display: flex;
-  flex-direction: column;
-  gap: 5rem;
-  margin-top: 20px;
+
+.mileage_summary_table {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 0 1rem;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 10px 0;
+    text-align: left;
+  }
+
+  th {
+    width: 50%;
+    font-weight: normal;
+    color: #111111;
+  }
+
+  td {
+    width: 50%;
+    text-align: right;
+    font-weight: bold;
+    color: #111111;
+  }
 }
-.show_mileage {
-  display: flex;
-  flex-direction: column;
-  gap: 5rem;
-  padding-left: 30px;
-  margin-top: 20px;
-  margin-left: 60px;
-  font-weight: bold;
-  font-size: 16px;
-}
+
 .mileage-section {
-  width: 80%;
-  max-width: 1000px;
-  padding-left: 24px;
-  padding-right: 24px;
+  width: 100%;
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
   box-sizing: border-box;
 }
 .tabs {
   display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .tabs button {
   flex: 1;
@@ -600,39 +596,52 @@ export default {
 }
 .filter-area {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: space-between;
   flex-wrap: wrap;
+  width: 100%;
   margin-top: 1.5rem;
   margin-bottom: 3.5rem;
   padding: 8px 0;
-  gap: 4px;
+  gap: 5px;
 }
-.filter-area button {
-  flex: 1;
-  min-width: 90px;
-  padding: 6px 12px;
-  text-align: center;
+.filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
   border: 1px solid #cccccc;
   background-color: #ffffff;
-  cursor: pointer;
-}
 
-.filter-area button.selected {
+  button {
+    flex: 1;
+    min-width: unset;
+    padding: 10px 12px;
+    text-align: center;
+    border: 1px solid #cccccc;
+    background-color: #ffffff;
+    cursor: pointer;
+  }
+}
+.filter-buttons button.selected {
   background: #ffffff;
   border-color: #111111;
 }
 .date-range {
   display: flex;
   align-items: center;
+  flex: 1;
   gap: 6px;
   ::v-deep(.date-picker) {
+    flex: 1;
+    width: auto !important;
     .data-input {
-      padding: 0 3rem 0 1.6rem;
+      padding: 0 1.6rem;
       border: 1px solid #ccc;
       background-color: #fff;
       font-size: 1.4rem;
-      max-height: 32.8px;
+      max-height: 100%;
+      box-sizing: border-box;
     }
 
     &.is-active .data-input {
@@ -641,12 +650,14 @@ export default {
   }
 }
 .filter-submit {
-  background-color: #111111 !important;
+  background-color: #a5b195 !important;
   color: #ffffff;
   padding: 6px 12px;
   border: none;
   border-radius: 4px;
-  max-width: 50px;
+  max-width: 100%;
+  height: 45px;
+  font-size: 14px;
   cursor: pointer;
 }
 .mileage-table {
@@ -664,35 +675,44 @@ export default {
   th {
     border-top: 1px solid #111111;
     border-bottom: 1px solid #d9d9d9;
+    background-color: #f9f9f9;
   }
 
   td {
     border-top: 1px solid #d9d9d9;
+    vertical-align: middle;
   }
 
+  /* 컬럼 너비 조정 */
   th:nth-child(1),
   td:nth-child(1) {
-    width: 200px;
+    width: 65%;
+    text-align: left;
   }
 
   th:nth-child(2),
   td:nth-child(2) {
-    width: 400px;
-  }
-  td:nth-child(2) {
-    text-align: left;
+    width: 35%;
   }
 
-  th:nth-child(3),
-  td:nth-child(3) {
-    width: 200px;
+  .mileage-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
-  th:nth-child(4),
-  td:nth-child(4),
-  th:nth-child(5),
-  td:nth-child(5) {
-    width: 80px;
+  .created-date {
+    font-size: 1.2rem;
+    color: #666666;
+  }
+  .category {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333333;
+  }
+  .expiration-date {
+    font-size: 1.2rem;
+    color: #999999;
   }
 }
 ::v-deep(.pagination) {

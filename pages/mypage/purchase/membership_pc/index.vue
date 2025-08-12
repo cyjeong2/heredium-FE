@@ -117,7 +117,7 @@
           :list-data="mileage_list"
           :show-prev-page="true"
           :show-next-page="true"
-          @getListData="(pageIndex) => loadMileageList(pageIndex, false)"
+          @getListData="(pageIndex) => loadMileageList(pageIndex, true)"
         >
           <template #data="{ data }">
             <table class="mileage-table">
@@ -218,7 +218,7 @@ export default {
   },
   watch: {
     activeTab() {
-      this.loadMileageList(0);
+      this.loadMileageList(0, true);
     }
   },
   mounted() {
@@ -339,6 +339,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .container {
   margin-bottom: 12rem;
