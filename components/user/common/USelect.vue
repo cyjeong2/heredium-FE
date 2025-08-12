@@ -189,12 +189,13 @@ export default {
     align-items: center;
     justify-content: space-between;
     padding: 0 1.6rem;
-    height: 5.2rem;
+    height: 4.5rem;
     border: 1px solid var(--color-u-grey-2);
     background: var(--color-white);
     color: var(--color-black);
     cursor: pointer;
     user-select: none;
+    border-radius: 0.5rem;
 
     &.disabled {
       color: var(--color-grey-3);
@@ -236,6 +237,7 @@ export default {
     background: var(--color-white);
     border: 1px solid var(--color-u-grey-2);
     overflow-y: auto;
+    border-radius: 0.5rem;
   }
 
   .dropdown-item {
@@ -279,7 +281,7 @@ i.only-mobile {
     width: 100%;               /* li 너비 가득 채우기 */
     padding: 0.6rem 0.8rem;     /* 입력창 안쪽 여백 */
     border: 1px solid var(--color-u-grey-2);
-    border-radius: 0.3rem;
+    border-radius: 0.5rem;
     font-size: 1.4rem;
     line-height: 1.4;
     outline: none;

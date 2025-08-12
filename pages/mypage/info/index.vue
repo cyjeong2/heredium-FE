@@ -14,6 +14,7 @@
           placeholder="비밀번호를 입력해주세요."
           w-size="full"
           class="h-m"
+          style="margin-bottom: 1.2rem; max-width: 43.6rem;"
           @enter="onPasswordConfirm"
         />
         <UButton w-size="100" @click="onPasswordConfirm">확인</UButton>
@@ -23,97 +24,93 @@
           <p class="p1">회원 정보</p>
         </div>
         <div class="grid-wrap"></div>
-        <table>
-          <tr>
-            <td>아이디</td>
-            <td v-if="!emailChange">
-              {{ account.email }}
-              <div v-if="!isSNSLogin">
-                <UButton class="xs" button-type="chart" @click="onEmailChange">아이디 변경</UButton>
+        <div class="form-rows">
+          <!-- 이름 (읽기전용 입력으로 보여주기) -->
+          <div class="form-row">
+            <label class="form-label">이름</label>
+            <div class="form-field">
+              <UInput :value="account.name" readonly disabled class="h-xs" w-size="full" />
+            </div>
+          </div>
+          <!-- 아이디 -->
+          <div class="form-row">
+            <label class="form-label">아이디</label>
+            <div class="form-field">
+              <div v-if="!emailChange" class="inline-field">
+                <UInput :value="account.email" readonly disabled class="h-xs" w-size="full" />
+                <div v-if="!isSNSLogin" class="inline-field">
+                  <UButton class="xs" button-type="chart" @click="onEmailChange">아이디 변경</UButton>
+                </div>
+                <div v-else class="sns-label">
+                  [{{
+                    SNSLoginType === 'KAKAO' ? '카카오'
+                    : SNSLoginType === 'NAVER' ? '네이버'
+                    : SNSLoginType === 'GOOGLE' ? '구글'
+                    : SNSLoginType === 'APPLE' ? '애플' : '존재하지 않는 SNS'
+                  }}]
+                </div>
               </div>
               <div v-else>
-                [{{
-                  SNSLoginType === 'KAKAO'
-                    ? '카카오'
-                    : SNSLoginType === 'NAVER'
-                    ? '네이버'
-                    : SNSLoginType === 'GOOGLE'
-                    ? '구글'
-                    : SNSLoginType === 'APPLE'
-                    ? '애플'
-                    : '존재하지 않는 SNS'
-                }}]
+                <UInput
+                  v-model="account.email"
+                  class="h-xs"
+                  w-size="full"
+                  :class="{ 'is-error': !feedback.email.isValid }"
+                  :error-msg="feedback.email.text"
+                  placeholder="id@gmail.com"
+                />
+                <div style="margin-top: 8px;">
+                  <UButton class="xs" button-type="chart" @click="cancelEmailChange">취소</UButton>
+                </div>
               </div>
-            </td>
-            <td v-else>
-              <UInput
-                v-model="account.email"
-                class="h-xs"
-                w-size="full"
-                :class="{ 'is-error': !feedback.email.isValid }"
-                :error-msg="feedback.email.text"
-                placeholder="heredium@exemple.com"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>이름</td>
-            <td>{{ account.name }}</td>
-          </tr>
-          <tr v-if="!isSNSLogin">
-            <td>새 비밀번호</td>
-            <td v-if="!passwordChange">
-              <UButton class="xs" button-type="chart" @click="onPasswordChange">비밀번호 변경</UButton>
-            </td>
-            <td v-else>
-              <UInput
-                v-model="newPassword1"
-                type="password"
-                class="h-xs"
-                :class="{ 'is-error': !feedback.newPassword1.isValid }"
-                :error-msg="feedback.newPassword1.text"
-                placeholder="8 ~ 16자로 입력해주세요."
-              />
-            </td>
-          </tr>
-          <tr v-if="passwordChange">
-            <td>새 비밀번호 확인</td>
-            <td>
-              <UInput
-                v-model="newPassword2"
-                type="password"
-                class="h-xs"
-                :class="{ 'is-error': !feedback.newPassword2.isValid }"
-                :error-msg="feedback.newPassword2.text"
-                placeholder="비밀번호를 재입력해주세요."
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>휴대폰 번호</td>
-            <td>
-              {{ getPhone(account.phone) }}
-              <div v-if="currentUser?.birthDate == null">
-                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 인증</UButton>
+            </div>
+          </div>
+          <!-- 비밀번호(변경 버튼) -->
+          <div v-if="!isSNSLogin" class="form-row">
+            <label class="form-label">새 비밀번호</label>
+            <div class="form-field">
+              <div v-if="!passwordChange" class="inline-field">
+                <UButton class="xs" button-type="chart" @click="onPasswordChange">비밀번호 변경</UButton>
               </div>
-              <div v-else>
-                <UButton class="xs" button-type="chart" @click="onPhoneChange">휴대폰 번호 변경</UButton>
+              <div v-else class="stack">
+                <UInput
+                  v-model="newPassword1"
+                  type="password"
+                  class="h-xs"
+                  w-size="full"
+                  :class="{ 'is-error': !feedback.newPassword1.isValid }"
+                  :error-msg="feedback.newPassword1.text"
+                  placeholder="8 ~ 16자로 입력해주세요."
+                />
+                <UInput
+                  v-model="newPassword2"
+                  type="password"
+                  class="h-xs mt-8"
+                  w-size="full"
+                  :class="{ 'is-error': !feedback.newPassword2.isValid }"
+                  :error-msg="feedback.newPassword2.text"
+                  placeholder="비밀번호를 재입력해주세요."
+                />
+                <div style="margin-top: 8px;">
+                  <UButton class="xs" button-type="chart" @click="cancelPasswordChange">취소</UButton>
+                </div>
               </div>
-            </td>
-          </tr>
-          <!--          <tr>-->
-          <!--            <td>생년월일</td>-->
-          <!--            <td>{{ $dayjs(account.birthday).format('YYYY.MM.DD') }}</td>-->
-          <!--          </tr>-->
-          <!--          <tr>-->
-          <!--            <td>성별</td>-->
-          <!--            <td>{{ getGender(account.gender) }}</td>-->
-          <!--          </tr>-->
-          <!-- <tr> -->
-            <!-- <td>지역주민</td> -->
-            <!-- <td><UCheckbox v-model="account.isLocalResident">대전에 살고 있어요!</UCheckbox></td> -->
-          <!-- </tr> -->
-        </table>
+            </div>
+          </div>
+
+          <!-- 휴대폰 번호 -->
+          <div class="form-row">
+            <label class="form-label">휴대폰 번호</label>
+            <div class="form-field">
+              <div class="inline-field">
+                <UInput :value="getPhone(account.phone)" readonly disabled class="h-xs" w-size="full" />
+                <UButton class="xs" button-type="chart" @click="onPhoneChange">
+                  {{ currentUser?.birthDate == null ? '휴대폰 인증' : '휴대폰 번호 변경' }}
+                </UButton>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- <div class="marketing-area"> -->
           <!-- <UCheckbox v-model="account.isMarketingReceive">마케팅 활용 동의 및 광고 수신 동의</UCheckbox> -->
         <!-- </div> -->
@@ -121,7 +118,7 @@
           <p class="p1">추가 정보 입력</p>
           <p class="p2">추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!</p>
         </div>
-        <div class="grid-wrap"></div>
+        <div class="grid-wrap" style="padding-top: 2.2rem;"></div>
         <div>
           <UCheckbox v-model="form.additionalInfoAgreed">
             <strong style="margin-right: 5px;">(선택)</strong>추가 개인정보 수집 및 활용에 동의합니다.
@@ -174,7 +171,7 @@
           </div>
         </div>
         <div class="submit-area">
-          <UButton w-size="100" @click="onSaveData">저장</UButton>
+          <UButton w-size="100" @click="onSaveData">완료</UButton>
           <NuxtLink to="/mypage/info/withdrawal" class="withdrawal-btn">회원탈퇴</NuxtLink>
         </div>
       </div>
@@ -628,6 +625,21 @@ export default {
       this.couponModalVisible = false;
       this.issuedCoupons = [];
     },
+    cancelEmailChange() {
+      this.emailChange = false;
+      this.account.email = this.originalInfo.email; // 기존 값 복원
+      this.feedback.email.isValid = true;
+      this.feedback.email.text = '';
+    },
+    cancelPasswordChange() {
+      this.passwordChange = false;
+      this.newPassword1 = '';
+      this.newPassword2 = '';
+      this.feedback.newPassword1.isValid = true;
+      this.feedback.newPassword1.text = '';
+      this.feedback.newPassword2.isValid = true;
+      this.feedback.newPassword2.text = '';
+    }
   }
 };
 </script>
@@ -681,9 +693,6 @@ h2 {
       font-size: 1.6rem;
       font-weight: 500;
       line-height: 2.6rem;
-    }
-    .input-wrap {
-      margin-bottom: 2.4rem;
     }
 
     table {
@@ -820,8 +829,7 @@ h2 {
       }
 
       .input-wrap {
-        margin-bottom: 3.2rem;
-        max-width: 43.6rem;
+        max-width: 31.6rem;
       }
 
       button.primary {
@@ -945,7 +953,6 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-top: 1px solid black;
-  padding-top: 2.2rem;
   row-gap: 3.2rem;
   column-gap: 1.6rem;
 }
@@ -1005,7 +1012,6 @@ h2 {
     margin-bottom: 3.5rem;
     background-color: var(--color-grey-1);
     border: 1px solid var(--color-grey-2);
-    border-radius: 0.3rem;
     font-size: 1.4rem;
     color: var(--color-grey-8);
   }
@@ -1069,5 +1075,112 @@ h2 {
   margin-top: 3.4rem;   /* 레이블 아래에서 동일 간격 */
 }
 
+/* 기존 table 스타일은 제거(또는 그대로 두고 .form-rows만 새로 추가) */
+.form-rows {
+  display: grid;
+}
 
+/* 한 줄: 좌측 라벨, 우측 필드 */
+.form-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: center;
+  column-gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(190,190,190,0.4);
+}
+
+.form-label {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.form-field {
+  display: block;
+}
+
+/* 입력 + 버튼 가로 배치 */
+.inline-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 비번 두 칸 세로 쌓기 */
+.stack > * + * {
+  margin-top: 8px;
+}
+
+.sns-label {
+  margin-left: 8px;
+  font-size: 1.4rem;
+  color: var(--color-grey-6);
+}
+
+/* 모바일: 세 번째 이미지처럼 세로 쌓기 */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr; /* 라벨/필드 세로 */
+    row-gap: 8px;
+    border-bottom: 1px solid rgba(190,190,190,0.4);
+    padding: 12px 0;
+  }
+  .form-label {
+    font-size: 1.4rem;
+  }
+  .inline-field {
+    grid-template-columns: 1fr; /* 입력과 버튼도 세로 */
+    gap: 8px;
+  }
+}
+
+/* 공통: 인풋 옆에 버튼 */
+.inline-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;    /* 데스크탑에선 한 줄 */
+}
+
+/* 인풋은 남는 공간 가변, 버튼은 내용 크기 */
+.inline-field :deep(.u-input),
+.inline-field .inline-input {
+  flex: 1 1 auto;
+  width: auto !important;
+  min-width: 0;         /* 길어도 줄어들 수 있게 */
+}
+.inline-field > * {
+  flex: 0 0 auto;       /* 버튼/라벨은 고정 폭 */
+  min-width: 0;
+}
+
+/* 모바일: 공간 부족하면 다음 줄로 내려감 */
+@media (max-width: 768px) {
+  .inline-field {
+    flex-wrap: wrap;    /* 줄바꿈 허용 */
+    gap: 8px;
+  }
+  /* 인풋은 한 줄 전체 사용 */
+  .inline-field :deep(.u-input),
+  .inline-field .inline-input {
+    flex: 1 1 100%;
+  }
+  /* 버튼도 100% 폭으로 */
+  .inline-field > button,
+  .inline-field > .u-button,
+  .inline-field > div:has(> .xs) {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack > * + * {
+  margin-top: 8px;
+}
 </style>

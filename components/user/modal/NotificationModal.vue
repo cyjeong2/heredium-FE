@@ -63,7 +63,6 @@ export default {
   },
   methods: {
     async fetchMembership() {
-      console.log("this.code", this.code)
       try {
         // 여기에 실제 API 경로를 맞춰주세요.
         // 예: GET /user/memberships/{code} 또는 /api/membership/code/{code}

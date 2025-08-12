@@ -114,7 +114,6 @@ h1 {
       font-weight: 700;
       line-height: 160%;
       letter-spacing: 0.25px;
-      border-bottom: 1px solid var(--color-black);
       padding-bottom: 1rem;
       margin-bottom: 1.3rem;
     }
@@ -128,9 +127,9 @@ h1 {
       margin-bottom: 2.6rem;
 
       &.nuxt-link-active {
-        color: var(--color-u-primary);
+        color: black;
         font-weight: 700;
-        border-bottom: 2px solid var(--color-u-primary);
+        border-bottom: 2px solid black;
         padding-bottom: 0.4rem; /* 밑줄과 텍스트 간 적당한 여백 */
         margin-bottom: 1.8rem;  /* 기존 마진에서 밑줄 두께(2px)+여백(4px)만큼 줄여줍니다 */
       }

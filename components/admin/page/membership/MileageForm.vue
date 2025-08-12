@@ -36,7 +36,7 @@
               <SRadio
                 v-for="opt in paymentMethodOptions"
                 :key="opt.value"
-                v-model.number="form.paymentMethod"
+                v-model="form.paymentMethod"
                 :value="opt.value"
                 :class="{ 'is-error': error?.paymentMethod || feedback?.paymentMethod }"
               >
@@ -62,7 +62,7 @@
           <div class="row">
             <label>결제금액<b class="must">*</b></label>
             <SInput
-              v-model.number="form.paymentAmount"
+              v-model="form.paymentAmount"
               type="text"
               is-numeric
               text-align="right"

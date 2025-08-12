@@ -10,26 +10,25 @@
     </div>
     <div class="coupon-detail">
       <p class="name">{{ detailCoupon.name }}</p>
+      <div class="type-discount">
+        <span class="type">헤레디움 {{ couponTypeLabel }}</span>
+        <span class="discount-text">
+          {{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }} 할인 쿠폰
+        </span>
+      </div>
       <div class="discount">
         <!-- <div v-if="!isSelection" class="date">
           <img src="~assets/img/icon/icon_discount_tag.svg" />
           <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
         </div> -->
         <div class="date">
-          사용기간:
+          유효기간:
           <span>{{
             getFormattedDate(
               detailCoupon.unused_coupons[0].delivered_date,
               detailCoupon.unused_coupons[0].expiration_date
             )
           }}</span>
-        </div>
-      </div>
-      <div>
-        <div class="date">
-          사용여부:
-          <span v-if="detailCoupon.unused_coupons.length > 0">사용가능</span>
-          <span v-else>사용완료</span>
         </div>
       </div>
       <div class="coupon-remaining">
@@ -73,6 +72,7 @@ import UButton from '../../common/UButton.vue';
 import ModalCouponInfor from '../../modal/coupon/ModalCouponInfor.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
+import { COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 
 export default {
   name: 'CouponCard',
@@ -112,6 +112,10 @@ export default {
     };
   },
   computed: {
+    couponTypeLabel() {
+      const opt = COUPON_TYPE_OPTION_LIST.find(o => o.value === this.detailCoupon.coupon_type);
+      return opt ? opt.label : this.detailCoupon.coupon_type;
+    },
     couponImageSrc() {
       return this.getImage(this.detailCoupon.image_url);
     },
@@ -184,6 +188,7 @@ export default {
     .img-wrap {
       height: 10rem;
       width: 10rem;
+      padding: 2.5rem;
 
       > img {
         width: 100%;
@@ -337,6 +342,48 @@ export default {
 @media screen and (min-width: 769px) {
   .coupon-card {
     max-width: 400px;
+  }
+}
+
+.coupon-card {
+  .coupon-detail {
+
+    /* 제목: 굵게, 크게 */
+    .name {
+      font-size: 1.8rem;   /* ≈ 18px */
+      font-weight: 700;
+      line-height: 1.4;
+      color: #111;         /* 진한 검정 */
+      margin: 0 0 .4rem 0; /* 아래 살짝 간격 */
+    }
+
+     /* 본문(설명) */
+    .type-discount {
+      display: block;      /* 줄바꿈 */
+      font-size: 1.5rem;   /* ≈ 15px */
+      font-weight: 400;
+      line-height: 1.6;
+      color: #111;
+      margin: 0 0 .4rem 0;
+
+      .type,
+      .discount-text {
+        font-weight: 400;  /* 굵기 통일 */
+      }
+    }
+
+    /* 유효기간: 더 작고 회색 */
+    .discount {
+      margin-top: -1rem;
+
+      .date {
+        font-size: 1.3rem;   /* ≈ 13px */
+        line-height: 1.6;
+        color: #9e9e9e;      /* 회색 */
+        display: inline-block;
+        min-width: unset;    /* 기존 최소폭 해제 */
+      }
+    }
   }
 }
 </style>

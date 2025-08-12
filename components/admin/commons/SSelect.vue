@@ -117,7 +117,16 @@ export default {
       this.isOpen = !this.isOpen;
     },
     onSelected() {
-      const value = this.selected;
+      let value = this.selected;
+
+      // placeholder가 null/'' 이면 null 유지
+      if (value === '' || value === null) {
+        value = null;
+      } else {
+        const n = Number(value);
+        // 숫자로 변환 가능하면 숫자, 아니면 원본
+        value = Number.isNaN(n) ? value : n;
+      }
 
       this.isOpen = false;
       this.$emit('input', value);
