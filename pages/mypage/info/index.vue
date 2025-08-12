@@ -133,6 +133,7 @@
                 :option-list="jobOptions"
                 default-text="선택"
                 w-size="full"
+                :searchable="true"
               />
             </div>
           </div>
@@ -145,6 +146,7 @@
                 :option-list="cityOptions"
                 w-size="full"
                 default-text="시/도 선택"
+                :searchable="true"
               />
             </div>
           </div>
@@ -154,6 +156,7 @@
               :option-list="districtOptions"
               w-size="full"
               default-text="시/군/구 선택"
+              :searchable="true"
             />
           </div>
         </div>

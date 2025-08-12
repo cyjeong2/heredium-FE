@@ -1,7 +1,7 @@
 <template>
   <main class="container">
     <div class="m progress-bar">
-      <div class="fill" />
+      <div class="fill"></div>
     </div>
     <div class="register-wrap">
       <div class="logo-area">
@@ -16,7 +16,7 @@
         <h2>더 깊은 예술을 경험해보세요!</h2>
       </div>
       <div class="pc progress-bar">
-        <div class="fill" />
+        <div class="fill"></div>
       </div>
       <p>가입을 위해 약관에 동의를 해주세요.</p>
       <div class="terms-area">
@@ -38,7 +38,7 @@
           </UCheckbox> -->
         </div>
       </div>
-      <UButton w-size="100" @click="onNextRegister">다음</UButton>
+      <UButton w-size="100" :disabled="submitting" @click="onNextRegister">다음</UButton>
     </div>
     <URegisterModal
       :is-show="modal.isTerms"
@@ -62,6 +62,7 @@ import UCheckbox from '~/components/user/common/UCheckbox';
 import UButton from '~/components/user/common/UButton';
 import URegisterModal from '~/components/user/modal/URegisterModal';
 import UDialogModal from '~/components/user/modal/UDialogModal';
+import { createFormElement } from '~/assets/js/commons';
 
 export default {
   name: 'Register1Page',
@@ -82,6 +83,7 @@ export default {
         isTerms: false,
         isError: false
       },
+      submitting: false,
     };
   },
   watch: {
@@ -113,13 +115,39 @@ export default {
         this.isTerms[key] = newValue;
       }
     },
-    onNextRegister() {
+    async onNextRegister() {
       if (this.isTerms.AGE && this.isTerms.SERVICE && this.isTerms.AGREE) {
-        this.$router.push('/auth/register/register2');
+        // this.$router.push({ path: '/auth/register/register2', query: { auto: 1 } });
+        await this.phoneAuth();
       } else {
         this.modal.isError = true;
       }
-    }
+    },
+    async phoneAuth() {                                   // ✅ register2.check() 그대로 이식
+      if (this.submitting) return;
+      this.submitting = true;
+
+      const { protocol, host } = window.location;
+      const returnUrl = `${protocol}//${host}/auth/register/register3`;
+      const errorUrl  = `${protocol}//${host}/auth/register/register1`;
+
+      try {
+        const res = await this.$axios.$get('/nice/encrypt', { params: { returnUrl, errorUrl } });
+        const form = createFormElement(
+          'https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb',
+          { m: 'checkplusService', recvMethodType: 'get', EncodeData: res }
+        );
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(() => form.remove(), 0); // iOS 등에서 안전하게 제거
+      } catch (err) {
+        console.error(err);
+        alert('에러가 발생했습니다.\n다시 시도해 해주세요.');
+        window.location.reload(true);
+      } finally {
+        this.submitting = false;
+      }
+    },
   }
 };
 </script>

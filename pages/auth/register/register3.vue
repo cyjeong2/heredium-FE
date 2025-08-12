@@ -89,6 +89,7 @@
                 :option-list="jobOptions"
                 default-text="선택"
                 w-size="full"
+                :searchable="true"
               />
             </div>
           </div>
@@ -98,18 +99,22 @@
             <div class="region-row">
               <div class="region-col">
                 <USelect
+                  v-if="hydrated"
                   v-model="form.region.state"
                   :option-list="cityOptions"
                   w-size="full"
                   default-text="시/도 선택"
+                  :searchable="true"
                 />
               </div>
               <div class="region-col">
                 <USelect
+                  v-if="hydrated"
                   v-model="form.region.district"
                   :option-list="districtOptions"
                   w-size="full"
                   default-text="시/군/구 선택"
+                  :searchable="true"
                 />
               </div>
             </div>

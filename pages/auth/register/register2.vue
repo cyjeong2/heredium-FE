@@ -34,34 +34,43 @@ import { createFormElement } from '~/assets/js/commons';
 export default {
   name: 'Register2Page',
   components: { UButton, UDialogModal },
+  data() {
+    return {
+      submitting: false, // 중복 방지
+    };
+  },
+  mounted() {
+    // register1에서 auto=1로 온 경우 자동 실행
+    if (this.$route.query.auto) {
+      this.check();
+    }
+  },
   methods: {
     async check() {
+
+      if (this.submitting) return;
+      this.submitting = true;
+
       const windowLocation = window.location;
       const returnUrl = `${windowLocation.protocol}//${windowLocation.host}/auth/register/register3`;
       const errorUrl = `${windowLocation.protocol}//${windowLocation.host}/auth/register1`;
 
-      await this.$axios
-        .$get('/nice/encrypt', {
-          params: {
-            returnUrl,
-            errorUrl
-          }
-        })
-        .then((res) => {
-          const form = createFormElement('https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb', {
-            m: 'checkplusService',
-            recvMethodType: 'get',
-            EncodeData: res
-          });
-          document.querySelector('body').appendChild(form);
-          form.submit();
-          form.remove();
-        })
-        .catch((err) => {
-          console.log(err);
-          alert('에러가 발생했습니다.\n다시 시도해 해주세요.');
-          window.location.reload(true);
-        });
+      try {
+        const res = await this.$axios.$get('/nice/encrypt', { params: { returnUrl, errorUrl } });
+        const form = createFormElement(
+          'https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb',
+          { m: 'checkplusService', recvMethodType: 'get', EncodeData: res }
+        );
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(() => form.remove(), 0);
+      } catch (err) {
+        console.log(err);
+        alert('에러가 발생했습니다.\n다시 시도해 해주세요.');
+        window.location.reload(true);
+      } finally {
+        this.submitting = false;
+      }
     }
   }
 };
