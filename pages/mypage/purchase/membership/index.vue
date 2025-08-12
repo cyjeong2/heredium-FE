@@ -360,8 +360,6 @@ export default {
 .container {
   margin-bottom: 12rem;
   min-height: 100vh !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
 }
 .mypage {
   margin-top: 2rem;
