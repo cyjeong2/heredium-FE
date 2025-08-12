@@ -100,11 +100,11 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="startDate" :max="endDate ? $dayjs(endDate).toDate() : null" style="width: 227.5px" />
+            <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
             <span>~</span>
             <UDatepicker
               v-model="endDate"
-              :min="startDate ? $dayjs(startDate).toDate() : null"
+              :min="startDate"
               style="width: 227.5px"
             />
           </div>
