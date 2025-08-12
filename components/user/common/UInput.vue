@@ -190,6 +190,7 @@ input {
   border: 1px solid var(--color-u-grey-2);
   text-align: left;
   background-color: var(--color-white);
+  border-radius: 2px;
 
   &::placeholder {
     color: var(--color-u-grey-2);
@@ -235,7 +236,7 @@ input {
 .h-xs {
   input {
     width: 100% !important;
-    height: 3.6rem;
+    height: 4rem;
     padding: 0 1.2rem;
     font-size: 1.2rem;
   }
@@ -271,7 +272,7 @@ input {
   .h-xs {
     input {
       width: 32rem !important;
-      height: 4rem;
+      height: 4.5rem;
       padding: 0 1.6rem;
       font-size: 1.4rem;
     }

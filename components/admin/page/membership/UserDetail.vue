@@ -135,21 +135,14 @@
               </td>
               <td>
                 <div class="flex justify-center">
-                  <!-- 일반 적립 취소 -->
                   <SButton
-                    v-if="item.type === 0 && item.relatedMileageId == null"
+                    v-if="canShowCancel(item, data)"
                     button-type="standard"
                     size="small"
-                    @click="handleBeforeRefund(item)"
-                  >취소</SButton>
-
-                  <!-- 승급으로 소진된 적립 → 승급취소 흐름 -->
-                  <SButton
-                    v-else-if="item.type === 0 && item.relatedMileageId != null"
-                    button-type="standard"
-                    size="small"
-                    @click="handleBeforeUpgradeCancel(item)"
-                  >취소</SButton>
+                    @click="onClickCancel(item, data)"
+                  >
+                    취소
+                  </SButton>
                 </div>
               </td>
             </tr>
@@ -345,6 +338,48 @@ export default {
         alert('취소 처리에 실패했습니다.');
       }
     },
+     // 가장 최근 승급 부모 id 구하기
+    getLatestUpgradeParentId(rows) {
+      const upgradeParents = rows.filter(r => this.getTypeText(r.type) === '승급');
+      if (upgradeParents.length === 0) return null;
+
+      return upgradeParents.reduce((latest, cur) => {
+        const a = new Date(latest.createdDate).getTime();
+        const b = new Date(cur.createdDate).getTime();
+        return b > a ? cur : latest;
+      }).id;
+    },
+
+    // 취소 버튼 노출 여부
+    canShowCancel(item, rows) {
+      // 0) 티켓 연동된 내역은 취소 불가
+      if (item.ticketId != null) return false; // null/undefined 둘 다 차단
+
+      // 1) 일반 적립(부모)은 취소 가능
+      if (item.type === 0 && item.relatedMileageId == null) return true;
+
+      // 2) 승급-연결 적립(자식)은 "가장 최근 승급"의 자식만 가능
+      if (item.type === 0 && item.relatedMileageId != null) {
+        const latestId = this.getLatestUpgradeParentId(rows);
+        return latestId != null && item.relatedMileageId === latestId;
+      }
+
+      return false;
+    },
+
+    // 클릭 시 핸들러: 일반/승급취소 분기
+    onClickCancel(item, rows) {
+      if (item.type === 0 && item.relatedMileageId == null) {
+        this.handleBeforeRefund(item);
+        return;
+      }
+      // 승급-연결 적립인 경우: 오직 최신 승급의 자식만
+      const latestId = this.getLatestUpgradeParentId(rows);
+      if (latestId != null && item.relatedMileageId === latestId) {
+        this.handleBeforeUpgradeCancel(item);
+      }
+    },
+
   }
 };
 </script>

@@ -36,7 +36,7 @@
               <SRadio
                 v-for="opt in paymentMethodOptions"
                 :key="opt.value"
-                v-model.number="form.paymentMethod"
+                v-model="form.paymentMethod"
                 :value="opt.value"
                 :class="{ 'is-error': error?.paymentMethod || feedback?.paymentMethod }"
               >
@@ -50,7 +50,7 @@
             <label>일련번호<b class="must">*</b></label>
             <SInput
               v-model="form.serialNumber"
-              placeholder="하나나문자+5자리(영문) 또는 오프라인"
+              :placeholder="serialPlaceholder"
               w-size="s-large"
               maxlength="20"
               :class="{ 'is-error': error?.serialNumber || feedback?.serialNumber }"
@@ -62,7 +62,7 @@
           <div class="row">
             <label>결제금액<b class="must">*</b></label>
             <SInput
-              v-model.number="form.paymentAmount"
+              v-model="form.paymentAmount"
               type="text"
               is-numeric
               text-align="right"
@@ -128,6 +128,32 @@ export default {
     };
   },
   computed: {
+    serialPlaceholder() {
+      const cat = this.form.category    // 0,1,2,3
+      const pay = this.form.paymentMethod  // 1=온라인, 2=오프라인
+
+      // 전시
+      if (cat === 0) {
+        return pay === 2
+          ? '티켓 뒷면 숫자 5자리'
+          : 'QR코드 끝 5자리'
+      }
+
+      // 프로그램
+      if (cat === 1) {
+        return pay === 2
+          ? '카드 승인번호'
+          : 'QR코드 끝 5자리'
+      }
+
+      // 커피 또는 아트숍
+      if (cat === 2 || cat === 3) {
+        return '카드 승인번호'
+      }
+
+      // 디폴트
+      return ''
+    },
     categoryOptions() {
       return Object.entries(CATEGORY_TYPE).map(([value, label]) => ({
         label,

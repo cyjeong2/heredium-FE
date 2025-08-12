@@ -91,7 +91,7 @@
       </section>
       <!-- ④–⑥ 하단 버튼 -->
       <div class="button-row">
-        <!-- <SButton v-if="selectedMembershipId" @click="onDelete">삭제</SButton> -->
+        <SButton v-if="isAdmin" :disabled="!selectedMembershipId || isSaving" @click="modal.isConfirmDelete = true">삭제</SButton>
         <SButton v-if="isAdmin" button-type="primary" :disabled="isSaving" @click="beforeOnSave">저장</SButton>
       </div>
       </fieldset>
@@ -106,6 +106,16 @@
       <template #content>저장하시겠습니까?</template>
       <template #modal-btn1>
         <SButton button-type="primary" @click="onSave">확인</SButton>
+      </template>
+    </SDialogModal>
+    <SDialogModal
+      :is-show="modal.isConfirmDelete"
+      @close="modal.isConfirmDelete = false"
+    >
+      <template #content>정말 해당 멤버십을 삭제하시겠습니까?</template>
+      <template #modal-btn1><SButton @click="modal.isConfirmDelete = false">취소</SButton></template>
+      <template #modal-btn2>
+        <SButton button-type="primary" :disabled="isSaving" @click="onDelete">확인</SButton>
       </template>
     </SDialogModal>
     <SDialogModal :is-show="modal.isSave" @close="modal.isSave = false">
@@ -186,6 +196,7 @@ export default {
       modal: {
         isConfirmSave: false,
         isSave: false,
+        isConfirmDelete: false,
       },
       isShowErrorModal: false,
     };
@@ -350,12 +361,29 @@ export default {
         await this.onMembershipSelect(this.selectedMembershipId);
       }
     },
-    // onDelete() {
-    //   if (confirm('정말 삭제하시겠습니까?')) {
-    //     // TODO: 삭제 API 호출
-    //     this.$router.back();
-    //   }
-    // },
+    async onDelete() {
+      // 1) 선택 여부 재확인
+      if (!this.selectedMembershipId) return;
+
+      // 3) 버튼 비활성화 표시
+      this.isSaving = true;
+
+      try {
+        // 4) 삭제 API 호출
+        await this.$axios.delete(`/admin/memberships/${this.selectedMembershipId}`);
+
+        // 5) 삭제 후 목록 페이지로 이동 (혹은 이전 페이지)
+        // - 목록이 '/admin/memberships' 라고 가정
+        this.$router.go(0);
+      } catch (err) {
+        console.error('멤버십 삭제 실패', err);
+        this.errorMsg = '삭제 중 오류가 발생했습니다. 다시 시도해주세요.';
+        this.isShowErrorModal = true;
+      } finally {
+        this.isSaving = false;
+        this.modal.isConfirmDelete = false;
+      }
+    },
     handleUpdateCoupon(newCouponData, couponIndex) {
       this.coupons[couponIndex] = cloneDeep(newCouponData);
     },

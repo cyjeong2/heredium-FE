@@ -9,9 +9,9 @@
       <img :src="couponImageSrc" />
     </div>
     <div class="coupon-detail">
-      <p class="name">{{ couponDisplayName }}</p>
+      <p class="name">{{ detailCoupon.name }}</p>
       <div class="type-discount">
-        <span class="type">{{ couponTypeLabel }} &nbsp;</span>
+        <span class="type">헤레디움 {{ couponTypeLabel }}</span>
         <span class="discount-text">
           {{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }} 할인 쿠폰
         </span>
@@ -23,19 +23,12 @@
         </div> -->
         <div class="date">
           유효기간:
-          <span v-if="isMembershipCoupon">
-            {{ getFormattedDate(
-                detailCoupon.membership_start_date,
-                detailCoupon.membership_end_date
-              ) }}
-          </span>
-          <span v-else-if="firstUnused">
-            {{ getFormattedDate(
-                firstUnused.delivered_date,
-                firstUnused.expiration_date
-              ) }}
-          </span>
-          <span v-else>기간 정보 없음</span>
+          <span>{{
+            getFormattedDate(
+              detailCoupon.unused_coupons[0].delivered_date,
+              detailCoupon.unused_coupons[0].expiration_date
+            )
+          }}</span>
         </div>
       </div>
       <div class="coupon-remaining">
@@ -43,7 +36,7 @@
           <UButton
             class="reservation-btn"
             w-size="100"
-            :disabled="isExpired || isCouponAwaitingStart || remainingCount === 0"
+            :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
             @click="handleOpenModal"
           >
             QR코드
@@ -123,31 +116,6 @@ export default {
       const opt = COUPON_TYPE_OPTION_LIST.find(o => o.value === this.detailCoupon.coupon_type);
       return opt ? opt.label : this.detailCoupon.coupon_type;
     },
-    couponDisplayName() {
-      // 멤버십 쿠폰인지 체크하는 기존 로직 재활용
-      if (this.isMembershipCoupon) {
-        return this.detailCoupon.display_name + " 멤버십 전용 상시 할인 쿠폰"
-      }
-      return this.detailCoupon.name;
-    },
-    // 1) used/unused 배열이 비어 있으면 '멤버십 쿠폰' 으로 간주
-    isMembershipCoupon() {
-      const used   = this.detailCoupon.used_coupons   || [];
-      const unused = this.detailCoupon.unused_coupons || [];
-      return used.length === 0 && unused.length === 0;
-    },
-    // 2) 남은 개수: membership 쿠폰은 1장, 아니면 unused.filter(!expired).length
-    remainingCount() {
-      if (this.isMembershipCoupon) return 1;
-      return (this.detailCoupon.unused_coupons || [])
-        .filter(u => !u.is_expired).length;
-    },
-    // 3) 첫 unused 아이템 (없으면 null)
-    firstUnused() {
-      return this.isMembershipCoupon
-        ? null
-        : (this.detailCoupon.unused_coupons || [])[0] || null;
-    },
     couponImageSrc() {
       return this.getImage(this.detailCoupon.image_url);
     },
@@ -155,11 +123,14 @@ export default {
       return this.modelValue === this.value;
     },
     isCouponAwaitingStart() {
-      if (this.isMembershipCoupon) return false;
-      if (!this.firstUnused) return true;
+      const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
+      if (!deliveredDate) return true;
       const today = this.$dayjs();
-      const start = this.$dayjs(this.firstUnused.delivered_date, 'YYYY-MM-DD HH:mm:ss', true);
-      return today.isBefore(start);
+      const startDate = this.$dayjs(deliveredDate, 'YYYY-MM-DD HH:mm:ss', true);
+      if (!startDate.isValid()) {
+        return true;
+      }
+      return today.isBefore(startDate);
     },
     showCoupon() {
       if (this.isExpired) {
@@ -194,8 +165,7 @@ export default {
       this.$emit('refresh-coupon-list');
     },
     checkExpiration() {
-      // this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
-      this.isExpired = this.remainingCount === 0;
+      this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
     }
   }
 };
@@ -229,7 +199,7 @@ export default {
 
     .name {
       font-weight: 600;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       color: var(--color-default);
     }
 
@@ -256,7 +226,7 @@ export default {
     display: flex;
     flex: 1;
     flex-direction: column;
-    row-gap: 3px;
+    row-gap: 8px;
     color: var(--color-u-placeholder);
   }
 
@@ -377,19 +347,41 @@ export default {
 
 .coupon-card {
   .coupon-detail {
-    .type-discount {
-      display: flex;
-      align-items: center;
-      font-size: 1.4rem;
-      color: black;
-      margin-bottom: -5px;
-      margin-top: 5px;
 
-      .type {
-        font-weight: 500;
-      }
+    /* 제목: 굵게, 크게 */
+    .name {
+      font-size: 1.8rem;   /* ≈ 18px */
+      font-weight: 700;
+      line-height: 1.4;
+      color: #111;         /* 진한 검정 */
+      margin: 0 0 .4rem 0; /* 아래 살짝 간격 */
+    }
+
+     /* 본문(설명) */
+    .type-discount {
+      display: block;      /* 줄바꿈 */
+      font-size: 1.5rem;   /* ≈ 15px */
+      font-weight: 400;
+      line-height: 1.6;
+      color: #111;
+      margin: 0 0 .4rem 0;
+
+      .type,
       .discount-text {
-        font-weight: 500;
+        font-weight: 400;  /* 굵기 통일 */
+      }
+    }
+
+    /* 유효기간: 더 작고 회색 */
+    .discount {
+      margin-top: -1rem;
+
+      .date {
+        font-size: 1.3rem;   /* ≈ 13px */
+        line-height: 1.6;
+        color: #9e9e9e;      /* 회색 */
+        display: inline-block;
+        min-width: unset;    /* 기존 최소폭 해제 */
       }
     }
   }

@@ -18,13 +18,8 @@
                   :alt="membership.name"
                 />
               </template>
-              <template v-else>
-                <div class="guide-icon" :style="{ backgroundColor: fallbackColor }">
-                  <i :class="fallbackIconClass" />
-                </div>
-              </template>
               <div class="guide-label">
-                {{ membership?.name || fallbackName }}
+                {{ membership?.name }}
               </div>
             </div>
             <div class="guide-text">
@@ -68,15 +63,12 @@ export default {
   },
   methods: {
     async fetchMembership() {
-      console.log("this.code", this.code)
       try {
         // 여기에 실제 API 경로를 맞춰주세요.
         // 예: GET /user/memberships/{code} 또는 /api/membership/code/{code}
         this.membership = await this.$axios.$get(
           `/user/membership/code/${this.code}`
         );
-
-        console.log('this.membership', this.membership)
       } catch (err) {
         console.warn('멤버십 정보 조회 실패', err);
         this.membership = null;
@@ -120,10 +112,12 @@ export default {
   z-index: 500;
 }
 .modal-inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%; height: 100%;
   background: #fff;
+
   @media screen and (min-width: 769px) {
     width: 45.4rem;
     height: auto;
@@ -208,20 +202,31 @@ export default {
   }
 }
 .foot {
+  position: static;        /* ← 변경 */
+  bottom: 0;               /* ← 화면(모달) 맨 아래에 고정 */
+  left: 0;
+  width: 100%;
   display: flex;
   justify-content: center;
   gap: 1.6rem;
-  padding: 1.4rem 2rem;
+  padding: 2rem 2rem;
   border-top: 1px solid var(--color-u-grey-1);
   background: #fff;
-  margin-top: auto;
+  z-index: 10;             /* ← 본문 위에 떴다 내리도록 */
+
+  button {
+    flex: 1;                          /* 양쪽 버튼 동일 너비 */
+    height: 4.8rem;                   /* 적당한 높이 */
+    font-size: 1.6rem;
+    font-weight: 700;
+    border-radius: 0.3rem;            /* 높이의 절반으로 하면 완전 pill 형태 */
+    cursor: pointer;
+    transition: background-color .2s;
+  }
 
   @media screen and (min-width: 769px) {
-    padding: 0 3.2rem 3.6rem;
+    padding: 2.0rem 2.0rem 2.0rem;
     margin-top: 0;
-    button {
-      margin-top: 3.6rem;
-    }
   }
   button[button-type="secondary"] {
     background: transparent;

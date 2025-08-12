@@ -101,11 +101,12 @@ button {
   align-items: center;
   justify-content: center;
   font-size: 1.8rem;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 160%;
   height: 5.2rem;
   padding: 0 1.2rem;
   letter-spacing: 0.25px;
+  border-radius: 0.5rem;
 
   &.primary {
     color: var(--color-white);
@@ -131,7 +132,7 @@ button {
 
   &.xs {
     min-width: 10rem !important;
-    height: 3.6rem;
+    height: 4.5rem;
     font-size: 1.2rem;
   }
 

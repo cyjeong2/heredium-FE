@@ -1,12 +1,12 @@
 <template>
   <main class="container">
     <div class="m progress-bar">
-      <div class="fill" />
+      <div class="fill"></div>
     </div>
     <div class="title-area">
       <h1>회원가입</h1>
       <div class="pc progress-bar">
-        <div class="fill" />
+        <div class="fill"></div>
       </div>
       <p>본인 인증을 진행해주세요.</p>
     </div>

@@ -1,45 +1,63 @@
 <template>
   <div
+    ref="root"
     class="dropdown"
-    :class="{ 'is-open': isOpen }"
-    :style="{
-      width: `${width}`
-    }"
-    @click="onStopPropagation"
+    :class="[{ 'is-open': isOpen }, wSize]"
+    :style="{ width }"
   >
+    <!-- slot 으로 라벨을 넣고 싶을 때 -->
     <div v-if="isHasSlotText" class="txt-body1">
-      <slot />
+      <slot/>
     </div>
-    <div
-      class="dropdown-wrap"
-      :style="{
-        width: `${width}`
-      }"
-    >
-      <select
-        v-model="selected"
+
+    <div class="dropdown-wrap" :style="{ width }">
+      <!-- 선택된 값 표시 버튼 -->
+      <div
         class="dropdown-btn"
-        :disabled="disabled"
-        :style="{
-          width: `${width}`
-        }"
-        @click="toggleOn"
-        @focusout="toggleOff"
-        @change="onSelected"
+        :class="{ disabled }"
+        :style="{ width }"
+        @click.stop="toggle"
       >
-        <option v-if="defaultText" :value="null" hidden>{{ defaultText }}</option>
-        <option v-for="item in optionList" :key="item.value" :value="item.value">{{ item.label }}</option>
-      </select>
-      <div class="dropdown-icon">
-        <template v-if="!isCalIcon">
-          <i class="pc uic-arrow_bottom rotate" />
-          <i class="m umic-arrow_bottom rotate" />
-        </template>
-        <template v-else>
-          <i class="pc uic-calendar" />
-          <i class="m umic-calendar" />
-        </template>
+        <span class="selected-text">
+          {{ currentLabel || defaultText || '선택' }}
+        </span>
+        <div class="dropdown-icon">
+          <!-- PC / 모바일 대응 -->
+          <i class="only-pc uic-arrow_bottom rotate" />
+          <i class="only-mobile uic-arrow_bottom rotate" />
+       </div>
       </div>
+
+      <!-- 커스텀 옵션 리스트 -->
+      <ul v-if="isOpen" class="dropdown-menu" :style="{ width }">
+        <!-- 검색창 -->
+        <li v-if="searchable" class="dropdown-item search-input">
+          <input
+            v-model="searchTerm"
+            type="text"
+            placeholder="검색"
+            @click.stop
+          />
+        </li>
+        <!-- 기본 힌트 옵션 -->
+        <li
+          v-if="defaultText"
+          class="dropdown-item hint"
+          @click.stop="select(null)"
+        >
+          {{ defaultText }}
+        </li>
+        <!-- 실제 옵션 -->
+        <li
+          v-for="item in filteredOptions"
+          :key="item.value"
+          class="dropdown-item"
+          :class="{ selected: item.value === selected }"
+          @click.stop="select(item.value)"
+        >
+          {{ item.label }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -50,122 +68,116 @@ export default {
   props: {
     value: {
       type: [String, Number, Boolean, null],
-      required: false,
       default: null
     },
-    // optionList: [{ value: '', label: '' }]
     optionList: {
       type: Array,
-      required: false,
       default: () => []
     },
     defaultText: {
       type: String,
-      required: false,
-      default: null
+      default: ''
     },
-    // value: x-small | small | normal | large | x-large
     wSize: {
       type: String,
-      required: false,
-      default: ''
+      default: 'normal' // 'small' | 'normal' | 'full'
     },
     disabled: {
       type: Boolean,
-      required: false,
       default: false
     },
     isCalIcon: {
       type: Boolean,
-      required: false,
+      default: false
+    },
+    searchable: {
+      type: Boolean,
       default: false
     }
   },
   data() {
     return {
-      width: 15.2,
+      width: '40rem',
       isOpen: false,
-      selected: null
+      selected: this.value,
+      searchTerm: ''
     };
   },
   computed: {
+    // 검색어가 있을 때 옵션 필터
+    filteredOptions() {
+      if (!this.searchable || !this.searchTerm) {
+        return this.optionList;
+      }
+      const term = this.searchTerm.toLowerCase();
+      return this.optionList.filter(o =>
+        o.label.toLowerCase().includes(term)
+      );
+    },
     isHasSlotText() {
       return !!this.$slots.default;
+    },
+    currentLabel() {
+      const f = this.optionList.find(o => o.value === this.selected);
+      return f ? f.label : '';
     }
   },
   watch: {
-    value(newValue) {
-      this.selected = newValue;
-    }
+    value(v) { this.selected = v; },
+    wSize: 'calcWidth'
   },
-  created() {
-    let width = '';
-
-    switch (this.wSize) {
-      case 'small':
-        width = '25rem';
-        break;
-      case 'normal':
-        width = '40rem';
-        break;
-      case 'full':
-        width = '100%';
-        break;
-      default:
-        width = '40rem';
-        break;
-    }
-    this.width = width;
-    this.selected = this.value;
+  mounted() {
+    this.calcWidth();
+    document.addEventListener('click', this.onClickOutside);
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.onClickOutside);
   },
   methods: {
-    toggleOn() {
-      this.isOpen = true;
+    calcWidth() {
+      switch (this.wSize) {
+        case 'small':  this.width = '25rem'; break;
+        case 'full':   this.width = '100%'; break;
+        default:       this.width = '40rem'; break;
+      }
     },
-    toggleOff() {
+    toggle() {
+      if (!this.disabled) this.isOpen = !this.isOpen;
+    },
+    select(val) {
+      if (this.disabled) return;
+      this.selected = val;
+      this.$emit('input', val);
+      this.$emit('change', val);
       this.isOpen = false;
     },
-    onStopPropagation(e) {
-      e.stopPropagation();
-    },
-    onToggleMenu() {
-      this.isOpen = !this.isOpen;
-    },
-    onSelected() {
-      const value = this.selected;
+    onClickOutside(e) {
+      const root = this.$refs.root;
+      // ref 가 없거나, 이미 언마운트된 상태라면 그냥 무시
+      if (!root || !root.contains) return;
 
-      this.isOpen = false;
-      this.$emit('input', value);
-      this.$emit('change');
+      if (!root.contains(e.target)) {
+        this.isOpen = false;
+      }
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .dropdown {
   position: relative;
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
+  vertical-align: top;
 
-  &.small {
-    width: 15.2rem !important;
-
-    .dropdown-wrap,
-    .dropdown-btn {
-      width: 15.2rem !important;
-    }
-
-    .dropdown-icon {
-      width: 2rem;
-      i {
-        font-size: 2rem;
-      }
-    }
+  &.small { /* wSize="small" */
+    width: 25rem !important;
   }
-
-  .label {
-    margin-right: 1.2rem;
+  &.normal {
+    width: 40rem;
+  }
+  &.full { /* wSize="full" */
+    width: 100%;
   }
 
   .dropdown-wrap {
@@ -173,72 +185,117 @@ export default {
   }
 
   .dropdown-btn {
-    color: var(--color-black);
-    height: 5.2rem;
-    width: 40rem;
-    padding: 0 6.4rem 0 1.6rem;
-    border: 1px solid var(--color-u-grey-2);
-    text-align: left;
-    background-color: var(--color-white);
-    outline: 0;
-
-    &:disabled {
-      color: var(--color-grey-3);
-      pointer-events: none;
-    }
-  }
-
-  .dropdown-icon {
     display: flex;
-    position: absolute;
-    height: calc(100% - 2px);
-    width: 2.4rem;
     align-items: center;
-    justify-content: center;
-    top: 1px;
-    right: 2.1rem;
-    font-size: 2.4rem;
-    pointer-events: none;
-  }
+    justify-content: space-between;
+    padding: 0 1.6rem;
+    height: 4.5rem;
+    border: 1px solid var(--color-u-grey-2);
+    background: var(--color-white);
+    color: var(--color-black);
+    cursor: pointer;
+    user-select: none;
+    border-radius: 0.5rem;
 
-  &.is-open .dropdown-icon i.rotate {
-    transform: rotate(-180deg);
-  }
-
-  i.m {
-    display: none;
-  }
-}
-
-@media screen and (min-width: 769px) {
-  .dropdown-btn {
-    font-size: 1.8rem;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .dropdown-btn {
-    height: 4.4rem !important;
-    width: 20rem;
-    padding: 0 4.8rem 0 1.6rem !important;
-
-    &:disabled {
+    &.disabled {
       color: var(--color-grey-3);
-      pointer-events: none;
+      background: var(--color-grey-1);
+      cursor: not-allowed;
+    }
+
+    .selected-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .dropdown-icon {
+      flex: 0 0 auto;
+      margin-left: 0.8rem;
+      i {
+        font-size: 2.4rem;
+        &.rotate { transition: transform .2s; }
+      }
     }
   }
 
-  .dropdown-icon {
-    right: 1.2rem !important;
-    font-size: 2rem !important;
+  .dropdown-icon i {
+    transform: rotate(-90deg);
+    transition: transform .2s;
   }
 
-  i.pc {
-    display: none;
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    max-height: 22.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--color-white);
+    border: 1px solid var(--color-u-grey-2);
+    overflow-y: auto;
+    border-radius: 0.5rem;
   }
 
-  i.m {
+  .dropdown-item {
+    padding: 1rem 1.6rem;
+    cursor: pointer;
+    white-space: nowrap;
+    &:hover { background: var(--color-grey-1); }
+    &.selected { background: var(--color-grey-2); }
+  }
+
+  .dropdown-item.hint {
+    font-style: italic;
+    color: var(--color-grey-4);
+  }
+}
+
+/* 기존 pc/m 규칙 복사해서 only-로 하나 더 만들어줍니다 */
+i.only-mobile {
+  display: none;
+}
+@media screen and (max-width: 768px) {
+  i.only-pc {
+    display: none !important;
+  }
+  i.only-mobile {
     display: block !important;
   }
+}
+/* 회전 토글은 그대로 */
+.dropdown.is-open .dropdown-icon i.rotate {
+  transform: rotate(-270deg);
+}
+
+/* dropdown.vue 아래쪽에 추가 */
+.dropdown-item.search-input {
+  padding: 0.8rem 1.6rem;       /* 위아래 0.8rem, 좌우 1.6rem 패딩 */
+  box-sizing: border-box;      /* padding 포함해서 width 계산 */
+
+  input {
+    display: block;            /* 블록 레벨로 만들어서 */
+    width: 100%;               /* li 너비 가득 채우기 */
+    padding: 0.6rem 0.8rem;     /* 입력창 안쪽 여백 */
+    border: 1px solid var(--color-u-grey-2);
+    border-radius: 0.5rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    outline: none;
+
+    /* 포커스 시 테두리 강조 */
+    &:focus {
+      border-color: var(--color-u-primary);
+      box-shadow: 0 0 0 2px rgba(var(--color-u-primary-rgb), 0.2);
+    }
+  }
+}
+
+/* 만약 li 높이가 너무 크면 이렇게 최소 높이만 잡아줄 수도 있습니다 */
+.dropdown-item.search-input {
+  min-height: auto;
 }
 </style>

@@ -10,14 +10,9 @@
       </section>
 
       <section class="container">
-        <div class="grid-content membership-content-editor only-pc">
+        <div class="grid-content membership-content-editor">
+          <!-- <h2>멤버십 소개</h2> -->
           <div v-html="postDetail.content_detail"></div>
-        </div>
-        <!-- 모바일에서만 보임: mobile 용이 없으면 pc용으로 fallback -->
-        <div class="grid-content membership-content-editor only-mobile">
-          <div
-            v-html="effectiveMobileContent"
-          ></div>
         </div>
       </section>
 
@@ -163,14 +158,6 @@ export default {
     };
   },
   computed: {
-     effectiveMobileContent() {
-      const m = this.postDetail?.content_detail_mobile || ''
-      // HTML 태그 제거하고 남은 텍스트 길이로 판별
-      const textOnly = m.replace(/<[^>]*>/g, '').trim()
-      return textOnly.length > 0
-        ? m
-        : (this.postDetail?.content_detail || '')
-    },
     postImageDetail() {
       return this.getImage(this.postDetail?.thumbnail_urls?.large);
     },
@@ -560,7 +547,7 @@ h2 {
     padding-right: 3.2rem;
   }
   .grid-content > div {
-    width: 100%;
+    width: 65.9824%;
   }
 
   .membership-content-editor {

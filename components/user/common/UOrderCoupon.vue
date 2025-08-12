@@ -26,7 +26,7 @@
 </template>
 
 <script>
-// import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash/cloneDeep';
 import CouponList from '../page/coupon/CouponList.vue';
 import UModalFullScreen from '../modal/UModalFullScreen.vue';
 import UButton from './UButton.vue';
@@ -105,66 +105,23 @@ export default {
     },
     async getCouponList() {
       try {
-        // 1) 전체 쿠폰 카테고리 불러오기
-        const raw = await this.$axios.$get('/user/coupons/usage');
-        let list = Array.isArray(raw) ? raw : [];
-
-        // 2) 내가 보고 싶은 타입만 필터
-        list = list.filter(c => c.coupon_type === this.couponType);
-
-        // 3) membership 쿠폰 여부 플래그 추가
-        list = list.map(c => ({
-          ...c,
-          // used/unused 둘 다 비어 있으면 “멤버십 쿠폰”이라 간주
-          isMembershipCoupon:
-            Array.isArray(c.used_coupons) &&
-            c.used_coupons.length === 0 &&
-            Array.isArray(c.unused_coupons) &&
-            c.unused_coupons.length === 0
-        }));
-
-        // 4) 총 잔여 수량 계산
-        let total = 0;
-        for (const c of list) {
-          // 기존 unused count
-          let cnt = Array.isArray(c.unused_coupons)
-            ? c.unused_coupons.filter(u => !u.is_expired).length
-            : 0;
-
-          // 만약 membership 쿠폰이면, 사용 이력 없더라도 한 번은 쓸 수 있게 1장 처리
-          if (c.isMembershipCoupon) {
-            cnt = 1;
-          }
-
-          total += cnt;
+        let dataListCoupon = await this.$axios.$get('/user/coupons/usage');
+        if (!dataListCoupon) {
+          dataListCoupon = [];
         }
-
-        this.dataListCoupon = list;
-        this.totalCoupon    = total;
-      } catch (err) {
-        console.error('cannot get coupon', err);
-        this.dataListCoupon = [];
-        this.totalCoupon    = 0;
+        dataListCoupon = dataListCoupon.filter((couponCategory) => couponCategory.coupon_type === this.couponType);
+        let totalCoupon = 0;
+        for (const couponCategory of dataListCoupon) {
+          const availableCoupon = couponCategory?.unused_coupons?.filter((item) => !item.is_expired);
+          totalCoupon += availableCoupon ? availableCoupon.length : 0;
+        }
+        this.totalCoupon = totalCoupon;
+        this.dataListCoupon = dataListCoupon;
+      } catch (error) {
+        // show empty coupon
+        console.error('cannot get coupon', error.response);
+        this.totalCoupon = 0;
       }
-
-      //   let dataListCoupon = await this.$axios.$get('/user/coupons/usage');
-      //   console.log('dataListCoupon', dataListCoupon)
-      //   if (!dataListCoupon) {
-      //     dataListCoupon = [];
-      //   }
-      //   dataListCoupon = dataListCoupon.filter((couponCategory) => couponCategory.coupon_type === this.couponType);
-      //   let totalCoupon = 0;
-      //   for (const couponCategory of dataListCoupon) {
-      //     const availableCoupon = couponCategory?.unused_coupons?.filter((item) => !item.is_expired);
-      //     totalCoupon += availableCoupon ? availableCoupon.length : 0;
-      //   }
-      //   this.totalCoupon = totalCoupon;
-      //   this.dataListCoupon = dataListCoupon;
-      // } catch (error) {
-      //   // show empty coupon
-      //   console.error('cannot get coupon', error.response);
-      //   this.totalCoupon = 0;
-      // }
     },
     toggleCouponSelect(id) {
       if (this.selectedCouponId === id) {
@@ -180,42 +137,19 @@ export default {
       return couponList.find((coupon) => coupon.is_expired === false);
     },
     getCoupon(id) {
-
-      const cat = this.dataListCoupon.find(c => c.id === id);
-      if (!cat) return null;
-
-      // unused 쿠폰이 있는 경우(일반 쿠폰)
-      if (cat.unused_coupons.length > 0) {
-        const first = cat.unused_coupons.find(u => !u.is_expired);
-        return {
-          ...cat,
-          uuid: first.uuid,
-          isMembership: false
-        };
+      const coupons = cloneDeep(this.dataListCoupon.find((coupon) => coupon.id === id));
+      if (!coupons) {
+        return null;
       }
+      const firstCouponAvailable = this.getFirstCouponAvailable(coupons.unused_coupons);
+      if (!firstCouponAvailable) {
+        return null;
+      }
+      delete coupons.unused_coupons;
+      delete coupons.used_coupons;
 
-      // 멤버십 쿠폰
-      return {
-        id: cat.id,
-        coupon_type: cat.coupon_type,
-        discount_percent: cat.discount_percent,
-        image_url: cat.image_url,
-        isMembership: true
-      };
-
-      // const coupons = cloneDeep(this.dataListCoupon.find((coupon) => coupon.id === id));
-      // if (!coupons) {
-      //   return null;
-      // }
-      // const firstCouponAvailable = this.getFirstCouponAvailable(coupons.unused_coupons);
-      // if (!firstCouponAvailable) {
-      //   return null;
-      // }
-      // delete coupons.unused_coupons;
-      // delete coupons.used_coupons;
-
-      // coupons.uuid = firstCouponAvailable.uuid;
-      // return coupons;
+      coupons.uuid = firstCouponAvailable.uuid;
+      return coupons;
     },
     handleUpdateCoupon() {
       let coupon = null;
