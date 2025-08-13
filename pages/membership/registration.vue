@@ -164,12 +164,18 @@ export default {
   },
   computed: {
      effectiveMobileContent() {
-      const m = this.postDetail?.content_detail_mobile || ''
-      // HTML 태그 제거하고 남은 텍스트 길이로 판별
-      const textOnly = m.replace(/<[^>]*>/g, '').trim()
-      return textOnly.length > 0
-        ? m
-        : (this.postDetail?.content_detail || '')
+      const m = (this.postDetail?.content_detail_mobile || '').trim();
+
+      // 공백, &nbsp;만 제거해보고 남아있으면 모바일 사용
+      const stripped = m.replace(/(&nbsp;|\s|<br\s*\/?>)+/gi, '').trim();
+
+      // 이미지/비디오/아이프레임 같은 의미있는 태그가 있으면 OK
+      const hasMedia = /<(img|video|iframe|svg)\b/i.test(m);
+
+      if (m && (stripped.length > 0 || hasMedia)) {
+        return m; // 모바일 콘텐츠 사용
+      }
+      return this.postDetail?.content_detail || ''; // 없으면 PC용으로 fallback
     },
     postImageDetail() {
       return this.getImage(this.postDetail?.thumbnail_urls?.large);
