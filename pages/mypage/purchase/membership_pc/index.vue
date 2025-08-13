@@ -102,11 +102,7 @@
           <div class="date-range">
             <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
             <span>~</span>
-            <UDatepicker
-              v-model="endDate"
-              :min="startDate"
-              style="width: 227.5px"
-            />
+            <UDatepicker v-model="endDate" :min="startDate" style="width: 227.5px" />
           </div>
 
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
@@ -173,6 +169,7 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
+import MILEAGE_EVENT_TYPE from '~/assets/js/types.js';
 
 export default {
   name: 'MembershipAndCouponPage',
@@ -279,21 +276,28 @@ export default {
       }
     },
     formatTypeCategory(type, category) {
-      const categoryMap = {
-        0: '헤레디움 전시',
-        1: '헤레디움 프로그램',
-        2: '헤레디움 커피',
-        3: '헤레디움 아트숍'
-      };
-      if (type === 1) {
-        return '[사용] CN PASS PLUS 등급 업그레이드';
-      }
-      if (type === 6) {
-        return '[소멸] 승급취소';
-      }
       const isAdded = [0, 4, 5].includes(type);
       const prefix = isAdded ? '[적립]' : '[소멸]';
-      return `${prefix} ${categoryMap[category]}`;
+      const categoryMap = {
+        EXHIBITION: '전시',
+        PROGRAM: '프로그램',
+        COFFEE: '커피',
+        ARTSHOP: '아트숍'
+      };
+
+      if (category !== null && category !== undefined) {
+        const categoryName = `헤레디움 ${categoryMap[category]}`;
+        console.log(category);
+        return `${prefix} ${categoryName}`;
+      }
+      switch (type) {
+        case 1:
+          return '[사용] CN PASS PLUS 등급 업그레이드';
+        case 6:
+          return '[소멸] 승급취소';
+        default:
+          return `[${MILEAGE_EVENT_TYPE[type] || '알 수 없는 내역'}]`;
+      }
     },
     formatDate(dateStr) {
       if (!dateStr) return '';

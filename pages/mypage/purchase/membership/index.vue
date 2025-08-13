@@ -10,9 +10,9 @@
       <div class="ticketing-body">
         <div class="membership_info">
           <div class="membership_icon">
-            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" style="width: 48px; height: 48px"/>
-            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" style="width: 48px; height: 48px"/>
-            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" style="width: 48px; height: 48px"/>
+            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" style="width: 48px; height: 48px" />
+            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" style="width: 48px; height: 48px" />
+            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" style="width: 48px; height: 48px" />
           </div>
           <div class="name_membership">
             <div>
@@ -49,9 +49,7 @@
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
                 <div class="benefit-hover-wrapper">
-                  <button class="membership_benefit" @click="showModal = true">
-                    등급 혜택보기
-                  </button>
+                  <button class="membership_benefit" @click="showModal = true">등급 혜택보기</button>
 
                   <ModalMembershipInfor
                     v-if="showModal"
@@ -110,13 +108,9 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="startDate" :max="endDate ? $dayjs(endDate).toDate() : null" style="width: 227.5px" />
+            <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
             <span>~</span>
-            <UDatepicker
-              v-model="endDate"
-              :min="startDate ? $dayjs(startDate).toDate() : null"
-              style="width: 227.5px"
-            />
+            <UDatepicker v-model="endDate" :min="startDate" style="width: 227.5px" />
           </div>
 
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
@@ -190,10 +184,11 @@ import ModalMembershipInfor from '~/components/user/modal/membership/ModalMember
 import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
+import MILEAGE_EVENT_TYPE from '~/assets/js/types.js';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: {UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
+  components: { UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
@@ -296,21 +291,27 @@ export default {
       }
     },
     formatTypeCategory(type, category) {
-      const categoryMap = {
-        0: '헤레디움 전시',
-        1: '헤레디움 프로그램',
-        2: '헤레디움 커피',
-        3: '헤레디움 아트숍'
-      };
-      if (type === 1) {
-        return '[사용] CN PASS PLUS 등급 업그레이드';
-      }
-      if (type === 6) {
-        return '[소멸] 승급취소';
-      }
       const isAdded = [0, 4, 5].includes(type);
       const prefix = isAdded ? '[적립]' : '[소멸]';
-      return `${prefix} ${categoryMap[category]}`;
+      const categoryMap = {
+        EXHIBITION: '전시',
+        PROGRAM: '프로그램',
+        COFFEE: '커피',
+        ARTSHOP: '아트숍'
+      };
+
+      if (category !== null && category !== undefined) {
+        const categoryName = `헤레디움 ${categoryMap[category]}`;
+        return `${prefix} ${categoryName}`;
+      }
+      switch (type) {
+        case 1:
+          return '[사용] CN PASS PLUS 등급 업그레이드';
+        case 6:
+          return '[소멸] 승급취소';
+        default:
+          return `[${MILEAGE_EVENT_TYPE[type] || '알 수 없는 내역'}]`;
+      }
     },
     formatDate(dateStr) {
       if (!dateStr) return '';
