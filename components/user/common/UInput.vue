@@ -16,13 +16,7 @@
       :type="type"
       :maxlength="maxlength ? maxlength : '524288'"
       :disabled="disabled"
-      :inputmode="isNumberOnly ? 'numeric' : (type === 'email' ? 'email' : null)"
-      autocapitalize="off"
-      autocomplete="off"
-      autocorrect="off"
-      @compositionstart="isComposing = true"
-      @compositionend="onCompositionEnd"
-      @input="onInput"
+      @input="updateInput"
       @keyup="keyup"
       @keyup.enter="enter"
     />
@@ -106,8 +100,7 @@ export default {
   },
   data() {
     return {
-      width: '',
-      isComposing: false,
+      width: ''
     };
   },
   created() {
@@ -141,17 +134,6 @@ export default {
     }
   },
   methods: {
-    onInput(e) {
-      // 한글 등 조합 중에는 건드리지 않음
-      if (this.isComposing) return;
-      this.updateInput(e);
-    },
-    onCompositionEnd(e) {
-      this.isComposing = false;
-      // 조합이 끝난 뒤 한 번만 정규화
-      this.updateInput(e);
-    },
-
     updateInput(e) {
       this.$emit('input', this.getComputedValue(e));
     },
@@ -199,7 +181,7 @@ export default {
 }
 
 input {
-  caret-color: var(--color-black);
+  color: var(--color-black);
   height: 5.2rem;
   width: 14.4rem;
   font-size: 1.8rem;
@@ -223,7 +205,6 @@ input {
   &.is-success {
     border: 0.1rem solid var(--color-green) !important;
   }
-  -webkit-text-fill-color: var(--color-black);
 }
 
 .is-error {
@@ -307,8 +288,9 @@ input {
 
 @media screen and (max-width: 768px) {
   input {
-    font-size: 1.4rem;
+    font-size: 16px !important;
     height: 4rem;
+    -webkit-text-size-adjust: 100%;
   }
 
   .error-msg {
@@ -317,18 +299,23 @@ input {
   }
 }
 
-/* iOS 자동완성(autofill) 배경/글자색 강제 */
-input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px var(--color-white) inset;
-  -webkit-text-fill-color: var(--color-black) !important;
-  transition: background-color 5000s ease-in-out 0s; /* 깜빡임 방지 */
+/* UInput.vue (전역 CSS여도 무방) */
+input {
+  color: var(--color-black);
+  -webkit-text-fill-color: var(--color-black); /* ← iOS 렌더링 보정 */
+  background-color: var(--color-white);
 }
 
-/* iOS에서 폰트가 16px 미만이면 확대되며 렌더링 깨짐: 최소 16px 보장 */
-@supports (-webkit-touch-callout: none) {
-  .h-m input { font-size: 1.6rem; }   /* html 기본 10px라면 1.6rem=16px */
-  @media (max-width: 768px) {
-    input { font-size: 1.6rem; }
-  }
+input::-webkit-input-placeholder {
+  -webkit-text-fill-color: var(--color-u-grey-2);
+}
+
+/* 오토필 보정 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-black);
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-white) inset;
+  transition: background-color 9999s ease-out 0s;
 }
 </style>
