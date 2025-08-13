@@ -9,10 +9,11 @@
           src="~assets/img/pc/logo.svg"
           alt="HEREDIUM 로고"
           class="logo"
-          width="130"
-          height="120"
+          width="92"
+          height="45"
+          style="margin-bottom: 2.2rem; margin-top: 3.0rem;"
         />
-        <h2>회원가입하고</h2>
+        <h2 style="margin-bottom: 1.2rem;">회원가입하고</h2>
         <h2>더 깊은 예술을 경험해보세요!</h2>
       </div>
       <div class="pc progress-bar">

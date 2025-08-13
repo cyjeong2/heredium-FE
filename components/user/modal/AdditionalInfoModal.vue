@@ -6,7 +6,7 @@
         <div class="head">
           <h3 class="title">추가 정보 입력</h3>
           <button type="button" class="close-btn" @click="skipMarketing">
-            <i class="ic-close" />
+            <i class="ic-close"></i>
           </button>
         </div>
 
@@ -16,43 +16,44 @@
             추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!
           </div> -->
           <!-- <hr class="divider" /> -->
-          <div>
+          <div class="terms-area">
             <UCheckbox v-model="form.additionalInfoAgreed">
               <strong style="margin-right: 5px;">(선택)</strong>추가 개인정보 수집 및 활용에 동의합니다.
             </UCheckbox>
-          </div>
-          <div v-if="form.additionalInfoAgreed" class="add-input">
-            <!-- 직업 입력 -->
-            <div class="form-group">
-              <label for="jobSelect">직업</label>
-              <USelect
-                id="jobSelect"
-                v-model="form.job"
-                :option-list="jobOptions"
-                default-text="선택"
-                w-size="full"
-                :searchable="true"
-              />
-            </div>
 
-            <!-- 지역 입력 -->
-            <div class="form-group region">
-              <label>지역</label>
-              <div class="region-selects">
+            <div v-if="form.additionalInfoAgreed" class="add-input">
+              <!-- 직업 입력 -->
+              <div class="form-group">
+                <label for="jobSelect">직업</label>
                 <USelect
-                  v-model="form.region.state"
-                  :option-list="stateOptions"
-                  default-text="시/도 선택"
+                  id="jobSelect"
+                  v-model="form.job"
+                  :option-list="jobOptions"
+                  default-text="선택"
                   w-size="full"
                   :searchable="true"
                 />
-                <USelect
-                  v-model="form.region.district"
-                  :option-list="districtOptions"
-                  default-text="시/군/구 선택"
-                  w-size="full"
-                  :searchable="true"
-                />
+              </div>
+
+              <!-- 지역 입력 -->
+              <div class="form-group region">
+                <label>지역</label>
+                <div class="region-selects">
+                  <USelect
+                    v-model="form.region.state"
+                    :option-list="stateOptions"
+                    default-text="시/도 선택"
+                    w-size="full"
+                    :searchable="true"
+                  />
+                  <USelect
+                    v-model="form.region.district"
+                    :option-list="districtOptions"
+                    default-text="시/군/구 선택"
+                    w-size="full"
+                    :searchable="true"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -61,12 +62,12 @@
             <UCheckbox v-model="form.agreeMarketing">
               <strong style="margin-right: 5px;">(선택)</strong> 마케팅 정보 수집에 동의합니다.
             </UCheckbox>
-            <div class="marketing-info">
-              <p>
-                고객(정보주체)의 개인정보보호 및 권리는
-                「개인정보 보호법」및 관계 법령에 따라 헤레디움(사이트)에서 안전하게 관리하고 있습니다.
-              </p>
-            </div>
+          </div>
+          <div class="marketing-info">
+            <p>
+              고객(정보주체)의 개인정보보호 및 권리는
+              「개인정보 보호법」및 관계 법령에 따라 헤레디움(사이트)에서 안전하게 관리하고 있습니다.
+            </p>
           </div>
         </div>
 
@@ -222,28 +223,38 @@ export default {
       display:flex; gap:1.6rem;
     }
   }
-  .terms-area {
-    display:flex; flex-direction:column; gap:2rem;
-    margin-top: 2rem;
-    .marketing-info {
-      padding: 1.2rem 1.2rem;
-      background-color: var(--color-grey-1);
-      border: 1px solid var(--color-grey-2);
-      border-radius: 0.3rem;
-      font-size: 1.4rem;
-      color: var(--color-grey-8);
-      margin-bottom: 3.0rem;
-      p {
-        font-size: 14px;
-        font-weight: 400;
-        margin: 0;
-        line-height: 1.6;
-        text-align: left; /* 기본 왼쪽 정렬 */
-      }
 
-      strong {
-        font-weight: 700;
-      }
+  .terms-area {
+    display:flex; flex-direction:column;
+    border: 1px solid var(--color-grey-1);
+    padding: 1.5rem 2.0rem;
+  }
+
+  @media screen and (max-width: 767px) {
+    .terms-area {
+      padding: 1.5rem 0.8rem;
+    }
+  }
+
+  .marketing-info {
+    padding: 1.2rem 1.2rem;
+    background-color: var(--color-grey-1);
+    border: 1px solid var(--color-grey-1);
+    font-size: 1.4rem;
+    color: var(--color-grey-8);
+    margin-bottom: 3.0rem;
+    p {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.6;
+      text-align: left; /* 기본 왼쪽 정렬 */
+    }
+
+    label + label {
+      margin-top: 2rem;
+    }
+    strong {
+      font-weight: 700;
     }
   }
 }

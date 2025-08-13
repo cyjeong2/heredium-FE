@@ -1,10 +1,10 @@
 <template>
   <main class="container">
     <div style="margin-top: 4rem;">
-      <img class="m" src="~assets/img/pc/logo.svg" alt="" width="120" height="120" />
-      <img class="pc" src="~assets/img/pc/logo.svg" alt="" width="144" height="144" />
+      <img class="m" src="~assets/img/pc/logo.svg" alt="" width="92" height="45" />
+      <img class="pc" src="~assets/img/pc/logo.svg" alt="" width="92" height="45" />
     </div>
-    <h1>헤레디움<br/> 회원가입을 축하합니다!</h1>
+    <h2>헤레디움<br/> 회원가입을 축하합니다!</h2>
     <p>헤레디움의 다양한 전시 프로그램을 만나보세요.</p>
     <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">시작</ULink>
     <!-- 쿠폰 모달 -->
@@ -69,9 +69,9 @@ export default {
   display: none;
 }
 
-h1 {
-  margin: 3.2rem 0 2rem;
-  font-size: 2.8rem;
+h2 {
+  margin: 4.2rem 0 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   text-align: center;
   line-height: 2.8rem;
@@ -84,7 +84,7 @@ div {
 }
 
 p {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 500;
   text-align: center;
   line-height: 2.24rem;

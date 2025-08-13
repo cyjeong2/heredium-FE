@@ -119,50 +119,53 @@
           <p class="p2">추가 정보 입력 및 마케팅 정보 수신활용에 동의하시면 혜택을 드려요!</p>
         </div>
         <div class="grid-wrap" style="padding-top: 2.2rem;"></div>
-        <div>
-          <UCheckbox v-model="form.additionalInfoAgreed">
-            <strong style="margin-right: 5px;">(선택)</strong>추가 개인정보 수집 및 활용에 동의합니다.
-          </UCheckbox>
-        </div>
-        <div v-if="form.additionalInfoAgreed" class="add-input">
-          <div class="input job-input">
-            <label>직업</label>
-            <div style="margin-top: 1.2rem;">
-              <USelect
-                v-model="form.job"
-                :option-list="jobOptions"
-                default-text="선택"
-                w-size="full"
-                :searchable="true"
-              />
-            </div>
-          </div>
+        <div class="terms-area">
+          <div class="each-terms">
+            <UCheckbox v-model="form.additionalInfoAgreed">
+              <strong style="margin-right: 5px;">(선택)</strong>추가 개인정보 수집 및 활용에 동의합니다.
+            </UCheckbox>
+            <div v-if="form.additionalInfoAgreed" class="grid-gray-wrap"></div>
+            <div v-if="form.additionalInfoAgreed" class="add-input">
+              <div class="input job-input">
+                <label>직업</label>
+                <div style="margin-top: 1.2rem;">
+                  <USelect
+                    v-model="form.job"
+                    :option-list="jobOptions"
+                    default-text="선택"
+                    w-size="full"
+                    :searchable="true"
+                  />
+                </div>
+              </div>
 
-          <div class="input city-input">
-            <label >지역</label>
-            <div style="margin-top: 1.2rem;">
-              <USelect
-                v-model="form.region.state"
-                :option-list="cityOptions"
-                w-size="full"
-                default-text="시/도 선택"
-                :searchable="true"
-              />
+              <div class="input city-input">
+                <label>지역</label>
+                <div style="margin-top: 1.2rem;">
+                  <USelect
+                    v-model="form.region.state"
+                    :option-list="cityOptions"
+                    w-size="full"
+                    default-text="시/도 선택"
+                    :searchable="true"
+                  />
+                </div>
+              </div>
+              <div class="input district-input">
+                <USelect
+                  v-model="form.region.district"
+                  :option-list="districtOptions"
+                  w-size="full"
+                  default-text="시/군/구 선택"
+                  :searchable="true"
+                />
+              </div>
             </div>
-          </div>
-          <div class="input district-input">
-            <USelect
-              v-model="form.region.district"
-              :option-list="districtOptions"
-              w-size="full"
-              default-text="시/군/구 선택"
-              :searchable="true"
-            />
           </div>
         </div>
         <div class="terms-area">
           <div class="each-terms">
-            <UCheckbox v-model="isTerms.MARKETING">
+            <UCheckbox v-model="isTerms.MARKETING" class="checkBox">
               <strong style="margin-right: 5px;">(선택)</strong>마케팅 정보 수집에 동의합니다.
             </UCheckbox>
           </div>
@@ -966,6 +969,22 @@ h2 {
   }
 }
 
+.grid-gray-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--color-grey-1);
+  margin-top: 1.8rem;
+  row-gap: 3.2rem;
+  column-gap: 1.6rem;
+}
+@media screen and (min-width: 768px) {
+  .grid-gray-wrap {
+    row-gap: 2.4rem;
+    column-gap: 2.8rem;
+    margin-top: 2.2rem;
+  }
+}
+
 /* ─── 지역 입력 ───────────────────────────────────────── */
 .region-row {
   display: flex;
@@ -986,9 +1005,7 @@ h2 {
   .each-terms {
     display: flex;
     flex-direction: column;
-    padding: 2.4rem 0;
-    margin-bottom: 2rem;
-    margin-top: 2rem;
+    padding: 2.0rem 2.4rem;
     border-top: 1px solid var(--color-grey-1);
     border-bottom: 1px solid var(--color-grey-1);
     label + label {
@@ -1003,6 +1020,7 @@ h2 {
       font-size: 1.3rem;
       margin-left: 3rem;
     }
+    border: 1px solid var(--color-grey-1);
   }
   button {
     margin-right: 0.5rem;
@@ -1011,16 +1029,19 @@ h2 {
     color: var(--color-u-primary);
   }
   .marketing-info {
-    padding: 1.2rem;
+    padding: 2.0rem 2.4rem;
     margin-bottom: 3.5rem;
     background-color: var(--color-grey-1);
-    border: 1px solid var(--color-grey-2);
+    border: 1px solid var(--color-grey-1);
     font-size: 1.4rem;
     color: var(--color-grey-8);
   }
   @media screen and (max-width: 767px) {
+    .each-terms {
+      padding: 1.6rem 0.7rem;       /* 예: 모바일용 값 */
+    }
     .marketing-info {
-      padding: 0.8rem 1rem;
+      padding: 0.8rem 0.5rem;
       margin-bottom: 2.5rem;
     }
   }
@@ -1033,7 +1054,7 @@ h2 {
   grid-template-rows: auto auto;/* 두 행 (직업 / 지역) */
   gap: 1.6rem;                  /* 행 간격 */
   width: 100%;
-  margin-top: 20px;
+  margin-top: 1.2rem;
 }
 
 .add-input .job-input {
