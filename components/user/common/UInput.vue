@@ -236,7 +236,7 @@ input {
 .h-xs {
   input {
     width: 100% !important;
-    height: 3.6rem;
+    height: 4rem;
     padding: 0 1.2rem;
     font-size: 1.2rem;
   }
@@ -245,6 +245,7 @@ input {
 .h-small {
   input {
     font-size: 1.4rem;
+    height: 4rem;
   }
 
   .error-msg {
@@ -271,7 +272,7 @@ input {
   .h-xs {
     input {
       width: 32rem !important;
-      height: 4rem;
+      height: 4.5rem;
       padding: 0 1.6rem;
       font-size: 1.4rem;
     }
