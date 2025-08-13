@@ -321,7 +321,6 @@ input {
 input {
   color: var(--color-black);
   caret-color: var(--color-black);
-  -webkit-text-fill-color: var(--color-black);  /* iOS에서 글자 투명 방지 */
   -webkit-appearance: none;                     /* iOS 기본 스타일 제거 */
   appearance: none;
   background-clip: padding-box;
@@ -330,17 +329,6 @@ input {
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
                'Noto Sans KR', 'Segoe UI', Roboto, 'Helvetica Neue',
                Arial, sans-serif;
-}
-
-input::placeholder {
-  color: var(--color-u-grey-2);
-}
-
-/* iOS 자동완성 시 색/배경 강제 */
-input:-webkit-autofill {
-  -webkit-text-fill-color: var(--color-black) !important;
-  box-shadow: 0 0 0px 1000px var(--color-white) inset !important;
-  -webkit-box-shadow: 0 0 0px 1000px var(--color-white) inset !important;
 }
 
 /* 모바일에서 16px 미만이면 포커스 시 줌 → 버벅임 유발 */
