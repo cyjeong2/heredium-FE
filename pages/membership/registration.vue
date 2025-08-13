@@ -10,9 +10,14 @@
       </section>
 
       <section class="container">
-        <div class="grid-content membership-content-editor">
-          <!-- <h2>멤버십 소개</h2> -->
+        <div class="grid-content membership-content-editor only-pc">
           <div v-html="postDetail.content_detail"></div>
+        </div>
+        <!-- 모바일에서만 보임: mobile 용이 없으면 pc용으로 fallback -->
+        <div class="grid-content membership-content-editor only-mobile">
+          <div
+            v-html="effectiveMobileContent"
+          ></div>
         </div>
       </section>
 
@@ -93,7 +98,7 @@
     />
   </div>
   <section v-else class="container no-data-container">
-    <h1 class="title">멤버십</h1>
+    <h1 class="title">멤버십 </h1>
     <div class="no-data">리스트가 없습니다.</div>
   </section>
 </template>
@@ -158,6 +163,20 @@ export default {
     };
   },
   computed: {
+     effectiveMobileContent() {
+      const m = (this.postDetail?.content_detail_mobile || '').trim();
+
+      // 공백, &nbsp;만 제거해보고 남아있으면 모바일 사용
+      const stripped = m.replace(/(&nbsp;|\s|<br\s*\/?>)+/gi, '').trim();
+
+      // 이미지/비디오/아이프레임 같은 의미있는 태그가 있으면 OK
+      const hasMedia = /<(img|video|iframe|svg)\b/i.test(m);
+
+      if (m && (stripped.length > 0 || hasMedia)) {
+        return m; // 모바일 콘텐츠 사용
+      }
+      return this.postDetail?.content_detail || ''; // 없으면 PC용으로 fallback
+    },
     postImageDetail() {
       return this.getImage(this.postDetail?.thumbnail_urls?.large);
     },
@@ -547,7 +566,7 @@ h2 {
     padding-right: 3.2rem;
   }
   .grid-content > div {
-    width: 65.9824%;
+    width: 100%;
   }
 
   .membership-content-editor {
