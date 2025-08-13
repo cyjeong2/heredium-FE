@@ -236,7 +236,7 @@ input {
 .h-xs {
   input {
     width: 100% !important;
-    height: 4rem;
+    height: 3.6rem;
     padding: 0 1.2rem;
     font-size: 1.2rem;
   }
@@ -245,7 +245,6 @@ input {
 .h-small {
   input {
     font-size: 1.4rem;
-    height: 4rem;
   }
 
   .error-msg {
@@ -272,7 +271,7 @@ input {
   .h-xs {
     input {
       width: 32rem !important;
-      height: 4.5rem;
+      height: 4rem;
       padding: 0 1.6rem;
       font-size: 1.4rem;
     }
@@ -288,34 +287,13 @@ input {
 
 @media screen and (max-width: 768px) {
   input {
-    font-size: 16px !important;
+    font-size: 1.4rem;
     height: 4rem;
-    -webkit-text-size-adjust: 100%;
   }
 
   .error-msg {
     font-size: 1.2rem !important;
     margin-top: 0.5rem !important;
   }
-}
-
-/* UInput.vue (전역 CSS여도 무방) */
-input {
-  color: var(--color-black);
-  -webkit-text-fill-color: var(--color-black); /* ← iOS 렌더링 보정 */
-  background-color: var(--color-white);
-}
-
-input::-webkit-input-placeholder {
-  -webkit-text-fill-color: var(--color-u-grey-2);
-}
-
-/* 오토필 보정 */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--color-black);
-  -webkit-box-shadow: 0 0 0px 1000px var(--color-white) inset;
-  transition: background-color 9999s ease-out 0s;
 }
 </style>
