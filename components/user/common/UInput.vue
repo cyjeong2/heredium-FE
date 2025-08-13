@@ -16,7 +16,13 @@
       :type="type"
       :maxlength="maxlength ? maxlength : '524288'"
       :disabled="disabled"
-      @input="updateInput"
+      :inputmode="isNumberOnly ? 'numeric' : (type === 'email' ? 'email' : null)"
+      autocapitalize="off"
+      autocomplete="off"
+      autocorrect="off"
+      @compositionstart="isComposing = true"
+      @compositionend="onCompositionEnd"
+      @input="onInput"
       @keyup="keyup"
       @keyup.enter="enter"
     />
@@ -100,7 +106,8 @@ export default {
   },
   data() {
     return {
-      width: ''
+      width: '',
+      isComposing: false,
     };
   },
   created() {
@@ -134,6 +141,17 @@ export default {
     }
   },
   methods: {
+    onInput(e) {
+      // 한글 등 조합 중에는 건드리지 않음
+      if (this.isComposing) return;
+      this.updateInput(e);
+    },
+    onCompositionEnd(e) {
+      this.isComposing = false;
+      // 조합이 끝난 뒤 한 번만 정규화
+      this.updateInput(e);
+    },
+
     updateInput(e) {
       this.$emit('input', this.getComputedValue(e));
     },
@@ -181,7 +199,7 @@ export default {
 }
 
 input {
-  color: var(--color-black);
+  caret-color: var(--color-black);
   height: 5.2rem;
   width: 14.4rem;
   font-size: 1.8rem;
@@ -190,6 +208,7 @@ input {
   border: 1px solid var(--color-u-grey-2);
   text-align: left;
   background-color: var(--color-white);
+  border-radius: 2px;
 
   &::placeholder {
     color: var(--color-u-grey-2);
@@ -204,6 +223,7 @@ input {
   &.is-success {
     border: 0.1rem solid var(--color-green) !important;
   }
+  -webkit-text-fill-color: var(--color-black);
 }
 
 .is-error {
@@ -235,7 +255,7 @@ input {
 .h-xs {
   input {
     width: 100% !important;
-    height: 3.6rem;
+    height: 4rem;
     padding: 0 1.2rem;
     font-size: 1.2rem;
   }
@@ -244,6 +264,7 @@ input {
 .h-small {
   input {
     font-size: 1.4rem;
+    height: 4rem;
   }
 
   .error-msg {
@@ -270,7 +291,7 @@ input {
   .h-xs {
     input {
       width: 32rem !important;
-      height: 4rem;
+      height: 4.5rem;
       padding: 0 1.6rem;
       font-size: 1.4rem;
     }
@@ -293,6 +314,21 @@ input {
   .error-msg {
     font-size: 1.2rem !important;
     margin-top: 0.5rem !important;
+  }
+}
+
+/* iOS 자동완성(autofill) 배경/글자색 강제 */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-white) inset;
+  -webkit-text-fill-color: var(--color-black) !important;
+  transition: background-color 5000s ease-in-out 0s; /* 깜빡임 방지 */
+}
+
+/* iOS에서 폰트가 16px 미만이면 확대되며 렌더링 깨짐: 최소 16px 보장 */
+@supports (-webkit-touch-callout: none) {
+  .h-m input { font-size: 1.6rem; }   /* html 기본 10px라면 1.6rem=16px */
+  @media (max-width: 768px) {
+    input { font-size: 1.6rem; }
   }
 }
 </style>
