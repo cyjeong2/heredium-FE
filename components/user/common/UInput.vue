@@ -334,7 +334,6 @@ input {
 
 input::placeholder {
   color: var(--color-u-grey-2);
-  opacity: 1;                                   /* iOS에서 placeholder 흐림 방지 */
 }
 
 /* iOS 자동완성 시 색/배경 강제 */
