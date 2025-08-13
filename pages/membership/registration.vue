@@ -98,7 +98,7 @@
     />
   </div>
   <section v-else class="container no-data-container">
-    <h1 class="title">멤버십</h1>
+    <h1 class="title">멤버십 </h1>
     <div class="no-data">리스트가 없습니다.</div>
   </section>
 </template>
