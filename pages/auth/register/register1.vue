@@ -19,7 +19,7 @@
       <div class="pc progress-bar">
         <div class="fill"></div>
       </div>
-      <p>가입을 위해 약관에 동의를 해주세요.</p>
+      <p>가입을 위해 약관에 동의해 주세요.</p>
       <div class="terms-area">
         <div class="all-terms">
           <UCheckbox v-model="isAllChecked" @input="setCheckedAll"><strong>약관 전체 동의</strong></UCheckbox>

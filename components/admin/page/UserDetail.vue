@@ -75,11 +75,12 @@
         <label>마케팅 수신 동의 여부</label>
         <div>{{ cloneDetailData.isMarketingReceive ? '동의' : '미동의' }}</div>
       </div>
+      <!-- 추가: 직업 -->
       <div class="row">
-        <label>지역주민 여부</label>
-        <div>
-          <SCheckbox v-model="cloneDetailData.isLocalResident">지역주민</SCheckbox>
-        </div>
+        <label>직업</label>
+        <div>{{ jobLabel(cloneDetailData.job) }}</div>
+        <label>지역</label>
+        <div>{{ regionText(cloneDetailData.state, cloneDetailData.district) }}</div>
       </div>
     </div>
     <div class="bottom-menus mb-36">
@@ -247,17 +248,16 @@
 <script>
 import cloneDeep from 'lodash/cloneDeep';
 import SInput from '~/components/admin/commons/SInput';
-import SCheckbox from '~/components/admin/commons/SCheckbox';
 import SLink from '~/components/admin/commons/SLink';
 import SButton from '~/components/admin/commons/SButton';
 import SPageable from '~/components/admin/commons/SPageable';
 import SProgressTab from '~/components/admin/commons/SProgressTab';
-import { GENDER_TYPE, TICKET_KIND_TYPE, TICKET_STATE_TYPE, TICKET_TYPE } from '~/assets/js/types';
+import { GENDER_TYPE, TICKET_KIND_TYPE, TICKET_STATE_TYPE, TICKET_TYPE, JOB_OPTIONS } from '~/assets/js/types';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 
 export default {
   name: 'UserDetail',
-  components: { SDialogModal, SProgressTab, SPageable, SButton, SLink, SCheckbox, SInput },
+  components: { SDialogModal, SProgressTab, SPageable, SButton, SLink, SInput },
   props: {
     // pageType: COMMON | NONACTIVE | HANA
     pageType: {
@@ -303,6 +303,15 @@ export default {
       isConfirmPending: false
     };
   },
+  computed: {
+    // 직업 코드 → 라벨 매핑용
+    jobMap() {
+      return JOB_OPTIONS.reduce((acc, cur) => {
+        acc[cur.value] = cur.label;
+        return acc;
+      }, {});
+    }
+  },
   created() {
     let baseUrl = '';
 
@@ -323,6 +332,20 @@ export default {
     this.baseUrl = baseUrl;
   },
   methods: {
+    // 직업 라벨 반환 (숫자/문자 모두 대응, null/빈값은 '-')
+    jobLabel(jobValue) {
+      const key = jobValue === 0 ? '0' : String(jobValue ?? '');
+      return this.jobMap[key] ?? '-';
+    },
+    // 지역 표시 (둘 다 있으면 줄바꿈)
+    regionText(state, district) {
+      const s = (state || '').trim();
+      const d = (district || '').trim();
+      if (!s && !d) return '-';
+      if (s && !d) return s;
+      if (!s && d) return d;
+      return `${s}\n${d}`;
+    },
     async onModified(id) {
       this.isConfirmPending = true;
       await this.$axios.$put(`/admin/accounts/${id}`, this.cloneDetailData);
