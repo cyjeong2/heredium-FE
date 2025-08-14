@@ -185,7 +185,7 @@ import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
-import MILEAGE_EVENT_TYPE from '~/assets/js/types.js';
+import { MILEAGE_EVENT_TYPE } from '~/assets/js/types'
 
 export default {
   name: 'MembershipAndCouponPage',
