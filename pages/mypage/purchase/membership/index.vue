@@ -1,7 +1,7 @@
 <template>
   <main class="container">
     <div class="mypage">
-      <h1>Mypage</h1>
+      <SideBarMyPage />
     </div>
     <section>
       <div class="ticketing-head">
@@ -35,7 +35,7 @@
               </div>
               <div class="mileage_condition">
                 <p v-if="dataMembership.code === 1">
-                  마일리지 <B>{{ 70 - mileageList.totalMileage }}점</B> 적립시 <br />
+                  마일리지 <B>{{ Math.max(0, 70 - mileageList.totalMileage) }}점</B> 적립시 <br />
                   업그레이드 됩니다.
                 </p>
                 <p v-if="dataMembership.code === 2">
@@ -184,11 +184,12 @@ import ModalMembershipInfor from '~/components/user/modal/membership/ModalMember
 import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
+import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import MILEAGE_EVENT_TYPE from '~/assets/js/types.js';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
+  components: { UPageable, NoMileage, ModalMembershipInfor, UDatepicker, SideBarMyPage },
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
@@ -291,8 +292,7 @@ export default {
       }
     },
     formatTypeCategory(type, category) {
-      const isAdded = [0, 4, 5].includes(type);
-      const prefix = isAdded ? '[적립]' : '[소멸]';
+      const typeLabel = MILEAGE_EVENT_TYPE[type];
       const categoryMap = {
         EXHIBITION: '전시',
         PROGRAM: '프로그램',
@@ -302,7 +302,8 @@ export default {
 
       if (category !== null && category !== undefined) {
         const categoryName = `헤레디움 ${categoryMap[category]}`;
-        return `${prefix} ${categoryName}`;
+        console.log(category);
+        return `[${typeLabel}] ${categoryName}`;
       }
       switch (type) {
         case 1:

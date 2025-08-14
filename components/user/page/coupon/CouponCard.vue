@@ -115,7 +115,7 @@ export default {
     rightButton: {
       type: Boolean,
       default: false
-    }
+    },
   },
   data() {
     return {
@@ -129,13 +129,10 @@ export default {
     },
     isForeverExpiry() {
       const exp = this.firstUnusedCoupon?.expiration_date || '';
-      return /^9999-12-31\b/.test(exp);  // "9999-12-31" 또는 "9999-12-31 00:00:00" 등 대응
+      return /^9999-12-31\b/.test(exp); // "9999-12-31" 또는 "9999-12-31 00:00:00" 등 대응
     },
     fullRangeText() {
-      return this.getFormattedDate(
-        this.firstUnusedCoupon?.delivered_date,
-        this.firstUnusedCoupon?.expiration_date
-      );
+      return this.getFormattedDate(this.firstUnusedCoupon?.delivered_date, this.firstUnusedCoupon?.expiration_date);
     },
     startOnlyWithTilde() {
       const txt = String(this.fullRangeText || '');
@@ -146,7 +143,7 @@ export default {
       return this.isForeverExpiry ? this.startOnlyWithTilde : this.fullRangeText;
     },
     couponTypeLabel() {
-      const opt = COUPON_TYPE_OPTION_LIST.find(o => o.value === this.detailCoupon.coupon_type);
+      const opt = COUPON_TYPE_OPTION_LIST.find((o) => o.value === this.detailCoupon.coupon_type);
       return opt ? opt.label : this.detailCoupon.coupon_type;
     },
     couponImageSrc() {
@@ -380,28 +377,27 @@ export default {
 
 .coupon-card {
   .coupon-detail {
-
     /* 제목: 굵게, 크게 */
     .name {
-      font-size: 1.8rem;   /* ≈ 18px */
+      font-size: 1.8rem; /* ≈ 18px */
       font-weight: 700;
       line-height: 1.4;
-      color: #111;         /* 진한 검정 */
-      margin: 0 0 .4rem 0; /* 아래 살짝 간격 */
+      color: #111; /* 진한 검정 */
+      margin: 0 0 0.4rem 0; /* 아래 살짝 간격 */
     }
 
-     /* 본문(설명) */
+    /* 본문(설명) */
     .type-discount {
-      display: block;      /* 줄바꿈 */
-      font-size: 1.5rem;   /* ≈ 15px */
+      display: block; /* 줄바꿈 */
+      font-size: 1.5rem; /* ≈ 15px */
       font-weight: 400;
       line-height: 1.6;
       color: #111;
-      margin: 0 0 .4rem 0;
+      margin: 0 0 0.4rem 0;
 
       .type,
       .discount-text {
-        font-weight: 400;  /* 굵기 통일 */
+        font-weight: 400; /* 굵기 통일 */
       }
     }
 
@@ -410,11 +406,11 @@ export default {
       margin-top: -1rem;
 
       .date {
-        font-size: 1.3rem;   /* ≈ 13px */
+        font-size: 1.3rem; /* ≈ 13px */
         line-height: 1.6;
-        color: #9e9e9e;      /* 회색 */
+        color: #9e9e9e; /* 회색 */
         display: inline-block;
-        min-width: unset;    /* 기존 최소폭 해제 */
+        min-width: unset; /* 기존 최소폭 해제 */
       }
     }
   }
@@ -425,8 +421,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-left: auto;         /* 오른쪽으로 밀기 */
-  padding-right: 3.8rem;     /* 살짝 여백 */
+  margin-left: auto; /* 오른쪽으로 밀기 */
+  padding-right: 3.8rem; /* 살짝 여백 */
 }
 
 .right-action .use-btn {

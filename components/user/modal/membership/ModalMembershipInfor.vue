@@ -152,7 +152,7 @@ export default {
   },
   computed: {
     isPCUrl() {
-      return this.$route.path.includes('/mypage/purchase/membership_pc');
+      return this.$route.path.includes('/mypage/purchase/membership_pc') || this.$route.path.includes('/mypage/purchase/coupon_pc');
     }
   },
   beforeDestroy() {

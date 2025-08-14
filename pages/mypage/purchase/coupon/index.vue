@@ -1,7 +1,7 @@
 <template>
   <main class="container">
-    <div class="mypage">
-      <h1>Mypage</h1>
+    <div>
+      <SideBarMyPage />
     </div>
     <section>
       <div class="ticketing-head">
@@ -35,7 +35,7 @@
               </div>
               <div class="mileage_condition">
                 <p v-if="dataMembership.code === 1">
-                  마일리지 <B>{{ 70 - mileageList.totalMileage }}점</B> 적립시 <br />
+                  마일리지 <B>{{ Math.max(0, 70 - totalMileage) }}점</B> 적립시 <br />
                   업그레이드 됩니다.
                 </p>
                 <p v-if="dataMembership.code === 2">
@@ -68,14 +68,13 @@
             <tr>
               <th>현재 나의 쿠폰</th>
               <td>
-                <span style="font-size: 19px">{{ dataMembership.code === 3 ? '-' : mileageList.totalMileage }}</span> M
+                <span style="font-size: 19px">{{ totalCoupons }}</span>
               </td>
             </tr>
             <tr>
               <th>소멸 예정 쿠폰</th>
               <td>
-                <span style="font-size: 19px">{{ dataMembership.code === 3 ? '-' : mileageList.expiringMileage }}</span>
-                M
+                <span style="font-size: 19px">{{ expiringCoupons }}</span>
               </td>
             </tr>
           </table>
@@ -108,13 +107,9 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="startDate" :max="endDate ? $dayjs(endDate).toDate() : null" style="width: 227.5px" />
+            <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
             <span>~</span>
-            <UDatepicker
-              v-model="endDate"
-              :min="startDate ? $dayjs(startDate).toDate() : null"
-              style="width: 227.5px"
-            />
+            <UDatepicker v-model="endDate" :min="startDate" style="width: 227.5px" />
           </div>
 
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
@@ -122,45 +117,24 @@
 
         <!-- 테이블 -->
         <UPageable
-          :list-data="mileage_list"
+          :list-data="couponPageModel"
           :show-prev-page="true"
           :show-next-page="true"
-          @getListData="(pageIndex) => loadMileageList(pageIndex, true)"
+          @getListData="onCouponPageChange"
         >
           <template #data="{ data }">
-            <table class="mileage-table">
+            <table class="coupon-table">
               <tbody>
-                <template v-if="dataMembership.code !== 3">
-                  <tr v-for="item in data" :key="item.id">
-                    <td>
-                      <div class="mileage-details">
-                        <p class="created-date">{{ formatDate(item.createdDate) }}</p>
-                        <p class="category">{{ formatTypeCategory(item.type, item.category) }}</p>
-                        <p v-if="item.expirationDate" class="expiration-date">
-                          (유효기간: {{ formatDate(item.expirationDate) }})
-                        </p>
-                      </div>
-                    </td>
-                    <td>
-                      <b>
-                        {{
-                          [0, 4, 5].includes(item.type)
-                            ? `+${item.mileageAmount}M`
-                            : item.type === 1
-                            ? '초기화'
-                            : [2, 3, 6].includes(item.type)
-                            ? `-${item.mileageAmount}M`
-                            : '-'
-                        }}
-                      </b>
-                    </td>
-                  </tr>
-                </template>
-                <template v-if="data.length > 0">
-                  <tr v-for="n in 5 - data.length" :key="'empty-' + n" class="placeholder-row">
-                    <td colspan="2" style="height: 47px; border: none; background: transparent"></td>
-                  </tr>
-                </template>
+                <tr>
+                  <td colspan="5" style="padding: 0; border: none; background: transparent">
+                    <CouponList
+                      :key="`page-${couponPageIndex}-${data && data.length}`"
+                      class="coupon-list"
+                      :data="data"
+                      :right-button="true"
+                    />
+                  </td>
+                </tr>
               </tbody>
             </table>
           </template>
@@ -174,33 +148,41 @@
 import dayjs from 'dayjs';
 
 import ModalMembershipInfor from '~/components/user/modal/membership/ModalMembershipInfor.vue';
-import UPageable from '~/components/user/common/UPageable';
+import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
+import UPageable from '~/components/user/common/UPageable';
+import CouponList from '~/components/user/page/coupon/CouponList.vue';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { UPageable, ModalMembershipInfor, UDatepicker },
+  components: { SideBarMyPage, ModalMembershipInfor, UDatepicker, CouponList, UPageable },
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
     const dataMembership = await $axios.$get('/user/membership/info');
-    const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
+    const mileageRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
       params: { page: 0, size: initialPageSize }
     });
+    const totalMileage = mileageRes.totalMileage;
 
-    const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
+    const couponList = await $axios.$get('/user/coupons/usage');
+    console.log(couponList);
+
+    const usedCouponsList = couponList.filter((item) => (item.used_coupons?.length || 0) > 0);
+
+    const availableCouponsList = couponList
+      .map((item) => ({
+        ...item,
+        unused_coupons: (item.unused_coupons || []).filter((c) => !c.is_expired)
+      }))
+      .filter((item) => item.unused_coupons.length > 0);
+    console.log('available', availableCouponsList?.length, 'used', usedCouponsList?.length);
+
     return {
       dataMembership,
-      mileageList: mileageListRes,
-      mileage_list: {
-        content: mileageListRes.content,
-        totalElements: mileageListRes.totalElements,
-        totalPages,
-        number: mileageListRes.number,
-        size: initialPageSize,
-        first: mileageListRes.number === 0,
-        last: mileageListRes.number === totalPages - 1
-      },
+      totalMileage,
+      availableCouponsList,
+      usedCouponsList,
       startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
       endDate: dayjs().format('YYYY-MM-DD')
     };
@@ -208,10 +190,12 @@ export default {
   data() {
     return {
       activeTab: 'total',
+      couponPageSize: 5,
+      couponPageIndex: 0,
       tabs: [
         { key: 'total', label: '전체' },
-        { key: 'added', label: '적립 마일리지' },
-        { key: 'used', label: '사용 마일리지' }
+        { key: 'added', label: '보유 쿠폰' },
+        { key: 'used', label: '사용 쿠폰' }
       ],
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
@@ -219,85 +203,97 @@ export default {
       showModal: false
     };
   },
-  watch: {
-    activeTab() {
-      this.loadMileageList(0, true);
+  computed: {
+    totalCoupons() {
+      if (!this.availableCouponsList) return 0;
+      return this.availableCouponsList.reduce((sum, item) => {
+        return sum + (item.unused_coupons?.length || 0);
+      }, 0);
+    },
+    expiringCoupons() {
+      if (!this.availableCouponsList) return 0;
+      const today = dayjs();
+      return this.availableCouponsList.reduce((sum, item) => {
+        const expiring =
+          item.unused_coupons?.filter((coupon) => {
+            return coupon.expiration_date && dayjs(coupon.expiration_date).isBefore(today.add(30, 'day'));
+          }) || [];
+        return sum + expiring.length;
+      }, 0);
+    },
+    filteredCouponsAll() {
+      const start = this.startDate ? dayjs(this.startDate).startOf('day') : null;
+      const end = this.endDate ? dayjs(this.endDate).endOf('day') : null;
+
+      const inRange = (d) => {
+        if (!start || !end) return true;
+        const t = dayjs(d);
+        return t.isValid() && (t.isAfter(start) || t.isSame(start)) && (t.isBefore(end) || t.isSame(end));
+      };
+
+      if (this.activeTab === 'used') {
+        const src = this.usedCouponsList || [];
+        return src
+          .map((item) => {
+            const pool = (item.used_coupons || []).filter((c) => inRange(c.used_at || c.created_at));
+            return { ...item, used_coupons: pool };
+          })
+          .filter((item) => (item.used_coupons || []).length > 0);
+      }
+
+      // 'total'과 'added'는 보유 쿠폰만 보여줌
+      const src = this.availableCouponsList || [];
+      return src
+        .map((item) => {
+          const pool = (item.unused_coupons || []).filter((c) => {
+            const d = c.delivered_date || c.created_at;
+            return d ? inRange(d) : true;
+          });
+          return { ...item, unused_coupons: pool };
+        })
+        .filter((item) => (item.unused_coupons || []).length > 0);
+    },
+    currentCouponSource() {
+      return Array.isArray(this.filteredCouponsAll) ? this.filteredCouponsAll : [];
+    },
+
+    couponPageModel() {
+      const source = this.currentCouponSource;
+
+      const size = this.couponPageSize || 5;
+      const totalElements = source.length;
+      const totalPages = Math.max(1, Math.ceil(totalElements / size));
+      const safePage = Math.min(this.couponPageIndex || 0, totalPages - 1);
+
+      const start = safePage * size;
+      const end = start + size;
+      const content = source.slice(start, end);
+
+      return {
+        content,
+        totalElements,
+        totalPages,
+        number: safePage,
+        size,
+        first: safePage === 0,
+        last: safePage === totalPages - 1
+      };
     }
   },
+  watch: {
+    activeTab() {
+      this.couponPageIndex = 0;
+    }
+  },
+
   mounted() {
     this.applyPeriodFilter();
   },
   methods: {
-    async loadMileageList(pageIndex = 0, usePeriodFilter = false) {
-      if (!this.dataMembership) return;
-      try {
-        const params = {
-          page: pageIndex,
-          size: this.pageSizeForLoad
-        };
-
-        if (this.activeTab === 'added') {
-          params.types = [0, 4, 5];
-        } else if (this.activeTab === 'used') {
-          params.types = [1, 2, 3, 6];
-        }
-
-        if (usePeriodFilter && this.startDate && this.endDate) {
-          params.startDate = dayjs(this.startDate).startOf('day').format('YYYY-MM-DD HH:mm:ss');
-          params.endDate = dayjs(this.endDate).endOf('day').format('YYYY-MM-DD HH:mm:ss');
-        }
-
-        const res = await this.$axios.$get(`/user/membershipMileage/${this.dataMembership.account_id}`, {
-          params
-        });
-
-        const totalPages = Math.ceil(res.totalElements / this.pageSizeForLoad);
-
-        this.mileage_list = {
-          content: res.content,
-          totalElements: res.totalElements,
-          totalPages,
-          number: res.number,
-          size: this.pageSizeForLoad,
-          first: res.number === 0,
-          last: res.number === totalPages - 1
-        };
-
-        this.mileageList = {
-          ...this.mileageList,
-          totalMileage: res.totalMileage
-        };
-      } catch (error) {
-        console.error('마일리지 목록 불러오기 실패:', error);
-        this.mileage_list = {
-          content: [],
-          totalElements: 0,
-          totalPages: 0,
-          number: 0,
-          size: this.pageSizeForLoad,
-          first: true,
-          last: true
-        };
-        this.mileageList = { totalMileage: 0 };
-      }
+    onCouponPageChange(index) {
+      this.couponPageIndex = index;
     },
-    formatTypeCategory(type, category) {
-      const categoryMap = {
-        0: '헤레디움 전시',
-        1: '헤레디움 프로그램',
-        2: '헤레디움 커피',
-        3: '헤레디움 아트숍'
-      };
-      if (type === 1) {
-        return '[사용] CN PASS PLUS 등급 업그레이드';
-      }
-      if (type === 6) {
-        return '[소멸] 승급취소';
-      }
-      const isAdded = [0, 4, 5].includes(type);
-      const prefix = isAdded ? '[적립]' : '[소멸]';
-      return `${prefix} ${categoryMap[category]}`;
-    },
+
     formatDate(dateStr) {
       if (!dateStr) return '';
       return dayjs(dateStr).format('YYYY-MM-DD');
@@ -327,11 +323,12 @@ export default {
       this.startDate = start.format('YYYY-MM-DD');
       this.endDate = now.format('YYYY-MM-DD');
 
-      this.loadMileageList(0, true);
+      // 필터 바뀌면 첫 페이지로
+      this.couponPageIndex = 0;
     },
     applyPeriodFilter() {
       this.selectedFilter = 'custom';
-      this.loadMileageList(0, true);
+      this.couponPageIndex = 0;
     },
     openModal() {
       this.showModal = true;
@@ -342,6 +339,7 @@ export default {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .container {
   margin-bottom: 12rem;
@@ -405,6 +403,9 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
+  ::v-deep(.coupon-list) {
+    width: 100%;
+  }
   .mypage h1 {
     font-size: 2rem;
   }
@@ -421,6 +422,67 @@ export default {
   }
   .name_membership {
     width: 100%;
+  }
+  ::v-deep(.coupon-table td[colspan]) {
+    padding-top: 3rem !important;
+  }
+
+  ::v-deep(.coupon-list .coupon-card) {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+  ::v-deep(.coupon-card) {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    column-gap: 12px;
+    row-gap: 8px;
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  ::v-deep(.coupon-card .img-wrap) {
+    grid-column: 1;
+    grid-row: 1;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ::v-deep(.coupon-card .coupon-detail) {
+    display: contents;
+  }
+
+  ::v-deep(.coupon-card .coupon-detail > div:first-child) {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
+  }
+
+  ::v-deep(.coupon-card .right-action) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 8px 0 0;
+    padding: 0;
+    display: block;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  ::v-deep(.coupon-card .right-action .use-btn) {
+    width: 100% !important;
+    height: 44px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    text-align: center;
+    box-sizing: border-box;
   }
 }
 
@@ -644,11 +706,11 @@ export default {
   font-size: 14px;
   cursor: pointer;
 }
-.mileage-table {
+.coupon-table {
   width: 100%;
-  border-collapse: collapse;
+  border-top: 1px solid #111111;
   table-layout: fixed;
-
+  
   th,
   td {
     padding: 12px;

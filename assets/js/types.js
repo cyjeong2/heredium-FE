@@ -494,7 +494,7 @@ export const MILEAGE_EVENT_TYPE = Object.freeze({
   5: '소멸완료(취소)',
   6: '승급취소',
 });
-
+export default { CATEGORY_TYPE, MILEAGE_EVENT_TYPE };
 /**
  * 회원가입 · 프로필 작성 시 사용할 직업 옵션
  */

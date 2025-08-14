@@ -19,7 +19,7 @@
               </p>
               <div class="mileage_condition">
                 <p v-if="dataMembership.code === 1">
-                  마일리지 <B>{{ 70 - mileageList.totalMileage }}점</B> 적립시 업그레이드 됩니다.
+                  마일리지 <B>{{ Math.max(0, 70 - mileageList.totalMileage) }}점</B> 적립시 업그레이드 됩니다.
                 </p>
                 <p v-if="dataMembership.code === 2">
                   업그레이드 등급 유지기간
@@ -169,7 +169,7 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
-import MILEAGE_EVENT_TYPE from '~/assets/js/types.js';
+import { MILEAGE_EVENT_TYPE } from '~/assets/js/types'
 
 export default {
   name: 'MembershipAndCouponPage',
@@ -181,7 +181,7 @@ export default {
     const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
       params: { page: 0, size: initialPageSize }
     });
-
+    console.log(mileageListRes)
     const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
     return {
       dataMembership,
@@ -276,8 +276,7 @@ export default {
       }
     },
     formatTypeCategory(type, category) {
-      const isAdded = [0, 4, 5].includes(type);
-      const prefix = isAdded ? '[적립]' : '[소멸]';
+      const typeLabel = MILEAGE_EVENT_TYPE[type]
       const categoryMap = {
         EXHIBITION: '전시',
         PROGRAM: '프로그램',
@@ -288,7 +287,7 @@ export default {
       if (category !== null && category !== undefined) {
         const categoryName = `헤레디움 ${categoryMap[category]}`;
         console.log(category);
-        return `${prefix} ${categoryName}`;
+        return `[${typeLabel}] ${categoryName}`;
       }
       switch (type) {
         case 1:
