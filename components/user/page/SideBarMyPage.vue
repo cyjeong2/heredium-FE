@@ -11,8 +11,8 @@
         </div>
         <div class="tabs grid col-xs-3 mobile-sub-tab">
           <NuxtLink to="/mypage/purchase/all" class="tab">전시·프로그램</NuxtLink>
-          <NuxtLink to="/mypage/purchase/coupon" class="tab">멤버십</NuxtLink>
-          <NuxtLink to="/mypage/purchase/membership" class="tab">쿠폰함</NuxtLink>
+          <NuxtLink to="/mypage/purchase/coupon" class="tab">쿠폰함</NuxtLink>
+          <NuxtLink to="/mypage/purchase/membership" class="tab">멤버십</NuxtLink>
           <!-- <NuxtLink to="/mypage/purchase/coffee" class="tab">커피</NuxtLink> -->
         </div>
       </div>

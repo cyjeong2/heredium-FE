@@ -63,7 +63,7 @@
             </div>
           </div>
         </div>
-        <div class="mileage_summary_table">
+        <div class="coupon_summary_table">
           <table>
             <tr>
               <th>현재 나의 쿠폰</th>
@@ -81,7 +81,7 @@
         </div>
       </div>
       <!-- Tab UI -->
-      <div class="mileage-section">
+      <div class="coupon-section">
         <!-- 탭 버튼 영역 -->
         <div class="tabs">
           <button
@@ -200,7 +200,10 @@ export default {
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
       pageSizeForLoad: 5,
-      showModal: false
+      showModal: false,
+
+      appliedStartDate: null,
+      appliedEndDate: null
     };
   },
   computed: {
@@ -222,8 +225,8 @@ export default {
       }, 0);
     },
     filteredCouponsAll() {
-      const start = this.startDate ? dayjs(this.startDate).startOf('day') : null;
-      const end = this.endDate ? dayjs(this.endDate).endOf('day') : null;
+      const start = this.appliedStartDate ? dayjs(this.appliedStartDate).startOf('day') : null;
+      const end = this.appliedEndDate ? dayjs(this.appliedEndDate).endOf('day') : null;
 
       const inRange = (d) => {
         if (!start || !end) return true;
@@ -287,6 +290,8 @@ export default {
   },
 
   mounted() {
+    this.appliedStartDate = this.startDate;
+    this.appliedEndDate = this.endDate;
     this.applyPeriodFilter();
   },
   methods: {
@@ -324,10 +329,12 @@ export default {
       this.endDate = now.format('YYYY-MM-DD');
 
       // 필터 바뀌면 첫 페이지로
+      this.applyPeriodFilter();
       this.couponPageIndex = 0;
     },
     applyPeriodFilter() {
-      this.selectedFilter = 'custom';
+      this.appliedStartDate = this.startDate;
+      this.appliedEndDate = this.endDate;
       this.couponPageIndex = 0;
     },
     openModal() {
@@ -579,7 +586,7 @@ export default {
   flex-direction: row;
 }
 
-.mileage_summary_table {
+.coupon_summary_table {
   width: 100%;
   margin-top: 2rem;
   padding: 0 1rem;
@@ -609,7 +616,7 @@ export default {
   }
 }
 
-.mileage-section {
+.coupon-section {
   width: 100%;
   max-width: 100%;
   padding-left: 1rem;
@@ -710,7 +717,7 @@ export default {
   width: 100%;
   border-top: 1px solid #111111;
   table-layout: fixed;
-  
+
   th,
   td {
     padding: 12px;

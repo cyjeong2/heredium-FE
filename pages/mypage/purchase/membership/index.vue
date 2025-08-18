@@ -185,7 +185,7 @@ import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
-import { MILEAGE_EVENT_TYPE } from '~/assets/js/types'
+import { MILEAGE_EVENT_TYPE } from '~/assets/js/types';
 
 export default {
   name: 'MembershipAndCouponPage',
@@ -292,7 +292,8 @@ export default {
       }
     },
     formatTypeCategory(type, category) {
-      const typeLabel = MILEAGE_EVENT_TYPE[type];
+      const t = Number(type);
+      const typeLabel = MILEAGE_EVENT_TYPE?.[t];
       const categoryMap = {
         EXHIBITION: '전시',
         PROGRAM: '프로그램',
@@ -300,19 +301,26 @@ export default {
         ARTSHOP: '아트숍'
       };
 
+      if (t === 1) return '[사용] CN PASS PLUS 등급 업그레이드';
+      if (t === 6) return '[취소] CN PASS PLUS 등급 취소';
+
       if (category !== null && category !== undefined) {
-        const categoryName = `헤레디움 ${categoryMap[category]}`;
-        console.log(category);
-        return `[${typeLabel}] ${categoryName}`;
+        const catKo = categoryMap[category] || '기타';
+        const categoryName = `${catKo}`;
+
+        const isAdded = [0, 4, 5].includes(t);
+        const prefix = isAdded ? '[적립]' : '[소멸]';
+
+        const suffixByType = {
+          2: '유효기간 경과',
+          3: '취소'
+        };
+        const suffix = suffixByType[t];
+
+        return suffix ? `${prefix} ${categoryName} 구매_${suffix}` : `${prefix} 헤레디움 ${categoryName}`;
       }
-      switch (type) {
-        case 1:
-          return '[사용] CN PASS PLUS 등급 업그레이드';
-        case 6:
-          return '[소멸] 승급취소';
-        default:
-          return `[${MILEAGE_EVENT_TYPE[type] || '알 수 없는 내역'}]`;
-      }
+
+      return `[${typeLabel || '알 수 없는 내역'}]`;
     },
     formatDate(dateStr) {
       if (!dateStr) return '';

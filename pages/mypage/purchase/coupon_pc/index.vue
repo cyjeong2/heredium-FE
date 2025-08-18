@@ -193,7 +193,10 @@ export default {
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
       pageSizeForLoad: 5,
-      showModal: false
+      showModal: false,
+
+      appliedStartDate: null,
+      appliedEndDate: null
     };
   },
   computed: {
@@ -215,8 +218,8 @@ export default {
       }, 0);
     },
     filteredCouponsAll() {
-      const start = this.startDate ? dayjs(this.startDate).startOf('day') : null;
-      const end = this.endDate ? dayjs(this.endDate).endOf('day') : null;
+      const start = this.appliedStartDate ? dayjs(this.appliedStartDate).startOf('day') : null;
+      const end = this.appliedEndDate ? dayjs(this.appliedEndDate).endOf('day') : null;
 
       const inRange = (d) => {
         if (!start || !end) return true;
@@ -279,7 +282,8 @@ export default {
   },
 
   mounted() {
-    this.applyPeriodFilter();
+    this.appliedStartDate = this.startDate;
+    this.appliedEndDate = this.endDate;
   },
   methods: {
     onCouponPageChange(index) {
@@ -316,10 +320,12 @@ export default {
       this.endDate = now.format('YYYY-MM-DD');
 
       // 필터 바뀌면 첫 페이지로
+      this.applyPeriodFilter();
       this.couponPageIndex = 0;
     },
     applyPeriodFilter() {
-      this.selectedFilter = 'custom';
+      this.appliedStartDate = this.startDate;
+      this.appliedEndDate = this.endDate;
       this.couponPageIndex = 0;
     },
     openModal() {
@@ -689,6 +695,9 @@ export default {
   th:nth-child(5),
   td:nth-child(5) {
     width: 80px;
+  }
+  ::v-deep(.coupon-card .coupon-detail) {
+    text-align: left;
   }
   .coupon-list {
     display: flex;

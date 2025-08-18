@@ -101,7 +101,6 @@ export default {
       border-bottom: 1px solid #d1d5db;
       padding-bottom: 2rem;
       margin-bottom: 2rem;
-
       .name {
         margin-top: 3.2rem;
         font-weight: 700;
