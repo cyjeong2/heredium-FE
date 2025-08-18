@@ -30,7 +30,8 @@ export default {
         startDate: this.$route.query.startDate || '',
         endDate: this.$route.query.endDate || '',
         gender: this.$route.query.gender || null,
-        isMarketingReceive: this.$route.query.isMarketingReceive || null
+        isMarketingReceive: this.$route.query.isMarketingReceive || null,
+        job: this.$route.query.job || null,
       }
     };
   },
