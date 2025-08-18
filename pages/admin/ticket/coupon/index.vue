@@ -19,7 +19,7 @@
         />
         <div class="box-button">
           <!-- mode가 없을 때만: 추가/수정/삭제 -->
-          <div v-if="!mode" class="action-buttons">
+          <div v-if="!mode && isAdmin" class="action-buttons">
             <SButton @click="enterAddMode">추가</SButton>
             <SButton v-if="couponData.coupon_id" @click="enterEditMode">수정</SButton>
             <SButton v-if="couponData.coupon_id" button-type="standard" @click="confirmDelete">
@@ -28,7 +28,7 @@
           </div>
 
           <!-- add 혹은 edit 모드일 때만: 저장/취소 -->
-          <div v-if="mode === 'add' || mode === 'edit'" class="edit-form">
+          <div v-if="(mode === 'add' || mode === 'edit') && isAdmin" class="edit-form">
             <SButton button-type="primary" @click="confirmSave">저장</SButton>
             <SButton @click="cancelEdit">취소</SButton>
           </div>
@@ -375,7 +375,15 @@ export default {
       selectedCouponId: null,
     };
   },
-
+  computed: {
+    adminInfo() {
+      return this.$store.getters['service/auth/getAdminUserInfo'];
+    },
+    isAdmin() {
+      // ADMIN 권한만 true
+      return this.isShowByAuthLevel(['ADMIN']);
+    }
+  },
   watch: {
     'tableData.content': {
       deep: true,
@@ -916,6 +924,14 @@ export default {
         return
       }
 
+      // ▼ 추가: 수정 모드에서 저장하면 마케팅동의 쿠폰이 0개가 되는지 체크
+      if (this.willMarketingCountBecomeZeroOnEditSave()) {
+        this.confirmMsg = '저장 시 마케팅 동의 혜택 쿠폰이 없습니다. 계속하시겠습니까?';
+        this.onConfirm = this.saveCoupon;
+        this.showConfirmModal = true;
+        return;
+      }
+
       this.confirmMsg =
         this.mode === 'add'
           ? '신규 쿠폰을 저장하시겠습니까?'
@@ -959,6 +975,17 @@ export default {
     },
     // 5) 삭제 확인
     confirmDelete() {
+
+      // ▼ 추가: 삭제하면 0개 되는지 체크
+      if (this.willMarketingCountBecomeZeroOnDelete()) {
+
+        // 또는 사용자 확인 후 진행:
+        this.confirmMsg = '삭제 시 마케팅 동의 혜택 쿠폰이 없습니다. 계속하시겠습니까?';
+        this.onConfirm = this.deleteCoupon;
+        this.showConfirmModal = true;
+        return;
+      }
+
       this.confirmMsg = '쿠폰을 정말 삭제 하시겠습니까?';
       this.onConfirm = this.deleteCoupon;
       this.showConfirmModal = true;
@@ -1022,7 +1049,39 @@ export default {
           ? [c.recipient_type]
           : []
       }));
-    }
+    },
+    isShowByAuthLevel(allowAuthTypes) {
+      return allowAuthTypes.includes(this.adminInfo?.auth);
+    },
+    // 현재 목록(서버 기준)에서 마케팅동의 쿠폰 개수
+    getMarketingCount(list) {
+      if (!Array.isArray(list)) return 0;
+      return list.filter(c => !!c.marketing_consent_benefit).length;
+    },
+
+    // [수정 저장] 시, 수정 적용 후 개수 시뮬레이션
+    willMarketingCountBecomeZeroOnEditSave() {
+      if (this.mode !== 'edit') return false;
+      // 서버에서 받은 전체 목록 복사
+      const afterList = this.couponList.map(c => ({ ...c }));
+      const idx = afterList.findIndex(c => c.coupon_id === this.couponData.coupon_id);
+      if (idx >= 0) {
+        // 현재 에디터 값으로 치환 (최소 필요한 필드만)
+        afterList[idx].marketing_consent_benefit = !!this.couponData.marketing_consent_benefit;
+      }
+      const beforeCnt = this.getMarketingCount(this.couponList);
+      const afterCnt  = this.getMarketingCount(afterList);
+      return beforeCnt > 0 && afterCnt === 0;
+    },
+
+    // [삭제] 시, 삭제 적용 후 개수 시뮬레이션
+    willMarketingCountBecomeZeroOnDelete() {
+      if (!this.couponData?.coupon_id) return false;
+      const beforeCnt = this.getMarketingCount(this.couponList);
+      // 삭제 대상이 마케팅동의 쿠폰이고, 현재 개수가 1개뿐이라면 → 삭제 후 0개
+      const targetIsMarketing = !!this.couponData.marketing_consent_benefit;
+      return beforeCnt === 1 && targetIsMarketing === true;
+    },
   }
 };
 </script>
