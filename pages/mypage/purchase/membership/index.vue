@@ -151,11 +151,11 @@
                     <td>
                       <b>
                         {{
-                          [0, 4, 5].includes(item.type)
-                            ? `+${item.mileageAmount}M`
-                            : item.type === 1
+                          item.type === 1 || item.type === 6
                             ? '초기화'
-                            : [2, 3, 6].includes(item.type)
+                            : [0, 4, 5].includes(item.type)
+                            ? `+${item.mileageAmount}M`
+                            : [2, 3].includes(item.type)
                             ? `-${item.mileageAmount}M`
                             : '-'
                         }}
@@ -247,9 +247,9 @@ export default {
         };
 
         if (this.activeTab === 'added') {
-          params.types = [0, 4, 5];
+          params.types = [0, 4, 5, 6];
         } else if (this.activeTab === 'used') {
-          params.types = [1, 2, 3, 6];
+          params.types = [1, 2, 3];
         }
 
         if (usePeriodFilter && this.startDate && this.endDate) {

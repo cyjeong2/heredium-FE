@@ -138,11 +138,11 @@
                     <td>{{ formatTypeCategory(item.type, item.category) }}</td>
                     <td>{{ item.expirationDate ? formatDate(item.expirationDate) : '-' }}</td>
                     <td>
-                      <b>{{ [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
+                      <b>{{ item.type === 6 ? '초기화' : [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
                     </td>
                     <td>
                       <b>{{
-                        item.type === 1 ? '초기화' : [2, 3, 6].includes(item.type) ? `${item.mileageAmount}M` : '-'
+                        item.type === 1 ? '초기화' : [2, 3].includes(item.type) ? `${item.mileageAmount}M` : '-'
                       }}</b>
                     </td>
                   </tr>
@@ -231,9 +231,9 @@ export default {
         };
 
         if (this.activeTab === 'added') {
-          params.types = [0, 4, 5];
+          params.types = [0, 4, 5, 6];
         } else if (this.activeTab === 'used') {
-          params.types = [1, 2, 3, 6];
+          params.types = [1, 2, 3];
         }
 
         if (usePeriodFilter && this.startDate && this.endDate) {

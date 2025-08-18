@@ -228,29 +228,45 @@ export default {
       const start = this.appliedStartDate ? dayjs(this.appliedStartDate).startOf('day') : null;
       const end = this.appliedEndDate ? dayjs(this.appliedEndDate).endOf('day') : null;
 
-      const inRange = (d) => {
-        if (!start || !end) return true;
-        const t = dayjs(d);
-        return t.isValid() && (t.isAfter(start) || t.isSame(start)) && (t.isBefore(end) || t.isSame(end));
+      // 기간 교집합 체크: [aStart,aEnd] ↔ [bStart,bEnd]
+      const isOverlap = (aStart, aEnd, bStart, bEnd) => {
+        // aStart/aEnd가 null이면 무한대(-∞/∞)로 간주
+        const beginsBeforeBEnd = !aStart || !bEnd || aStart.isSame(bEnd) || aStart.isBefore(bEnd);
+        const endsAfterBStart = !aEnd || !bStart || aEnd.isSame(bStart) || aEnd.isAfter(bStart);
+        return beginsBeforeBEnd && endsAfterBStart;
       };
 
+      // 사용 쿠폰은 사용일 기준 (fallback: created_at)
       if (this.activeTab === 'used') {
         const src = this.usedCouponsList || [];
         return src
           .map((item) => {
-            const pool = (item.used_coupons || []).filter((c) => inRange(c.used_at || c.created_at));
+            const pool = (item.used_coupons || []).filter((c) => {
+              if (!start || !end) return true;
+              const used = c.used_at || c.created_at; // 되도록 used_at
+              const t = used ? dayjs(used) : null;
+              return t && (t.isSame(start) || t.isAfter(start)) && (t.isSame(end) || t.isBefore(end));
+            });
             return { ...item, used_coupons: pool };
           })
           .filter((item) => (item.used_coupons || []).length > 0);
       }
 
-      // 'total'과 'added'는 보유 쿠폰만 보여줌
+      // 보유(미사용) 쿠폰은 "유효기간 구간"과 조회기간이 겹치면 포함
       const src = this.availableCouponsList || [];
       return src
         .map((item) => {
           const pool = (item.unused_coupons || []).filter((c) => {
-            const d = c.delivered_date || c.created_at;
-            return d ? inRange(d) : true;
+            if (!start || !end) return true;
+
+            // 유효 시작/종료 (가능한 필드 우선순위로 선택)
+            const fromRaw = c.valid_from || c.delivered_date || c.created_at || null;
+            const toRaw = c.valid_to || c.expiration_date || null;
+
+            const from = fromRaw ? dayjs(fromRaw).startOf('day') : null; // null이면 -∞
+            const to = toRaw ? dayjs(toRaw).endOf('day') : null; // null이면  +∞
+
+            return isOverlap(from, to, start, end);
           });
           return { ...item, unused_coupons: pool };
         })
@@ -292,7 +308,6 @@ export default {
   mounted() {
     this.appliedStartDate = this.startDate;
     this.appliedEndDate = this.endDate;
-    this.applyPeriodFilter();
   },
   methods: {
     onCouponPageChange(index) {
