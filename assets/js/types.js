@@ -480,6 +480,13 @@ export const CATEGORY_TYPE = Object.freeze({
   3: '아트숍'
 });
 
+export const CATEGORY_STR_TYPE = Object.freeze({
+  EXHIBITION: '전시',
+  PROGRAM: '프로그램',
+  COFFEE: '커피',
+  ARTSHOP: '아트숍'
+});
+
 export const PAYMENT_METHOD_TYPE = Object.freeze({
   1: '온라인',
   2: '오프라인',
