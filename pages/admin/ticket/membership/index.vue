@@ -388,44 +388,38 @@ export default {
 .admin-table {
   th {
     &:first-of-type {
-      width: 6%;
+      width: 5%;
     }
     &:nth-of-type(2) {
-      width: 26rem;
+      width: 17%;
     }
     &:nth-of-type(3) {
-      width: 16%;
+      width: 8%;
     }
     &:nth-of-type(4) {
-      width: 10%;
+      width: 8%;
     }
     &:nth-of-type(5) {
-      width: 10%;
+      width: 8%;
     }
     &:nth-of-type(6) {
-      width: 10%;
+      width: 7%;
     }
     &:nth-of-type(7) {
-      width: 10%;
+      width: 7%;
     }
     &:nth-of-type(8) {
-      width: 10%;
+      width: 7%;
     }
     &:nth-of-type(9) {
-      width: 10%;
+      width: 7%;
     }
     &:nth-of-type(10) {
-      width: 100px;
+      width: 15%;
       min-width: 7%;
     }
     &:nth-of-type(11) {
-      width: 8%;
-    }
-    &:nth-of-type(12) {
-      width: 10%;
-    }
-    &:nth-of-type(13) {
-      width: 12%;
+      width: 7%;
     }
     &:last-of-type {
       width: 10%;
