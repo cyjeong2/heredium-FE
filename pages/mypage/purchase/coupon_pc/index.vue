@@ -32,7 +32,7 @@
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
                 <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
-                  <!-- 버튼은 열기만 -->
+                  
                   <button class="membership_benefit" @mouseenter="onHoverIn">등급 혜택보기</button>
 
                   <ModalMembershipInfor
