@@ -480,7 +480,7 @@ export const CATEGORY_TYPE = Object.freeze({
   3: '아트숍'
 });
 
-export const CATEGORY_STRING_TYPE = Object.freeze({
+export const CATEGORY_STR_TYPE = Object.freeze({
   EXHIBITION: '전시',
   PROGRAM: '프로그램',
   COFFEE: '커피',
