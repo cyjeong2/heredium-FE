@@ -11,9 +11,12 @@
     <template #content>
       <div @mouseleave="handleMouseLeave" @mouseenter="handleMouseEnter">
         <div class="title-modal">
-          <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
-          <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
-          <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
+          <img
+            v-if="imageSrcByCode(dataMembership.code)"
+            :src="imageSrcByCode(dataMembership.code)"
+            style="width: 48px; height: 48px"
+            alt="membership icon"
+          />
           <span class="name-membership">
             {{ dataMembership.name }} 님의 현재 등급은 <B>{{ dataMembership.membership_name }}</B> 입니다.
           </span>
@@ -23,43 +26,58 @@
             <div class="benefit-box">
               <div class="benefit-row">
                 <div class="left">
-                  <img src="~assets/img/Brown.png" class="membership-icon2" />
+                  <img :src="imageSrcByCode(1)" class="membership-icon2" />
                   <div class="name_target">
-                    <p class="membership-name">CN PASS</p>
+                    <p class="membership-name">{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</p>
                     <p class="membership-target">만 19세 이상 회원</p>
                   </div>
                 </div>
                 <div class="right">
-                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
-                  <p class="benefit-discount"><b>10%</b> 할인</p>
+                  <p class="benefit-info">
+                    <span v-for="(c, i) in getCouponsByCode(1)" :key="c.id || i" class="benefit-cat">
+                      {{ formatCouponText(c) }}
+                    </span>
+                    할인
+                  </p>
                 </div>
               </div>
 
               <div class="benefit-row">
                 <div class="left">
-                  <img src="~assets/img/Terracotta.png" class="membership-icon2" />
+                  <img :src="imageSrcByCode(2)" class="membership-icon2" />
                   <div class="name_target">
-                    <p class="membership-name">CN PASS PLUS</p>
-                    <p class="membership-target">마일리지 70점 달성 CN PASS 회원</p>
+                    <p class="membership-name">{{ (benefitRows.find((item) => item.code === 2) || {}).name }}</p>
+                    <p class="membership-target">
+                      마일리지 {{ benefitRows.find((item) => item.code === 2)?.usage_threshold }}점 달성
+                      {{ benefitRows.find((item) => item.code === 1)?.name }} 회원
+                    </p>
                   </div>
                 </div>
                 <div class="right">
-                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
-                  <p class="benefit-discount"><b>15%</b> 할인</p>
+                  <p class="benefit-info">
+                    <span v-for="(c, i) in getCouponsByCode(2)" :key="c.id || i" class="benefit-cat">
+                      {{ formatCouponText(c) }}
+                    </span>
+                    할인
+                  </p>
                 </div>
               </div>
 
               <div class="benefit-row">
                 <div class="left">
-                  <img src="~assets/img/Green.png" class="membership-icon2" />
+                  <img :src="imageSrcByCode(3)" class="membership-icon2" />
                   <div class="name_target">
-                    <p class="membership-name">CN PASS STUDENT</p>
+                    <p class="membership-name">{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</p>
                     <p class="membership-target">만 19세 미만 회원</p>
                   </div>
                 </div>
                 <div class="right">
-                  <p class="benefit-info">전시, 프로그램, 카페, 아트숍</p>
-                  <p class="benefit-discount"><b>10%</b> 할인</p>
+                  <p class="benefit-info">
+                    <span v-for="(c, i) in getCouponsByCode(3)" :key="c.id || i" class="benefit-cat">
+                      {{ formatCouponText(c) }}
+                    </span>
+                    할인
+                  </p>
                 </div>
               </div>
             </div>
@@ -80,12 +98,15 @@
   >
     <template #title>
       <div class="title-modal only-mobile">
-        <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
-        <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
-        <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
+        <img
+          v-if="imageSrcByCode(dataMembership.code)"
+          :src="imageSrcByCode(dataMembership.code)"
+          style="width: 48px; height: 48px"
+          alt="membership icon"
+        />
         <span class="name-membership only-mobile">
           {{ dataMembership.name }} 님의 현재 등급은<br />
-          <B>{{ dataMembership.membership_name === 'CN PASS PLUS' ? 'CN PASS+' : dataMembership.membership_name }}</B>
+          <B>{{ dataMembership.short_name }}</B>
           입니다.
         </span>
       </div>
@@ -95,29 +116,53 @@
       <div class="benefit only-mobile">
         <div class="benefit-box only-mobile">
           <div class="benefit-row only-mobile">
-            <img src="~assets/img/Brown.png" class="membership-icon2 only-mobile" />
+            <img :src="imageSrcByCode(1)" class="membership-icon2 only-mobile" />
             <div class="name_target">
-              <p class="membership-name only-mobile"><B>CN PASS</B></p>
+              <p class="membership-name only-mobile">
+                <B>{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</B>
+              </p>
               <p class="membership-target only-mobile">만 19세 이상 회원</p>
-              <p class="benefit-info only-mobile">전시, 프로그램, 카페, 아트숍 <b>10%</b> 할인</p>
+              <p class="benefit-info only-mobile">
+                <span v-for="(c, i) in getCouponsByCode(1)" :key="c.id || i" class="benefit-cat">
+                  {{ formatCouponText(c) }}
+                </span>
+                할인
+              </p>
             </div>
           </div>
 
           <div class="benefit-row only-mobile">
-            <img src="~assets/img/Terracotta.png" class="membership-icon2" />
+            <img :src="imageSrcByCode(2)" class="membership-icon2" />
             <div class="name_target only-mobile">
-              <p class="membership-name only-mobile"><B>CN PASS+</B></p>
-              <p class="membership-target only-mobile">마일리지 70점 달성 CN PASS 회원</p>
-              <p class="benefit-info only-mobile">전시, 프로그램, 카페, 아트숍 <b>15%</b> 할인</p>
+              <p class="membership-name only-mobile">
+                <B>{{ (benefitRows.find((item) => item.code === 2) || {}).short_name }}</B>
+              </p>
+              <p class="membership-target only-mobile">
+                마일리지 {{ benefitRows.find((item) => item.code === 2)?.usage_threshold }}점 달성
+                {{ benefitRows.find((item) => item.code === 1)?.name }} 회원
+              </p>
+              <p class="benefit-info only-mobile">
+                <span v-for="(c, i) in getCouponsByCode(2)" :key="c.id || i" class="benefit-cat">
+                  {{ formatCouponText(c) }}
+                </span>
+                할인
+              </p>
             </div>
           </div>
 
           <div class="benefit-row only-mobile">
-            <img src="~assets/img/Green.png" class="membership-icon2" />
+            <img :src="imageSrcByCode(3)" class="membership-icon2" />
             <div class="name_target only-mobile">
-              <p class="membership-name only-mobile"><B>CN PASS STUDENT</B></p>
+              <p class="membership-name only-mobile">
+                <B>{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</B>
+              </p>
               <p class="membership-target only-mobile">만 19세 미만 회원</p>
-              <p class="benefit-info only-mobile">전시, 프로그램, 카페, 아트숍 <b>10%</b> 할인</p>
+              <p class="benefit-info only-mobile">
+                <span v-for="(c, i) in getCouponsByCode(3)" :key="c.id || i" class="benefit-cat">
+                  {{ formatCouponText(c) }}
+                </span>
+                할인
+              </p>
             </div>
           </div>
         </div>
@@ -128,9 +173,12 @@
 
 <script>
 import UModal from '~/components/user/modal/UModal.vue';
+import { imageMixin } from '~/mixins/imageMixin';
+
 export default {
   name: 'ModalMembershipInfor',
   components: { UModal },
+  mixins: [imageMixin],
   model: {
     prop: 'value',
     event: 'input'
@@ -143,7 +191,8 @@ export default {
     value: {
       type: Boolean,
       required: true
-    }
+    },
+    benefitRows: { type: Array, default: () => [] }
   },
   data() {
     return {
@@ -152,7 +201,13 @@ export default {
   },
   computed: {
     isPCUrl() {
-      return this.$route.path.includes('/mypage/purchase/membership_pc') || this.$route.path.includes('/mypage/purchase/coupon_pc');
+      return (
+        this.$route.path.includes('/mypage/purchase/membership_pc') ||
+        this.$route.path.includes('/mypage/purchase/coupon_pc')
+      );
+    },
+    couponImageSrc() {
+      return this.getImage(this.dataMembership.image_url);
     }
   },
   beforeDestroy() {
@@ -166,10 +221,31 @@ export default {
       this.$emit('close');
     },
     handleMouseLeave() {
-       this.$emit('hover-out')
+      this.$emit('hover-out');
     },
     handleMouseEnter() {
       this.$emit('hover-in');
+    },
+    getCouponsByCode(code) {
+      const rows = Array.isArray(this.benefitRows) ? this.benefitRows : [];
+      const row = rows.find((r) => Number(r.code) === Number(code));
+      return row && Array.isArray(row.coupons) ? row.coupons : [];
+    },
+    imageSrcByCode(code) {
+      const rows = Array.isArray(this.benefitRows) ? this.benefitRows : [];
+      const row = rows.find((r) => Number(r.code) === Number(code));
+      return row && row.image_url ? this.getImage(row.image_url) : null;
+    },
+    formatCouponText(c) {
+      if (!c) return '';
+      // 1) discount_percent 필드가 있으면 우선 사용
+      const pctFromField = c.discount_percent ?? c.discountPercent;
+      // 2) 없으면 name 문자열에서 끝자리 숫자 추출
+      const m = String(c.name || '').match(/^(.*?)(\d+)\s*%?$/);
+      const label = m ? m[1].trim() : (c.name || '').trim();
+      const pct = pctFromField != null ? pctFromField : m ? m[2] : '';
+
+      return pct ? `${label} ${pct}%` : label; // 예: "커피 10%"
     }
   }
 };
@@ -284,12 +360,13 @@ export default {
   .right {
     flex: 1;
     .benefit-info {
-      font-size: 14px;
+      font-size: 1.3rem;
       margin-bottom: -0.7rem;
+      text-align: left;
     }
 
     .benefit-discount {
-      font-size: 14px;
+      font-size: 1.3rem;
       b {
         font-weight: bold;
       }
@@ -308,13 +385,30 @@ export default {
   display: block;
   font-size: 1.3rem;
 }
+.benefit-info {
+  display: inline-block;
+  line-height: 1.6;
+}
 
+.benefit-info .benefit-cat {
+  display: inline;
+  margin-right: 8px;
+}
+
+.benefit-info .benefit-cat:nth-of-type(2)::after {
+  content: '';
+  display: block;
+}
+
+.benefit-info .benefit-cat:last-of-type {
+  margin-right: 0;
+}
 // 모바일 CSS
 .modal-custom.only-mobile {
   ::v-deep .modal-inner {
     width: 90% !important;
     max-width: 90vw;
-    height: 57% !important;
+    height: 61% !important;
     border-radius: 24px;
     position: absolute;
     top: 50% !important;

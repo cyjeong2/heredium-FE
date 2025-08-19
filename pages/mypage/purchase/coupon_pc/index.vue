@@ -8,9 +8,12 @@
       <div class="ticketing-body">
         <div class="membership_info">
           <div class="membership_icon">
-            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" />
-            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" />
-            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" />
+            <img
+              v-if="imageSrcByCode(dataMembership.code)"
+              :src="imageSrcByCode(dataMembership.code)"
+              style="width: 48px; height: 48px"
+              alt="membership icon"
+            />
           </div>
           <div class="name_membership">
             <div>
@@ -19,7 +22,16 @@
               </p>
               <div class="mileage_condition">
                 <p v-if="dataMembership.code === 1">
-                  마일리지 <B>{{ Math.max(0, 70 - totalMileage) }}</B> 적립시 업그레이드 됩니다.
+                  마일리지
+                  <B
+                    >{{
+                      Math.max(
+                        0,
+                        (membershipBenefit.items.find((item) => item.code === 2)?.usage_threshold || 0) - totalMileage
+                      )
+                    }}점</B
+                  >
+                  적립시 업그레이드 됩니다.
                 </p>
                 <p v-if="dataMembership.code === 2">
                   업그레이드 등급 유지기간
@@ -32,7 +44,6 @@
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
                 <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
-                  
                   <button class="membership_benefit" @mouseenter="onHoverIn">등급 혜택보기</button>
 
                   <ModalMembershipInfor
@@ -41,6 +52,7 @@
                     :is-modal-visible="showModal"
                     :data-membership="dataMembership"
                     class="transparent-modal"
+                    :benefit-rows="(membershipBenefit && membershipBenefit.items) || []"
                     @hover-in="onHoverIn"
                     @hover-out="onHoverOut"
                   />
@@ -53,8 +65,9 @@
                   적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
                 </p>
                 <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 CN PASS 등급으로 전환되며, <br />
-                  CN PASS STUDENT 회원의 경우 마일리지 적립이 불가합니다.
+                  <B>만 19세</B>가 도래하는 경우
+                  {{ membershipBenefit.items.find((item) => item.code === 1)?.name }} 등급으로 전환되며, <br />
+                  {{ dataMembership.membership_name }} 회원의 경우 마일리지 적립이 불가합니다.
                 </p>
               </div>
             </div>
@@ -146,10 +159,12 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
 import UPageable from '~/components/user/common/UPageable';
 import CouponList from '~/components/user/page/coupon/CouponList.vue';
+import { imageMixin } from '~/mixins/imageMixin';
 
 export default {
   name: 'MembershipAndCouponPage',
   components: { SideBarMyPage, ModalMembershipInfor, UDatepicker, CouponList, UPageable },
+  mixins: [imageMixin],
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
@@ -160,7 +175,7 @@ export default {
     const totalMileage = mileageRes.totalMileage;
 
     const couponList = await $axios.$get('/user/coupons/usage');
-    // const membershipNameinfo = await $axios.$get('/user/membership/name');
+    const membershipBenefit = await $axios.$get('/user/membership/benefit');
     const usedCouponsList = couponList.filter((item) => (item.used_coupons?.length || 0) > 0);
 
     const availableCouponsList = couponList
@@ -175,7 +190,7 @@ export default {
       totalMileage,
       availableCouponsList,
       usedCouponsList,
-      // membershipNameinfo,
+      membershipBenefit,
       startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
       endDate: dayjs().format('YYYY-MM-DD')
     };
@@ -364,6 +379,12 @@ export default {
         this.showModal = false;
         this.hideTimer = null;
       }, 80);
+    },
+    imageSrcByCode(code) {
+      const rows = (this.membershipBenefit && this.membershipBenefit.items) || [];
+      const row = rows.find((r) => Number(r.code) === Number(code));
+      if (row && row.image_url) return this.getImage(row.image_url);
+      return null;
     }
   }
 };

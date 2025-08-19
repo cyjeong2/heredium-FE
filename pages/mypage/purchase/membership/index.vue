@@ -10,17 +10,18 @@
       <div class="ticketing-body">
         <div class="membership_info">
           <div class="membership_icon">
-            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" style="width: 48px; height: 48px" />
-            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" style="width: 48px; height: 48px" />
-            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" style="width: 48px; height: 48px" />
+            <img
+              v-if="imageSrcByCode(dataMembership.code)"
+              :src="imageSrcByCode(dataMembership.code)"
+              style="width: 48px; height: 48px"
+              alt="membership icon"
+            />
           </div>
           <div class="name_membership">
             <div>
               <p class="name_class">
                 {{ dataMembership.name }} 님의 현재 등급은<br />
-                <B>{{
-                  dataMembership.membership_name === 'CN PASS PLUS' ? 'CN PASS+' : dataMembership.membership_name
-                }}</B>
+                <B>{{ dataMembership.short_name }}</B>
                 입니다.
               </p>
               <div class="mileage_description">
@@ -29,13 +30,24 @@
                   적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
                 </p>
                 <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 CN PASS 등급으로 전환되며, <br />
-                  CN PASS STUDENT 회원의 경우 마일리지 적립이 불가합니다.
+                  <B>만 19세</B>가 도래하는 경우
+                  {{ membershipBenefit.items.find((item) => item.code === 1)?.short_name }} 등급으로 전환되며, <br />
+                  {{ dataMembership.short_name }} 회원의 경우 마일리지 적립이 불가합니다.
                 </p>
               </div>
               <div class="mileage_condition">
                 <p v-if="dataMembership.code === 1">
-                  마일리지 <B>{{ Math.max(0, 70 - mileageList.totalMileage) }}점</B> 적립시 <br />
+                  마일리지
+                  <B
+                    >{{
+                      Math.max(
+                        0,
+                        (membershipBenefit.items.find((item) => item.code === 2)?.usage_threshold || 0) -
+                          mileageList.totalMileage
+                      )
+                    }}점</B
+                  >
+                  적립시 <br />
                   업그레이드 됩니다.
                 </p>
                 <p v-if="dataMembership.code === 2">
@@ -57,13 +69,14 @@
                     :is-modal-visible="showModal"
                     :data-membership="dataMembership"
                     class="transparent-modal"
+                    :benefit-rows="(membershipBenefit && membershipBenefit.items) || []"
                   />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div v-if="dataMembership.code !==3" class="mileage_summary_table">
+        <div v-if="dataMembership.code !== 3" class="mileage_summary_table">
           <table>
             <tr>
               <th>현재 나의 마일리지</th>
@@ -156,7 +169,7 @@
                             : [0, 4, 5].includes(item.type)
                             ? `+${item.mileageAmount}M`
                             : [2, 3].includes(item.type)
-                            ? `-${item.mileageAmount}M`
+                            ? `${item.mileageAmount}M`
                             : '-'
                         }}
                       </b>
@@ -186,10 +199,13 @@ import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import { MILEAGE_EVENT_TYPE } from '~/assets/js/types';
+import { imageMixin } from '~/mixins/imageMixin';
 
 export default {
   name: 'MembershipAndCouponPage',
   components: { UPageable, NoMileage, ModalMembershipInfor, UDatepicker, SideBarMyPage },
+  mixins: [imageMixin],
+
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
@@ -197,10 +213,11 @@ export default {
     const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
       params: { page: 0, size: initialPageSize }
     });
-
+    const membershipBenefit = await $axios.$get('/user/membership/benefit');
     const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
     return {
       dataMembership,
+      membershipBenefit,
       mileageList: mileageListRes,
       mileage_list: {
         content: mileageListRes.content,
@@ -291,6 +308,17 @@ export default {
         this.mileageList = { totalMileage: 0 };
       }
     },
+    imageSrcByCode(code) {
+      const rows = (this.membershipBenefit && this.membershipBenefit.items) || [];
+      const row = rows.find((r) => Number(r.code) === Number(code));
+      if (row && row.image_url) return this.getImage(row.image_url);
+      return null;
+    },
+    getMembershipLabelByCode(code) {
+      const items = (this.membershipBenefit && this.membershipBenefit.items) || [];
+      const row = items.find((r) => Number(r.code) === Number(code));
+      return row ? row.short_name || row.name : null;
+    },
     formatTypeCategory(type, category) {
       const t = Number(type);
       const typeLabel = MILEAGE_EVENT_TYPE?.[t];
@@ -301,8 +329,10 @@ export default {
         ARTSHOP: '아트숍'
       };
 
-      if (t === 1) return '[사용] CN PASS PLUS 등급 업그레이드';
-      if (t === 6) return '[취소] CN PASS PLUS 등급 취소';
+      const upgradeLabel = this.getMembershipLabelByCode(2);
+
+      if (t === 1) return `[사용] ${upgradeLabel} 등급 업그레이드`;
+      if (t === 6) return `[취소] ${upgradeLabel} 등급 취소`;
 
       if (category !== null && category !== undefined) {
         const catKo = categoryMap[category] || '기타';
