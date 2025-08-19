@@ -193,7 +193,7 @@ import SLink from '~/components/admin/commons/SLink';
 import SButton from '~/components/admin/commons/SButton';
 import SPageable from '~/components/admin/commons/SPageable';
 import SProgressTab from '~/components/admin/commons/SProgressTab';
-import { CATEGORY_TYPE, PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
+import { PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE, CATEGORY_STRING_TYPE } from '~/assets/js/types';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 import MileageForm from '~/components/admin/page/membership/MileageForm.vue';
 import CancelReasonForm from '~/components/admin/page/membership/CancelReasonForm.vue';
@@ -254,7 +254,7 @@ export default {
       }
     },
     getCategoryText(code) {
-      return CATEGORY_TYPE[code] || '-';
+      return CATEGORY_STRING_TYPE[code] || '-';
     },
     getPaymentMethodText(code) {
       // PAYMENT_METHOD_TYPE 이 undefined 면 빈 객체로 대체
