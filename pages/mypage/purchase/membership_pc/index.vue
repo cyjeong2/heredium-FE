@@ -31,7 +31,7 @@
                 </p>
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
-                <div class="benefit-hover-wrapper">
+                <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
                   <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
                     등급 혜택보기
                   </button>
@@ -52,17 +52,18 @@
                   적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
                 </p>
                 <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
-                  Green 회원의 경우 마일리지 적립이 불가합니다.
+                  <!-- db에서 가져온 등급으로 처리할 것 -->
+                  <B>만 19세</B>가 도래하는 경우 CN PASS 등급으로 전환되며, <br />
+                  CN PASS STUDENT 회원의 경우 마일리지 적립이 불가합니다.
                 </p>
               </div>
             </div>
           </div>
-          <div class="mileage_summary">
+          <div v-if="dataMembership.code !==3" class="mileage_summary">
             <div>현재 나의 마일리지</div>
             <div>소멸 예정 마일리지</div>
           </div>
-          <div class="show_mileage">
+          <div v-if="dataMembership.code !==3" class="show_mileage">
             <div class="mileage_total">
               <span style="font-size: 28px"> {{ dataMembership.code === 3 ? '-' : mileageList.totalMileage }} </span>M
             </div>
@@ -138,7 +139,9 @@
                     <td>{{ formatTypeCategory(item.type, item.category) }}</td>
                     <td>{{ item.expirationDate ? formatDate(item.expirationDate) : '-' }}</td>
                     <td>
-                      <b>{{ item.type === 6 ? '초기화' : [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-' }}</b>
+                      <b>{{
+                        item.type === 6 ? '초기화' : [0, 4, 5].includes(item.type) ? `+${item.mileageAmount}M` : '-'
+                      }}</b>
                     </td>
                     <td>
                       <b>{{
@@ -181,7 +184,6 @@ export default {
     const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
       params: { page: 0, size: initialPageSize }
     });
-    console.log(mileageListRes);
     const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
     return {
       dataMembership,
@@ -297,7 +299,7 @@ export default {
 
         const suffixByType = {
           2: '유효기간 경과',
-          3: '취소',
+          3: '취소'
         };
         const suffix = suffixByType[t];
 
@@ -506,6 +508,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  max-width: 30px;
+  max-height: 30px;
   margin-top: 20px;
   margin-left: 1.2rem;
 }
@@ -537,6 +541,10 @@ export default {
 .benefit-hover-wrapper {
   position: relative;
 }
+.benefit-hover-wrapper.push-right {
+  margin-left: auto;
+}
+
 .membership_benefit {
   background-color: #111111 !important;
   color: #ffffff;

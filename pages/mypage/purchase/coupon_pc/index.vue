@@ -31,7 +31,7 @@
                 </p>
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
-                <div class="benefit-hover-wrapper">
+                <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
                   <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
                     등급 혜택보기
                   </button>
@@ -52,8 +52,8 @@
                   적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
                 </p>
                 <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
-                  Green 회원의 경우 마일리지 적립이 불가합니다.
+                  <B>만 19세</B>가 도래하는 경우 CN PASS 등급으로 전환되며, <br />
+                  CN PASS STUDENT 회원의 경우 마일리지 적립이 불가합니다.
                 </p>
               </div>
             </div>
@@ -159,8 +159,7 @@ export default {
     const totalMileage = mileageRes.totalMileage;
 
     const couponList = await $axios.$get('/user/coupons/usage');
-    console.log(couponList);
-
+    // const membershipNameinfo = await $axios.$get('/user/membership/name')
     const usedCouponsList = couponList.filter((item) => (item.used_coupons?.length || 0) > 0);
 
     const availableCouponsList = couponList
@@ -169,7 +168,6 @@ export default {
         unused_coupons: (item.unused_coupons || []).filter((c) => !c.is_expired)
       }))
       .filter((item) => item.unused_coupons.length > 0);
-    console.log('available', availableCouponsList?.length, 'used', usedCouponsList?.length);
 
     return {
       dataMembership,
@@ -510,6 +508,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  max-width: 30px;
+  max-height: 30px;
   margin-top: 20px;
   margin-left: 1.2rem;
 }
@@ -541,6 +541,10 @@ export default {
 .benefit-hover-wrapper {
   position: relative;
 }
+.benefit-hover-wrapper.push-right {
+  margin-left: auto;
+}
+
 .membership_benefit {
   background-color: #111111 !important;
   color: #ffffff;

@@ -29,8 +29,8 @@
                   적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
                 </p>
                 <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
-                  Green 회원의 경우 마일리지 적립이 불가합니다.
+                  <B>만 19세</B>가 도래하는 경우 CN PASS 등급으로 전환되며, <br />
+                  CN PASS STUDENT 회원의 경우 마일리지 적립이 불가합니다.
                 </p>
               </div>
               <div class="mileage_condition">
@@ -63,7 +63,7 @@
             </div>
           </div>
         </div>
-        <div class="mileage_summary_table">
+        <div v-if="dataMembership.code !==3" class="mileage_summary_table">
           <table>
             <tr>
               <th>현재 나의 마일리지</th>
@@ -510,6 +510,7 @@ export default {
   color: #666666;
   font-size: 1.2rem;
 }
+
 .benefit-hover-wrapper {
   position: relative;
 }

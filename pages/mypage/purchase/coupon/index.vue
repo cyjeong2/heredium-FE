@@ -29,8 +29,8 @@
                   적립된 마일리지에 따라 <B>등급별 혜택</B>이 제공됩니다
                 </p>
                 <p v-if="dataMembership.code === 3">
-                  <B>만 19세</B>가 도래하는 경우 Brown 등급으로 전환되며, <br />
-                  Green 회원의 경우 마일리지 적립이 불가합니다.
+                  <B>만 19세</B>가 도래하는 경우 CN PASS 등급으로 전환되며, <br />
+                  CN PASS STUDENT 회원의 경우 마일리지 적립이 불가합니다.
                 </p>
               </div>
               <div class="mileage_condition">
@@ -166,7 +166,6 @@ export default {
     const totalMileage = mileageRes.totalMileage;
 
     const couponList = await $axios.$get('/user/coupons/usage');
-    console.log(couponList);
 
     const usedCouponsList = couponList.filter((item) => (item.used_coupons?.length || 0) > 0);
 
@@ -176,7 +175,6 @@ export default {
         unused_coupons: (item.unused_coupons || []).filter((c) => !c.is_expired)
       }))
       .filter((item) => item.unused_coupons.length > 0);
-    console.log('available', availableCouponsList?.length, 'used', usedCouponsList?.length);
 
     return {
       dataMembership,
@@ -236,7 +234,7 @@ export default {
         return beginsBeforeBEnd && endsAfterBStart;
       };
 
-      // 사용 쿠폰은 사용일 기준 (fallback: created_at)
+      // 사용 쿠폰은 사용일 기준
       if (this.activeTab === 'used') {
         const src = this.usedCouponsList || [];
         return src
@@ -761,12 +759,6 @@ export default {
   th:nth-child(2),
   td:nth-child(2) {
     width: 35%;
-  }
-
-  .mileage-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
   }
 
   .created-date {
