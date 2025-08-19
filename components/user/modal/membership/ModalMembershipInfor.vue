@@ -166,16 +166,10 @@ export default {
       this.$emit('close');
     },
     handleMouseLeave() {
-      this.closeTimer = setTimeout(() => {
-        this.handleClose();
-      }, 200);
+       this.$emit('hover-out')
     },
     handleMouseEnter() {
-      // 마우스가 다시 들어오면 닫기 타이머 취소
-      if (this.closeTimer) {
-        clearTimeout(this.closeTimer);
-        this.closeTimer = null;
-      }
+      this.$emit('hover-in');
     }
   }
 };

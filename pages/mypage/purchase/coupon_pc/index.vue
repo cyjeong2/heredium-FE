@@ -32,9 +32,8 @@
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
                 <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
-                  <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
-                    등급 혜택보기
-                  </button>
+                  <!-- 버튼은 열기만 -->
+                  <button class="membership_benefit" @mouseenter="onHoverIn">등급 혜택보기</button>
 
                   <ModalMembershipInfor
                     v-if="showModal"
@@ -42,6 +41,8 @@
                     :is-modal-visible="showModal"
                     :data-membership="dataMembership"
                     class="transparent-modal"
+                    @hover-in="onHoverIn"
+                    @hover-out="onHoverOut"
                   />
                 </div>
               </div>
@@ -159,7 +160,7 @@ export default {
     const totalMileage = mileageRes.totalMileage;
 
     const couponList = await $axios.$get('/user/coupons/usage');
-    // const membershipNameinfo = await $axios.$get('/user/membership/name')
+    // const membershipNameinfo = await $axios.$get('/user/membership/name');
     const usedCouponsList = couponList.filter((item) => (item.used_coupons?.length || 0) > 0);
 
     const availableCouponsList = couponList
@@ -174,6 +175,7 @@ export default {
       totalMileage,
       availableCouponsList,
       usedCouponsList,
+      // membershipNameinfo,
       startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
       endDate: dayjs().format('YYYY-MM-DD')
     };
@@ -192,6 +194,7 @@ export default {
       selectedFilter: '1개월',
       pageSizeForLoad: 5,
       showModal: false,
+      hideTimer: null,
 
       appliedStartDate: null,
       appliedEndDate: null
@@ -348,6 +351,19 @@ export default {
     },
     closeModal() {
       this.showModal = false;
+    },
+    onHoverIn() {
+      if (this.hideTimer) {
+        clearTimeout(this.hideTimer);
+        this.hideTimer = null;
+      }
+      this.showModal = true;
+    },
+    onHoverOut() {
+      this.hideTimer = setTimeout(() => {
+        this.showModal = false;
+        this.hideTimer = null;
+      }, 80);
     }
   }
 };
@@ -561,7 +577,6 @@ export default {
   transform: translateX(-50%);
   z-index: 10;
   margin-top: 10px;
-  pointer-events: none;
 }
 .modal_title {
   display: flex;
