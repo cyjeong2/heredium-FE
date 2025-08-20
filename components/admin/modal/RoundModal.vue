@@ -22,36 +22,40 @@
             <SButton v-if="isBatch || !getIsDisabled" w-size="small" h-size="small" @click="addRound">추가</SButton>
           </div>
           <div class="round-list">
-            <div v-if="!roundList || !roundList[0]" class="round-item-empty tm-2r">회차 리스트가 없습니다.</div>
-            <div v-for="(item, index) in roundList" v-else :key="index" class="round-item">
-              <div class="label">
-                <p>{{ index + 1 }}회차</p>
-              </div>
-              <div class="option">
-                <div class="option-item">
-                  <SSelect
-                    v-model="item.hour"
-                    :option-list="hourOptions1"
-                    w-size="small"
-                    :disabled="!isBatch && getIsDisabled"
-                    @change="sortRoundList"
-                  />
-                  <span class="divider tm-1b">:</span>
-                  <SSelect
-                    v-model="item.min"
-                    :option-list="minOptions"
-                    w-size="small"
-                    :disabled="!isBatch && getIsDisabled"
-                    @change="sortRoundList"
-                  />
+            <template v-if="roundList && roundList.length">
+              <div v-for="(item, index) in roundList" :key="index" class="round-item">
+                <div class="label">
+                  <p>{{ index + 1 }}회차</p>
                 </div>
-                <div class="option-limit">
-                  최대 인원
-                  <SInput v-model="item.maxPeople" text-align="right" is-comma-num />
-                  명
+                <div class="option">
+                  <div class="option-item">
+                    <SSelect
+                      v-model="item.hour"
+                      :option-list="hourOptions1"
+                      w-size="small"
+                      :disabled="!isBatch && getIsDisabled"
+                      @change="sortRoundList"
+                    />
+                    <span class="divider tm-1b">:</span>
+                    <SSelect
+                      v-model="item.min"
+                      :option-list="minOptions"
+                      w-size="small"
+                      :disabled="!isBatch && getIsDisabled"
+                      @change="sortRoundList"
+                    />
+                  </div>
+                  <div class="option-limit">
+                    최대 인원
+                    <SInput v-model="item.maxPeople" text-align="right" is-comma-num />
+                    명
+                  </div>
                 </div>
+                <button v-if="!getIsDisabled" type="button" @click="deleteRound(index)"><i class="ic-close" /></button>
               </div>
-              <button v-if="!getIsDisabled" type="button" @click="deleteRound(index)"><i class="ic-close" /></button>
+            </template>
+            <div v-else class="round-item-empty tm-2r">
+              회차 리스트가 없습니다.
             </div>
           </div>
         </div>
