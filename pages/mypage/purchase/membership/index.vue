@@ -198,7 +198,7 @@ import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
 import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
-import { MILEAGE_EVENT_TYPE } from '~/assets/js/types';
+import { CATEGORY_STR_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
 import { imageMixin } from '~/mixins/imageMixin';
 
 export default {
@@ -322,12 +322,6 @@ export default {
     formatTypeCategory(type, category) {
       const t = Number(type);
       const typeLabel = MILEAGE_EVENT_TYPE?.[t];
-      const categoryMap = {
-        EXHIBITION: '전시',
-        PROGRAM: '프로그램',
-        COFFEE: '커피',
-        ARTSHOP: '아트숍'
-      };
 
       const upgradeLabel = this.getMembershipLabelByCode(2);
 
@@ -335,7 +329,7 @@ export default {
       if (t === 6) return `[취소] ${upgradeLabel} 등급 취소`;
 
       if (category !== null && category !== undefined) {
-        const catKo = categoryMap[category] || '기타';
+        const catKo = CATEGORY_STR_TYPE[category] || '기타';
         const categoryName = `${catKo}`;
 
         const isAdded = [0, 4, 5].includes(t);

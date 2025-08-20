@@ -4,12 +4,14 @@
     v-if="isPCUrl"
     :is-show="value"
     class="modal-custom only-pc"
+    :class="['modal-custom', 'only-pc', { 'cursor-pos': positionMode === 'cursor' }]"
+    :style="modalStyleVars"
     :hide-edge-close-btn="true"
     :background-white="true"
     @close="handleClose"
   >
     <template #content>
-      <div @mouseleave="handleMouseLeave" @mouseenter="handleMouseEnter">
+      <div>
         <div class="title-modal">
           <img
             v-if="imageSrcByCode(dataMembership.code)"
@@ -33,12 +35,12 @@
                   </div>
                 </div>
                 <div class="right">
-                  <p class="benefit-info">
-                    <span v-for="(c, i) in getCouponsByCode(1)" :key="c.id || i" class="benefit-cat">
+                  <div class="benefit-grid" :class="{ 'one-row': getOrderedCouponsByCode(1).length <= 2 }">
+                    <span v-for="(c, i) in getOrderedCouponsByCode(1)" :key="c.id || i" class="benefit-cat">
                       {{ formatCouponText(c) }}
                     </span>
-                    할인
-                  </p>
+                    <span class="discount-suffix">할인</span>
+                  </div>
                 </div>
               </div>
 
@@ -54,12 +56,12 @@
                   </div>
                 </div>
                 <div class="right">
-                  <p class="benefit-info">
-                    <span v-for="(c, i) in getCouponsByCode(2)" :key="c.id || i" class="benefit-cat">
+                  <div class="benefit-grid" :class="{ 'one-row': getOrderedCouponsByCode(2).length <= 2 }">
+                    <span v-for="(c, i) in getOrderedCouponsByCode(2)" :key="c.id || i" class="benefit-cat">
                       {{ formatCouponText(c) }}
                     </span>
-                    할인
-                  </p>
+                    <span class="discount-suffix">할인</span>
+                  </div>
                 </div>
               </div>
 
@@ -72,12 +74,12 @@
                   </div>
                 </div>
                 <div class="right">
-                  <p class="benefit-info">
-                    <span v-for="(c, i) in getCouponsByCode(3)" :key="c.id || i" class="benefit-cat">
+                  <div class="benefit-grid" :class="{ 'one-row': getOrderedCouponsByCode(3).length <= 2 }">
+                    <span v-for="(c, i) in getOrderedCouponsByCode(3)" :key="c.id || i" class="benefit-cat">
                       {{ formatCouponText(c) }}
                     </span>
-                    할인
-                  </p>
+                    <span class="discount-suffix">할인</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -122,12 +124,12 @@
                 <B>{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</B>
               </p>
               <p class="membership-target only-mobile">만 19세 이상 회원</p>
-              <p class="benefit-info only-mobile">
-                <span v-for="(c, i) in getCouponsByCode(1)" :key="c.id || i" class="benefit-cat">
+              <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(1).length <= 2 }">
+                <span v-for="(c, i) in getOrderedCouponsByCode(1)" :key="c.id || i" class="benefit-cat only-mobile">
                   {{ formatCouponText(c) }}
                 </span>
-                할인
-              </p>
+                <span class="discount-suffix only-mobile">할인</span>
+              </div>
             </div>
           </div>
 
@@ -141,12 +143,12 @@
                 마일리지 {{ benefitRows.find((item) => item.code === 2)?.usage_threshold }}점 달성
                 {{ benefitRows.find((item) => item.code === 1)?.name }} 회원
               </p>
-              <p class="benefit-info only-mobile">
-                <span v-for="(c, i) in getCouponsByCode(2)" :key="c.id || i" class="benefit-cat">
+              <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(2).length <= 2 }">
+                <span v-for="(c, i) in getOrderedCouponsByCode(2)" :key="c.id || i" class="benefit-cat only-mobile">
                   {{ formatCouponText(c) }}
                 </span>
-                할인
-              </p>
+                <span class="discount-suffix only-mobile">할인</span>
+              </div>
             </div>
           </div>
 
@@ -157,12 +159,12 @@
                 <B>{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</B>
               </p>
               <p class="membership-target only-mobile">만 19세 미만 회원</p>
-              <p class="benefit-info only-mobile">
-                <span v-for="(c, i) in getCouponsByCode(3)" :key="c.id || i" class="benefit-cat">
+              <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(3).length <= 2 }">
+                <span v-for="(c, i) in getOrderedCouponsByCode(3)" :key="c.id || i" class="benefit-cat only-mobile">
                   {{ formatCouponText(c) }}
                 </span>
-                할인
-              </p>
+                <span class="discount-suffix only-mobile">할인</span>
+              </div>
             </div>
           </div>
         </div>
@@ -173,7 +175,10 @@
 
 <script>
 import UModal from '~/components/user/modal/UModal.vue';
+import { CATEGORY_STR_TYPE } from '~/assets/js/types';
 import { imageMixin } from '~/mixins/imageMixin';
+
+const TYPE_ORDER = ['EXHIBITION', 'PROGRAM', 'COFFEE', 'ARTSHOP'];
 
 export default {
   name: 'ModalMembershipInfor',
@@ -192,7 +197,9 @@ export default {
       type: Boolean,
       required: true
     },
-    benefitRows: { type: Array, default: () => [] }
+    benefitRows: { type: Array, default: () => [] },
+    positionMode: { type: String, default: '' },
+    anchorPos: { type: Object, default: null }
   },
   data() {
     return {
@@ -208,6 +215,28 @@ export default {
     },
     couponImageSrc() {
       return this.getImage(this.dataMembership.image_url);
+    },
+    modalStyleVars() {
+      if (this.positionMode !== 'cursor' || !this.anchorPos) return {};
+
+      const MODAL_W = 530;
+      const MODAL_H = 410;
+      const PADDING = 8;
+      const OFFSET_Y = 12;
+
+      const vw = typeof window !== 'undefined' ? window.innerWidth : 1920;
+      const vh = typeof window !== 'undefined' ? window.innerHeight : 1080;
+
+      let left = this.anchorPos.x;
+      let top = this.anchorPos.y + OFFSET_Y;
+
+      left = Math.max(PADDING, Math.min(left, vw - MODAL_W - PADDING));
+      top = Math.max(PADDING, Math.min(top, vh - MODAL_H - PADDING));
+
+      return {
+        '--cursor-left': left + 'px',
+        '--cursor-top': top + 'px'
+      };
     }
   },
   beforeDestroy() {
@@ -220,12 +249,6 @@ export default {
       this.$emit('input', false);
       this.$emit('close');
     },
-    handleMouseLeave() {
-      this.$emit('hover-out');
-    },
-    handleMouseEnter() {
-      this.$emit('hover-in');
-    },
     getCouponsByCode(code) {
       const rows = Array.isArray(this.benefitRows) ? this.benefitRows : [];
       const row = rows.find((r) => Number(r.code) === Number(code));
@@ -236,16 +259,26 @@ export default {
       const row = rows.find((r) => Number(r.code) === Number(code));
       return row && row.image_url ? this.getImage(row.image_url) : null;
     },
+    // 타입 순서 고정 정렬
+    getOrderedCouponsByCode(code) {
+      const list = this.getCouponsByCode(code);
+      return [...list].sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
+    },
+    chunkByTwo(arr) {
+      const out = [];
+      for (let i = 0; i < arr.length; i += 2) out.push(arr.slice(i, i + 2));
+      return out.slice(0, 2);
+    },
     formatCouponText(c) {
       if (!c) return '';
-      // 1) discount_percent 필드가 있으면 우선 사용
-      const pctFromField = c.discount_percent ?? c.discountPercent;
-      // 2) 없으면 name 문자열에서 끝자리 숫자 추출
-      const m = String(c.name || '').match(/^(.*?)(\d+)\s*%?$/);
-      const label = m ? m[1].trim() : (c.name || '').trim();
-      const pct = pctFromField != null ? pctFromField : m ? m[2] : '';
 
-      return pct ? `${label} ${pct}%` : label; // 예: "커피 10%"
+      // 타입 한글 매핑
+      const typeKo = CATEGORY_STR_TYPE[c.type] || c.type || '';
+
+      // 할인율
+      const pct = c.discount_percent ?? c.discountPercent ?? '';
+
+      return pct ? `${typeKo} ${pct}%` : typeKo;
     }
   }
 };
@@ -374,6 +407,45 @@ export default {
   }
 }
 
+.right .benefit-grid {
+  display: grid;
+  grid-template-columns: max-content max-content auto;
+  grid-auto-rows: auto;
+  column-gap: 12px;
+  align-items: baseline;
+  font-size: 1.3rem; /* 기존과 동일 */
+}
+
+.right .benefit-grid .benefit-cat:nth-of-type(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.right .benefit-grid .benefit-cat:nth-of-type(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+.right .benefit-grid .benefit-cat:nth-of-type(3) {
+  grid-column: 1;
+  grid-row: 2;
+}
+.right .benefit-grid .benefit-cat:nth-of-type(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.right .benefit-grid .discount-suffix {
+  grid-column: 3;
+  grid-row: 2;
+  white-space: nowrap;
+}
+
+.right .benefit-grid.one-row {
+  grid-template-columns: max-content max-content auto;
+}
+.right .benefit-grid.one-row .discount-suffix {
+  grid-row: 1;
+}
+
 .title {
   font-size: 1.3rem;
 }
@@ -386,7 +458,7 @@ export default {
   font-size: 1.3rem;
 }
 .benefit-info {
-  display: inline-block;
+  display: block;
   line-height: 1.6;
 }
 
@@ -402,6 +474,14 @@ export default {
 
 .benefit-info .benefit-cat:last-of-type {
   margin-right: 0;
+}
+.modal-custom.cursor-pos {
+  ::v-deep .modal-inner {
+    position: absolute;
+    top: var(--cursor-top, 60%) !important;
+    left: var(--cursor-left, 60%) !important;
+    transform: none !important;
+  }
 }
 // 모바일 CSS
 .modal-custom.only-mobile {
@@ -489,6 +569,45 @@ export default {
       }
     }
   }
+}
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  grid-auto-rows: auto;
+  row-gap: 2px;
+  column-gap: 12px;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .benefit-cat.only-mobile:nth-of-type(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .benefit-cat.only-mobile:nth-of-type(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .benefit-cat.only-mobile:nth-of-type(3) {
+  grid-column: 1;
+  grid-row: 2;
+}
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .benefit-cat.only-mobile:nth-of-type(4) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .discount-suffix.only-mobile {
+  grid-column: 3;
+  grid-row: 2;
+  white-space: nowrap;
+  justify-self: start;
+  min-width: 0;
+}
+
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile.one-row .discount-suffix.only-mobile {
+  grid-row: 1;
 }
 .modal-custom.only-mobile ::v-deep .modal-wrap {
   pointer-events: auto !important;

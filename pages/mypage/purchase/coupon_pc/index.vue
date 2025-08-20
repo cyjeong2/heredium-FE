@@ -43,8 +43,16 @@
                 </p>
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
-                <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
-                  <button class="membership_benefit" @mouseenter="onHoverIn">등급 혜택보기</button>
+                <div
+                  class="benefit-hover-wrapper"
+                  :class="{ 'push-right': dataMembership.code === 3 }"
+                  @mouseenter="onHoverIn"
+                  @mouseleave="onHoverOut"
+                  @mousemove="onHoverMove"
+                >
+                  <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
+                    등급 혜택보기
+                  </button>
 
                   <ModalMembershipInfor
                     v-if="showModal"
@@ -53,8 +61,8 @@
                     :data-membership="dataMembership"
                     class="transparent-modal"
                     :benefit-rows="(membershipBenefit && membershipBenefit.items) || []"
-                    @hover-in="onHoverIn"
-                    @hover-out="onHoverOut"
+                    :position-mode="'cursor'"
+                    :anchor-pos="hoverPos"
                   />
                 </div>
               </div>
@@ -197,9 +205,11 @@ export default {
   },
   data() {
     return {
-      activeTab: 'total',
       couponPageSize: 5,
       couponPageIndex: 0,
+      pageSizeForLoad: 5,
+
+      activeTab: 'total',
       tabs: [
         { key: 'total', label: '전체' },
         { key: 'added', label: '보유 쿠폰' },
@@ -207,12 +217,13 @@ export default {
       ],
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
-      pageSizeForLoad: 5,
       showModal: false,
       hideTimer: null,
 
       appliedStartDate: null,
-      appliedEndDate: null
+      appliedEndDate: null,
+
+      hoverPos: { x: 0, y: 0 }
     };
   },
   computed: {
@@ -380,6 +391,10 @@ export default {
         this.hideTimer = null;
       }, 80);
     },
+    onHoverMove(e) {
+      this.hoverPos = { x: e.clientX, y: e.clientY };
+    },
+
     imageSrcByCode(code) {
       const rows = (this.membershipBenefit && this.membershipBenefit.items) || [];
       const row = rows.find((r) => Number(r.code) === Number(code));
@@ -451,7 +466,7 @@ export default {
   }
 }
 
-@media screen and (min-width: 769px) {
+@media screen and (min-width: 768px) {
   .container {
     display: flex;
     margin-bottom: 12.6rem;
@@ -598,6 +613,7 @@ export default {
   transform: translateX(-50%);
   z-index: 10;
   margin-top: 10px;
+  pointer-events: none;
 }
 .modal_title {
   display: flex;

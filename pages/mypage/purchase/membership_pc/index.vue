@@ -44,8 +44,16 @@
                 </p>
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
-                <div class="benefit-hover-wrapper" :class="{ 'push-right': dataMembership.code === 3 }">
-                  <button class="membership_benefit" @mouseenter="onHoverIn">등급 혜택보기</button>
+                <div
+                  class="benefit-hover-wrapper"
+                  :class="{ 'push-right': dataMembership.code === 3 }"
+                  @mouseenter="onHoverIn"
+                  @mouseleave="onHoverOut"
+                  @mousemove="onHoverMove"
+                >
+                  <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
+                    등급 혜택보기
+                  </button>
 
                   <ModalMembershipInfor
                     v-if="showModal"
@@ -54,8 +62,8 @@
                     :data-membership="dataMembership"
                     class="transparent-modal"
                     :benefit-rows="(membershipBenefit && membershipBenefit.items) || []"
-                    @hover-in="onHoverIn"
-                    @hover-out="onHoverOut"
+                    :position-mode="'cursor'"
+                    :anchor-pos="hoverPos"
                   />
                 </div>
               </div>
@@ -186,7 +194,7 @@ import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
-import { MILEAGE_EVENT_TYPE } from '~/assets/js/types';
+import { CATEGORY_STR_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
 import { imageMixin } from '~/mixins/imageMixin';
 
 export default {
@@ -232,7 +240,8 @@ export default {
       selectedFilter: '1개월',
       pageSizeForLoad: 5,
       showModal: false,
-      hideTimer: null
+      hideTimer: null,
+      hoverPos: { x: 0, y: 0 },
     };
   },
   watch: {
@@ -311,20 +320,14 @@ export default {
     formatTypeCategory(type, category) {
       const t = Number(type);
       const typeLabel = MILEAGE_EVENT_TYPE?.[t];
-      const categoryMap = {
-        EXHIBITION: '전시',
-        PROGRAM: '프로그램',
-        COFFEE: '커피',
-        ARTSHOP: '아트숍'
-      };
-
+      // type.js를 사용하도록 수정
       const upgradeLabel = this.getMembershipLabelByCode(2);
 
       if (t === 1) return `[사용] ${upgradeLabel} 등급 업그레이드`;
       if (t === 6) return `[취소] ${upgradeLabel} 등급 취소`;
 
       if (category !== null && category !== undefined) {
-        const catKo = categoryMap[category] || '기타';
+        const catKo = CATEGORY_STR_TYPE[category] || '기타';
         const categoryName = `${catKo}`;
 
         const isAdded = [0, 4, 5].includes(t);
@@ -394,6 +397,9 @@ export default {
         this.showModal = false;
         this.hideTimer = null;
       }, 80);
+    },
+    onHoverMove(e) {
+      this.hoverPos = { x: e.clientX, y: e.clientY };
     }
   }
 };
@@ -607,6 +613,7 @@ export default {
   transform: translateX(-50%);
   z-index: 10;
   margin-top: 10px;
+  pointer-events: none;
 }
 .modal_title {
   display: flex;
