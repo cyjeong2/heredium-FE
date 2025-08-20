@@ -333,14 +333,14 @@ export default {
       display: flex;
       justify-content: space-between;
       column-gap: 1.2rem;
-      background-color: #e6e6e6;
+      background-color: #fafafa;
       border-radius: 24px;
       padding: 1.2rem;
     }
 
     &-card {
       padding: 7px 8px;
-      background-color: solid #f7f8f5;
+      background-color: #fafafa;
       flex: 1;
 
       &-name {
@@ -357,7 +357,7 @@ export default {
 .benefit-box {
   display: flex;
   flex-direction: column;
-  background-color: #e6e6e6;
+  background-color: #fafafa !important;
   border-radius: 24px;
   padding: 1.6rem;
   row-gap: 1.6rem;
@@ -476,10 +476,13 @@ export default {
 }
 // 모바일 CSS
 .modal-custom.only-mobile {
+  ::v-depp .modal-wrap {
+    background-color: transparent !important;
+  }
   ::v-deep .modal-inner {
     width: 90% !important;
     max-width: 90vw;
-    height: 61% !important;
+    height: 55% !important;
     border-radius: 24px;
     position: absolute;
     top: 50% !important;
@@ -501,11 +504,11 @@ export default {
     }
 
     .name-membership {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: normal;
       text-align: left;
       line-height: 1.4;
-
+      margin-top: 1.2rem;
       b {
         font-weight: bold;
       }
@@ -518,7 +521,7 @@ export default {
     .benefit-box.only-mobile {
       display: flex;
       flex-direction: column;
-      background-color: #e6e6e6;
+      background-color: #fafafa;
       border-radius: 24px;
       padding: 1.6rem;
       row-gap: 2.5rem;
@@ -539,7 +542,7 @@ export default {
       .name_target.only-mobile {
         display: flex;
         flex-direction: column;
-        column-gap: -3rem !important;
+        gap: 2px !important;
       }
 
       .membership-name.only-mobile {
@@ -561,15 +564,25 @@ export default {
     }
   }
 }
+.modal-custom.only-mobile .benefit-row.only-mobile .name_target.only-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile {
   display: grid;
   grid-template-columns: max-content max-content;
   grid-auto-rows: auto;
-  row-gap: 2px;
+  gap: 2px;
   column-gap: 7px;
   align-items: baseline;
   font-size: 12px;
   line-height: 1.25;
+}
+.modal-custom.only-mobile .benefit-row.only-mobile .membership-name.only-mobile,
+.modal-custom.only-mobile .benefit-row.only-mobile .membership-target.only-mobile {
+  line-height: 1.2;
 }
 
 .modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .benefit-cat.only-mobile:nth-of-type(1) {

@@ -803,4 +803,7 @@ export default {
 ::v-deep(.pagination) {
   margin-top: 2.6rem !important;
 }
+::v-deep(.modal-wrap) {
+  background-color: rgba(134, 132, 132, 0.8);
+}
 </style>
