@@ -36,11 +36,7 @@
                 </div>
                 <div class="right">
                   <div class="benefit-grid" :class="{ 'one-row': getOrderedCouponsByCode(1).length <= 2 }">
-                    <span
-                      v-for="(c, i) in coupons1"
-                      :key="c.id || i"
-                      class="benefit-cat"
-                    >
+                    <span v-for="(c, i) in coupons1" :key="c.id || i" class="benefit-cat">
                       {{ formatCouponText(c) }}<span v-if="i === coupons1.length - 1"> 할인</span>
                     </span>
                   </div>
@@ -60,11 +56,7 @@
                 </div>
                 <div class="right">
                   <div class="benefit-grid" :class="{ 'one-row': getOrderedCouponsByCode(2).length <= 2 }">
-                    <span
-                      v-for="(c, i) in coupons2"
-                      :key="c.id || i"
-                      class="benefit-cat"
-                    >
+                    <span v-for="(c, i) in coupons2" :key="c.id || i" class="benefit-cat">
                       {{ formatCouponText(c) }}<span v-if="i === coupons2.length - 1"> 할인</span>
                     </span>
                   </div>
@@ -81,11 +73,7 @@
                 </div>
                 <div class="right">
                   <div class="benefit-grid" :class="{ 'one-row': getOrderedCouponsByCode(3).length <= 2 }">
-                    <span
-                      v-for="(c, i) in coupons3"
-                      :key="c.id || i"
-                      class="benefit-cat"
-                    >
+                    <span v-for="(c, i) in coupons3" :key="c.id || i" class="benefit-cat">
                       {{ formatCouponText(c) }}<span v-if="i === coupons3.length - 1"> 할인</span>
                     </span>
                   </div>
@@ -134,16 +122,15 @@
               </p>
               <p class="membership-target only-mobile">만 19세 이상 회원</p>
               <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(1).length <= 2 }">
-                <span v-for="(c, i) in getOrderedCouponsByCode(1)" :key="c.id || i" class="benefit-cat only-mobile">
-                  {{ formatCouponText(c) }}
+                <span v-for="(c, i) in coupons1" :key="c.id || i" class="benefit-cat only-mobile">
+                  {{ formatCouponText(c) }}<span v-if="i === coupons1.length - 1"> 할인</span>
                 </span>
-                <span class="discount-suffix only-mobile">할인</span>
               </div>
             </div>
           </div>
 
           <div class="benefit-row only-mobile">
-            <img :src="imageSrcByCode(2)" class="membership-icon2" />
+            <img :src="imageSrcByCode(2)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 2) || {}).short_name }}</B>
@@ -153,26 +140,24 @@
                 {{ benefitRows.find((item) => item.code === 1)?.name }} 회원
               </p>
               <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(2).length <= 2 }">
-                <span v-for="(c, i) in getOrderedCouponsByCode(2)" :key="c.id || i" class="benefit-cat only-mobile">
-                  {{ formatCouponText(c) }}
+                <span v-for="(c, i) in coupons2" :key="c.id || i" class="benefit-cat only-mobile">
+                  {{ formatCouponText(c) }}<span v-if="i === coupons2.length - 1"> 할인</span>
                 </span>
-                <span class="discount-suffix only-mobile">할인</span>
               </div>
             </div>
           </div>
 
           <div class="benefit-row only-mobile">
-            <img :src="imageSrcByCode(3)" class="membership-icon2" />
+            <img :src="imageSrcByCode(3)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</B>
               </p>
               <p class="membership-target only-mobile">만 19세 미만 회원</p>
               <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(3).length <= 2 }">
-                <span v-for="(c, i) in getOrderedCouponsByCode(3)" :key="c.id || i" class="benefit-cat only-mobile">
-                  {{ formatCouponText(c) }}
+                <span v-for="(c, i) in coupons3" :key="c.id || i" class="benefit-cat only-mobile">
+                  {{ formatCouponText(c) }}<span v-if="i === coupons3.length - 1"> 할인</span>
                 </span>
-                <span class="discount-suffix only-mobile">할인</span>
               </div>
             </div>
           </div>
@@ -216,9 +201,15 @@ export default {
     };
   },
   computed: {
-    coupons1() { return this.getOrderedCouponsByCode(1); },
-    coupons2() { return this.getOrderedCouponsByCode(2); },
-    coupons3() { return this.getOrderedCouponsByCode(3); },
+    coupons1() {
+      return this.getOrderedCouponsByCode(1);
+    },
+    coupons2() {
+      return this.getOrderedCouponsByCode(2);
+    },
+    coupons3() {
+      return this.getOrderedCouponsByCode(3);
+    },
     isPCUrl() {
       return (
         this.$route.path.includes('/mypage/purchase/membership_pc') ||
@@ -572,10 +563,10 @@ export default {
 }
 .modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile {
   display: grid;
-  grid-template-columns: max-content max-content max-content;
+  grid-template-columns: max-content max-content;
   grid-auto-rows: auto;
   row-gap: 2px;
-  column-gap: 12px;
+  column-gap: 7px;
   align-items: baseline;
   font-size: 12px;
   line-height: 1.25;
@@ -598,17 +589,10 @@ export default {
   grid-row: 2;
 }
 
-.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .discount-suffix.only-mobile {
-  grid-column: 3;
-  grid-row: 2;
+.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile .benefit-cat.only-mobile:last-of-type {
   white-space: nowrap;
-  justify-self: start;
-  min-width: 0;
 }
 
-.modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile.one-row .discount-suffix.only-mobile {
-  grid-row: 1;
-}
 .modal-custom.only-mobile ::v-deep .modal-wrap {
   pointer-events: auto !important;
 }
