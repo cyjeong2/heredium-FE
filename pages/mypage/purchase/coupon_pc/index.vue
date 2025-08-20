@@ -44,26 +44,28 @@
                 <p v-if="dataMembership.code === 3"><B>미성년자</B>에게 부여되는 등급입니다.</p>
                 <!-- 등급 혜택 모달 -->
                 <div
+                  ref="benefitWrap"
                   class="benefit-hover-wrapper"
                   :class="{ 'push-right': dataMembership.code === 3 }"
                   @mouseenter="onHoverIn"
                   @mouseleave="onHoverOut"
-                  @mousemove="onHoverMove"
                 >
-                  <button class="membership_benefit" @mouseenter="showModal = true" @mouseleave="showModal = false">
-                    등급 혜택보기
-                  </button>
+                  <button class="membership_benefit">등급 혜택보기</button>
 
-                  <ModalMembershipInfor
-                    v-if="showModal"
-                    v-model="showModal"
-                    :is-modal-visible="showModal"
-                    :data-membership="dataMembership"
-                    class="transparent-modal"
-                    :benefit-rows="(membershipBenefit && membershipBenefit.items) || []"
-                    :position-mode="'cursor'"
-                    :anchor-pos="hoverPos"
-                  />
+                  <div
+                    v-show="showModal"
+                    class="transparent-modal modal-no-center"
+                    @mouseenter="onHoverIn"
+                    @mouseleave="onHoverOut"
+                  >
+                    <ModalMembershipInfor
+                      v-if="showModal"
+                      v-model="showModal"
+                      :is-modal-visible="showModal"
+                      :data-membership="dataMembership"
+                      :benefit-rows="(membershipBenefit && membershipBenefit.items) || []"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -378,23 +380,24 @@ export default {
     closeModal() {
       this.showModal = false;
     },
-    onHoverIn() {
+    onHoverIn(e) {
       if (this.hideTimer) {
         clearTimeout(this.hideTimer);
         this.hideTimer = null;
       }
       this.showModal = true;
     },
-    onHoverOut() {
+    onHoverOut(e) {
+      // 버튼 ↔ 팝업 사이 이동일 땐 닫지 않음
+      const wrap = this.$refs.benefitWrap;
+      const to = e.relatedTarget;
+      if (wrap && to && wrap.contains(to)) return;
+
       this.hideTimer = setTimeout(() => {
         this.showModal = false;
         this.hideTimer = null;
-      }, 80);
+      }, 120); // 살짝 딜레이 주어 자연스럽게
     },
-    onHoverMove(e) {
-      this.hoverPos = { x: e.clientX, y: e.clientY };
-    },
-
     imageSrcByCode(code) {
       const rows = (this.membershipBenefit && this.membershipBenefit.items) || [];
       const row = rows.find((r) => Number(r.code) === Number(code));
@@ -592,6 +595,7 @@ export default {
 }
 .benefit-hover-wrapper {
   position: relative;
+  display: inline-block;
 }
 .benefit-hover-wrapper.push-right {
   margin-left: auto;
@@ -608,12 +612,11 @@ export default {
 }
 .transparent-modal {
   position: absolute;
-  top: 100%;
+  transform: translateX(-50%); /* 중앙 정렬 */
   left: 50%;
-  transform: translateX(-50%);
+  top: calc(100% + 10px); /* 버튼 하단에서 10px 띄움 */
   z-index: 10;
-  margin-top: 10px;
-  pointer-events: none;
+  pointer-events: auto;
 }
 .modal_title {
   display: flex;
@@ -781,5 +784,44 @@ export default {
 }
 ::v-deep(.pagination) {
   margin-top: 2.6rem !important;
+}
+/* UModal 중앙정렬 해제(유지) */
+.modal-no-center :deep(.modal-inner) {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+/* 호버 팝업일 때 UModal 오버레이를 없애기 */
+.modal-no-center :deep(.modal-wrap.background-white) {
+  position: static !important; /* fixed 해제 */
+  top: auto !important;
+  left: auto !important;
+  width: auto !important; /* 전체화면 덮지 않도록 */
+  height: auto !important;
+  background: transparent !important;
+  pointer-events: none !important; /* 오버레이는 이벤트 막지 않게 */
+  z-index: auto !important;
+}
+
+/* 실제 내용은 이벤트 받도록 */
+.modal-no-center :deep(.modal-wrap .modal-inner) {
+  position: static !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+/* 팝업 위치는 버튼 기준 중앙 아래로 고정 */
+.benefit-hover-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.transparent-modal {
+  position: absolute;
+  left: 50% !important;
+  top: calc(100% + 10px) !important;
+  transform: translateX(-50%) !important;
+  z-index: 10;
 }
 </style>
