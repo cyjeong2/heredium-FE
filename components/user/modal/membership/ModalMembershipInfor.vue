@@ -292,11 +292,7 @@ export default {
     max-width: 80vw;
     max-height: 80vh;
     border-radius: 24px;
-    position: absolute;
     flex-direction: row;
-
-    top: 60% !important;
-    left: 60% !important;
     transform: translateX(-50%, 50%) !important;
   }
   .title-modal {
@@ -474,14 +470,6 @@ export default {
 
 .benefit-info .benefit-cat:last-of-type {
   margin-right: 0;
-}
-.modal-custom.cursor-pos {
-  ::v-deep .modal-inner {
-    position: absolute;
-    top: var(--cursor-top, 60%) !important;
-    left: var(--cursor-left, 60%) !important;
-    transform: none !important;
-  }
 }
 // 모바일 CSS
 .modal-custom.only-mobile {
