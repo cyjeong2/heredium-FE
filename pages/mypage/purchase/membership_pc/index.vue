@@ -8,12 +8,14 @@
       <div class="ticketing-body">
         <div class="membership_info">
           <div class="membership_icon">
-            <img
+            <!-- <img
               v-if="imageSrcByCode(dataMembership.code)"
               :src="imageSrcByCode(dataMembership.code)"
-              style="width: 48px; height: 48px"
               alt="membership icon"
-            />
+            /> -->
+            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" />
+            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" />
+            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" />
           </div>
           <div class="name_membership">
             <div>
@@ -51,9 +53,7 @@
                   @mouseenter="onHoverIn"
                   @mouseleave="onHoverOut"
                 >
-                  <button class="membership_benefit">
-                    등급 혜택보기
-                  </button>
+                  <button class="membership_benefit">등급 혜택보기</button>
 
                   <div
                     v-show="showModal"
@@ -127,11 +127,10 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
+            <UDatepicker v-model="uiStartDate" :max="uiEndDate" style="width: 227.5px" />
             <span>~</span>
-            <UDatepicker v-model="endDate" :min="startDate" style="width: 227.5px" />
+            <UDatepicker v-model="uiEndDate" :min="uiStartDate" style="width: 227.5px" />
           </div>
-
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
         </div>
 
@@ -140,7 +139,7 @@
           :list-data="mileage_list"
           :show-prev-page="true"
           :show-next-page="true"
-          @getListData="(pageIndex) => loadMileageList(pageIndex, true)"
+          @getListData="(pageIndex) => loadMileageList(pageIndex)"
         >
           <template #data="{ data }">
             <table class="mileage-table">
@@ -207,11 +206,22 @@ export default {
   mixins: [imageMixin],
   async asyncData({ $axios }) {
     const initialPageSize = 5;
+    const dayjs = (await import('dayjs')).default;
+    const uiStart = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+    const uiEnd = dayjs().format('YYYY-MM-DD');
 
     const dataMembership = await $axios.$get('/user/membership/info');
+
+    // 최초 로드시 최근 1개월만 조회
     const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
-      params: { page: 0, size: initialPageSize }
+      params: {
+        page: 0,
+        size: initialPageSize,
+        startDate: dayjs(uiStart).startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+        endDate: dayjs(uiEnd).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+      }
     });
+
     const membershipBenefit = await $axios.$get('/user/membership/benefit');
     const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
 
@@ -228,8 +238,12 @@ export default {
         first: mileageListRes.number === 0,
         last: mileageListRes.number === totalPages - 1
       },
-      startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
-      endDate: dayjs().format('YYYY-MM-DD')
+
+      uiStartDate: uiStart,
+      uiEndDate: uiEnd,
+
+      appliedStartDate: uiStart,
+      appliedEndDate: uiEnd
     };
   },
   data() {
@@ -245,19 +259,16 @@ export default {
       pageSizeForLoad: 5,
       showModal: false,
       hideTimer: null,
-      hoverPos: { x: 0, y: 0 },
+      hoverPos: { x: 0, y: 0 }
     };
   },
   watch: {
     activeTab() {
-      this.loadMileageList(0, true);
+      this.loadMileageList(0);
     }
   },
-  mounted() {
-    this.applyPeriodFilter();
-  },
   methods: {
-    async loadMileageList(pageIndex = 0, usePeriodFilter = false) {
+    async loadMileageList(pageIndex = 0) {
       if (!this.dataMembership) return;
       try {
         const params = {
@@ -270,18 +281,15 @@ export default {
         } else if (this.activeTab === 'used') {
           params.types = [1, 2, 3];
         }
+        const start = this.appliedStartDate || dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+        const end = this.appliedEndDate || dayjs().format('YYYY-MM-DD');
 
-        if (usePeriodFilter && this.startDate && this.endDate) {
-          params.startDate = dayjs(this.startDate).startOf('day').format('YYYY-MM-DD HH:mm:ss');
-          params.endDate = dayjs(this.endDate).endOf('day').format('YYYY-MM-DD HH:mm:ss');
-        }
+        params.startDate = dayjs(start).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        params.endDate = dayjs(end).endOf('day').format('YYYY-MM-DD HH:mm:ss');
 
-        const res = await this.$axios.$get(`/user/membershipMileage/${this.dataMembership.account_id}`, {
-          params
-        });
+        const res = await this.$axios.$get(`/user/membershipMileage/${this.dataMembership.account_id}`, { params });
 
         const totalPages = Math.ceil(res.totalElements / this.pageSizeForLoad);
-
         this.mileage_list = {
           content: res.content,
           totalElements: res.totalElements,
@@ -292,12 +300,9 @@ export default {
           last: res.number === totalPages - 1
         };
 
-        this.mileageList = {
-          ...this.mileageList,
-          totalMileage: res.totalMileage
-        };
-      } catch (error) {
-        console.error('마일리지 목록 불러오기 실패:', error);
+        this.mileageList = { ...this.mileageList, totalMileage: res.totalMileage };
+      } catch (e) {
+        console.error(e);
         this.mileage_list = {
           content: [],
           totalElements: 0,
@@ -374,14 +379,20 @@ export default {
           return;
       }
 
-      this.startDate = start.format('YYYY-MM-DD');
-      this.endDate = now.format('YYYY-MM-DD');
+      const uiStart = start.format('YYYY-MM-DD');
+      const uiEnd = now.format('YYYY-MM-DD');
+      this.uiStartDate = uiStart;
+      this.uiEndDate = uiEnd;
 
-      this.loadMileageList(0, true);
+      this.appliedStartDate = uiStart;
+      this.appliedEndDate = uiEnd;
+
+      this.loadMileageList(0);
     },
     applyPeriodFilter() {
-      this.selectedFilter = 'custom';
-      this.loadMileageList(0, true);
+      this.appliedStartDate = this.uiStartDate;
+      this.appliedEndDate = this.uiEndDate;
+      this.loadMileageList(0);
     },
     openModal() {
       this.showModal = true;
@@ -390,7 +401,10 @@ export default {
       this.showModal = false;
     },
     onHoverIn(e) {
-      if (this.hideTimer) { clearTimeout(this.hideTimer); this.hideTimer = null; }
+      if (this.hideTimer) {
+        clearTimeout(this.hideTimer);
+        this.hideTimer = null;
+      }
       this.showModal = true;
     },
     onHoverOut(e) {
@@ -403,7 +417,7 @@ export default {
         this.showModal = false;
         this.hideTimer = null;
       }, 120); // 살짝 딜레이 주어 자연스럽게
-    },
+    }
   }
 };
 </script>
@@ -559,12 +573,15 @@ export default {
   border: 1px solid #e6e6e6;
   background-color: #fff;
 }
-.membership_icon {
+.membership_icon img {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  max-width: 30px;
-  max-height: 30px;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  max-width: 30px !important;
+  max-height: 30px !important;
   margin-top: 20px;
   margin-left: 1.2rem;
 }
@@ -612,9 +629,9 @@ export default {
 }
 .transparent-modal {
   position: absolute;
-  transform: translateX(-50%);   /* 중앙 정렬 */
+  transform: translateX(-50%); /* 중앙 정렬 */
   left: 50%;
-  top: calc(100% + 10px);   /* 버튼 하단에서 10px 띄움 */
+  top: calc(100% + 10px); /* 버튼 하단에서 10px 띄움 */
   z-index: 10;
   pointer-events: auto;
 }
@@ -649,6 +666,7 @@ export default {
   margin-left: 60px;
   font-weight: bold;
   font-size: 16px;
+  text-align: right;
 }
 .mileage-section {
   width: 80%;
@@ -786,10 +804,10 @@ export default {
 
 /* 호버 팝업일 때 UModal 오버레이를 없애기 */
 .modal-no-center :deep(.modal-wrap.background-white) {
-  position: static !important;    /* fixed 해제 */
+  position: static !important; /* fixed 해제 */
   top: auto !important;
   left: auto !important;
-  width: auto !important;         /* 전체화면 덮지 않도록 */
+  width: auto !important; /* 전체화면 덮지 않도록 */
   height: auto !important;
   background: transparent !important;
   pointer-events: none !important; /* 오버레이는 이벤트 막지 않게 */
@@ -804,7 +822,10 @@ export default {
 }
 
 /* 팝업 위치는 버튼 기준 중앙 아래로 고정 */
-.benefit-hover-wrapper { position: relative; display: inline-block; }
+.benefit-hover-wrapper {
+  position: relative;
+  display: inline-block;
+}
 .transparent-modal {
   position: absolute;
   left: 50% !important;

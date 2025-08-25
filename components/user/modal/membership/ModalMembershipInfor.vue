@@ -13,12 +13,15 @@
     <template #content>
       <div>
         <div class="title-modal">
-          <img
+          <!-- <img
             v-if="imageSrcByCode(dataMembership.code)"
             :src="imageSrcByCode(dataMembership.code)"
             style="width: 48px; height: 48px"
             alt="membership icon"
-          />
+          /> -->
+          <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
+          <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
+          <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
           <span class="name-membership">
             {{ dataMembership.name }} 님의 현재 등급은 <B>{{ dataMembership.membership_name }}</B> 입니다.
           </span>
@@ -28,7 +31,8 @@
             <div class="benefit-box">
               <div class="benefit-row">
                 <div class="left">
-                  <img :src="imageSrcByCode(1)" class="membership-icon2" />
+                  <!-- <img :src="imageSrcByCode(1)" class="membership-icon2" /> -->
+                  <img src="~assets/img/Brown.png" class="membership-icon2" />
                   <div class="name_target">
                     <p class="membership-name">{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</p>
                     <p class="membership-target">만 19세 이상 회원</p>
@@ -45,7 +49,8 @@
 
               <div class="benefit-row">
                 <div class="left">
-                  <img :src="imageSrcByCode(2)" class="membership-icon2" />
+                  <!-- <img :src="imageSrcByCode(2)" class="membership-icon2" /> -->
+                  <img src="~assets/img/Terracotta.png" class="membership-icon2" />
                   <div class="name_target">
                     <p class="membership-name">{{ (benefitRows.find((item) => item.code === 2) || {}).name }}</p>
                     <p class="membership-target">
@@ -65,7 +70,8 @@
 
               <div class="benefit-row">
                 <div class="left">
-                  <img :src="imageSrcByCode(3)" class="membership-icon2" />
+                  <!-- <img :src="imageSrcByCode(3)" class="membership-icon2" /> -->
+                  <img src="~assets/img/Green.png" class="membership-icon2" />
                   <div class="name_target">
                     <p class="membership-name">{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</p>
                     <p class="membership-target">만 19세 미만 회원</p>
@@ -97,12 +103,15 @@
   >
     <template #title>
       <div class="title-modal only-mobile">
-        <img
+        <!-- <img
           v-if="imageSrcByCode(dataMembership.code)"
           :src="imageSrcByCode(dataMembership.code)"
           style="width: 48px; height: 48px"
           alt="membership icon"
-        />
+        /> -->
+        <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
+        <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
+        <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
         <span class="name-membership only-mobile">
           {{ dataMembership.name }} 님의 현재 등급은<br />
           <B>{{ dataMembership.short_name }}</B>
@@ -112,11 +121,12 @@
     </template>
 
     <template #content>
-      <div class="benefit only-mobile">
+      <div class="benefit only-mobile" @click.stop>
         <div class="benefit-box only-mobile">
           <div class="benefit-row only-mobile">
-            <img :src="imageSrcByCode(1)" class="membership-icon2 only-mobile" />
-            <div class="name_target">
+            <!-- <img :src="imageSrcByCode(1)" class="membership-icon2 only-mobile" /> -->
+            <img src="~assets/img/Brown.png" class="membership-icon2 only-mobile" />
+            <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</B>
               </p>
@@ -130,7 +140,8 @@
           </div>
 
           <div class="benefit-row only-mobile">
-            <img :src="imageSrcByCode(2)" class="membership-icon2 only-mobile" />
+            <!-- <img :src="imageSrcByCode(2)" class="membership-icon2 only-mobile" /> -->
+            <img src="~assets/img/Terracotta.png" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 2) || {}).short_name }}</B>
@@ -148,7 +159,8 @@
           </div>
 
           <div class="benefit-row only-mobile">
-            <img :src="imageSrcByCode(3)" class="membership-icon2 only-mobile" />
+            <!-- <img :src="imageSrcByCode(3)" class="membership-icon2 only-mobile" /> -->
+            <img src="~assets/img/Green.png" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</B>
@@ -476,18 +488,19 @@ export default {
 }
 // 모바일 CSS
 .modal-custom.only-mobile {
-  ::v-depp .modal-wrap {
-    background-color: transparent !important;
-  }
   ::v-deep .modal-inner {
-    width: 90% !important;
-    max-width: 90vw;
-    height: 55% !important;
+    width: 90vw !important;
+    max-width: 360px !important;
+
+    height: 65vh !important;
     border-radius: 24px;
     position: absolute;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .title-modal.only-mobile {
@@ -495,7 +508,6 @@ export default {
     align-items: left;
     justify-content: left;
     column-gap: 1rem;
-    padding: 20px 0;
 
     .membership-icon {
       width: 36px;
@@ -508,7 +520,6 @@ export default {
       font-weight: normal;
       text-align: left;
       line-height: 1.4;
-      margin-top: 1.2rem;
       b {
         font-weight: bold;
       }
@@ -516,7 +527,7 @@ export default {
   }
 
   .benefit.only-mobile {
-    margin-top: -1.2rem;
+    margin-top: -2.2rem;
 
     .benefit-box.only-mobile {
       display: flex;
@@ -530,7 +541,7 @@ export default {
     .benefit-row.only-mobile {
       display: flex;
       align-items: flex-start;
-      column-gap: 0.8rem;
+      column-gap: 1.4rem;
 
       .membership-icon2 {
         width: 36px;
@@ -543,6 +554,7 @@ export default {
         display: flex;
         flex-direction: column;
         gap: 2px !important;
+        margin-top: 0.7rem;
       }
 
       .membership-name.only-mobile {
@@ -567,7 +579,8 @@ export default {
 .modal-custom.only-mobile .benefit-row.only-mobile .name_target.only-mobile {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+
+  box-sizing: border-box;
 }
 
 .modal-custom.only-mobile .benefit-row.only-mobile .benefit-grid.only-mobile {

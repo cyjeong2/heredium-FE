@@ -121,9 +121,9 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
+            <UDatepicker v-model="uiStartDate" :max="uiEndDate" style="width: 227.5px" />
             <span>~</span>
-            <UDatepicker v-model="endDate" :min="startDate" style="width: 227.5px" />
+            <UDatepicker v-model="uiEndDate" :min="uiStartDate" style="width: 227.5px" />
           </div>
 
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
@@ -134,7 +134,7 @@
           :list-data="mileage_list"
           :show-prev-page="true"
           :show-next-page="true"
-          @getListData="(pageIndex) => loadMileageList(pageIndex, true)"
+          @getListData="(pageIndex) => loadMileageList(pageIndex)"
         >
           <template #data="{ data }">
             <table class="mileage-table">
@@ -194,27 +194,38 @@
 import dayjs from 'dayjs';
 
 import ModalMembershipInfor from '~/components/user/modal/membership/ModalMembershipInfor.vue';
+import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import UPageable from '~/components/user/common/UPageable';
 import NoMileage from '~/components/user/page/membership/NoMileage.vue';
 import UDatepicker from '~/components/user/common/UDatepicker';
-import SideBarMyPage from '~/components/user/page/SideBarMyPage.vue';
 import { CATEGORY_STR_TYPE, MILEAGE_EVENT_TYPE } from '~/assets/js/types';
 import { imageMixin } from '~/mixins/imageMixin';
 
 export default {
   name: 'MembershipAndCouponPage',
-  components: { UPageable, NoMileage, ModalMembershipInfor, UDatepicker, SideBarMyPage },
+  components: { SideBarMyPage, UPageable, NoMileage, ModalMembershipInfor, UDatepicker },
   mixins: [imageMixin],
-
   async asyncData({ $axios }) {
     const initialPageSize = 5;
+    const dayjs = (await import('dayjs')).default;
+    const uiStart = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+    const uiEnd = dayjs().format('YYYY-MM-DD');
 
     const dataMembership = await $axios.$get('/user/membership/info');
+
+    // 최초 로드도 최근 1개월로
     const mileageListRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
-      params: { page: 0, size: initialPageSize }
+      params: {
+        page: 0,
+        size: initialPageSize,
+        startDate: dayjs(uiStart).startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+        endDate: dayjs(uiEnd).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+      }
     });
+
     const membershipBenefit = await $axios.$get('/user/membership/benefit');
     const totalPages = Math.ceil(mileageListRes.totalElements / initialPageSize);
+
     return {
       dataMembership,
       membershipBenefit,
@@ -228,8 +239,12 @@ export default {
         first: mileageListRes.number === 0,
         last: mileageListRes.number === totalPages - 1
       },
-      startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
-      endDate: dayjs().format('YYYY-MM-DD')
+
+      uiStartDate: uiStart,
+      uiEndDate: uiEnd,
+
+      appliedStartDate: uiStart,
+      appliedEndDate: uiEnd
     };
   },
   data() {
@@ -243,19 +258,18 @@ export default {
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
       pageSizeForLoad: 5,
-      showModal: false
+      showModal: false,
+      hideTimer: null,
+      hoverPos: { x: 0, y: 0 }
     };
   },
   watch: {
     activeTab() {
-      this.loadMileageList(0, true);
+      this.loadMileageList(0);
     }
   },
-  mounted() {
-    this.applyPeriodFilter();
-  },
   methods: {
-    async loadMileageList(pageIndex = 0, usePeriodFilter = false) {
+    async loadMileageList(pageIndex = 0) {
       if (!this.dataMembership) return;
       try {
         const params = {
@@ -268,18 +282,15 @@ export default {
         } else if (this.activeTab === 'used') {
           params.types = [1, 2, 3];
         }
+        const start = this.appliedStartDate || dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+        const end = this.appliedEndDate || dayjs().format('YYYY-MM-DD');
 
-        if (usePeriodFilter && this.startDate && this.endDate) {
-          params.startDate = dayjs(this.startDate).startOf('day').format('YYYY-MM-DD HH:mm:ss');
-          params.endDate = dayjs(this.endDate).endOf('day').format('YYYY-MM-DD HH:mm:ss');
-        }
+        params.startDate = dayjs(start).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        params.endDate = dayjs(end).endOf('day').format('YYYY-MM-DD HH:mm:ss');
 
-        const res = await this.$axios.$get(`/user/membershipMileage/${this.dataMembership.account_id}`, {
-          params
-        });
+        const res = await this.$axios.$get(`/user/membershipMileage/${this.dataMembership.account_id}`, { params });
 
         const totalPages = Math.ceil(res.totalElements / this.pageSizeForLoad);
-
         this.mileage_list = {
           content: res.content,
           totalElements: res.totalElements,
@@ -290,12 +301,9 @@ export default {
           last: res.number === totalPages - 1
         };
 
-        this.mileageList = {
-          ...this.mileageList,
-          totalMileage: res.totalMileage
-        };
-      } catch (error) {
-        console.error('마일리지 목록 불러오기 실패:', error);
+        this.mileageList = { ...this.mileageList, totalMileage: res.totalMileage };
+      } catch (e) {
+        console.error(e);
         this.mileage_list = {
           content: [],
           totalElements: 0,
@@ -317,12 +325,12 @@ export default {
     getMembershipLabelByCode(code) {
       const items = (this.membershipBenefit && this.membershipBenefit.items) || [];
       const row = items.find((r) => Number(r.code) === Number(code));
-      return row ? row.short_name || row.name : null;
+      return row ? row.membership_name || row.name : null;
     },
     formatTypeCategory(type, category) {
       const t = Number(type);
       const typeLabel = MILEAGE_EVENT_TYPE?.[t];
-
+      // type.js를 사용하도록 수정
       const upgradeLabel = this.getMembershipLabelByCode(2);
 
       if (t === 1) return `[사용] ${upgradeLabel} 등급 업그레이드`;
@@ -372,24 +380,49 @@ export default {
           return;
       }
 
-      this.startDate = start.format('YYYY-MM-DD');
-      this.endDate = now.format('YYYY-MM-DD');
+      const uiStart = start.format('YYYY-MM-DD');
+      const uiEnd = now.format('YYYY-MM-DD');
+      this.uiStartDate = uiStart;
+      this.uiEndDate = uiEnd;
 
-      this.loadMileageList(0, true);
+      this.appliedStartDate = uiStart;
+      this.appliedEndDate = uiEnd;
+
+      this.loadMileageList(0);
     },
     applyPeriodFilter() {
-      this.selectedFilter = 'custom';
-      this.loadMileageList(0, true);
+      this.appliedStartDate = this.uiStartDate;
+      this.appliedEndDate = this.uiEndDate;
+      this.loadMileageList(0);
     },
     openModal() {
       this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
+    },
+    onHoverIn(e) {
+      if (this.hideTimer) {
+        clearTimeout(this.hideTimer);
+        this.hideTimer = null;
+      }
+      this.showModal = true;
+    },
+    onHoverOut(e) {
+      // 버튼 ↔ 팝업 사이 이동일 땐 닫지 않음
+      const wrap = this.$refs.benefitWrap;
+      const to = e.relatedTarget;
+      if (wrap && to && wrap.contains(to)) return;
+
+      this.hideTimer = setTimeout(() => {
+        this.showModal = false;
+        this.hideTimer = null;
+      }, 120); // 살짝 딜레이 주어 자연스럽게
     }
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .container {
   margin-bottom: 12rem;

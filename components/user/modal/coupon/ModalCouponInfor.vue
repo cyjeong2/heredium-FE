@@ -2,7 +2,7 @@
   <UModal :is-show="open" class="modal-custom" hide-edge-close-btn hide-head @close="handleClose">
     <template #content>
       <div class="head">
-        <div class="coupon-detail center">
+        <div class="coupon-detail">
           <p class="name">{{ detailCoupon.name }}</p>
           <p class="date">
             <img src="~assets/img/icon/icon_calender.svg" />
@@ -175,5 +175,39 @@ export default {
       width: 100% !important;
     }
   }
+}
+.modal-custom {
+  /* body 안에서 head와 qr-box 사이 간격을 통일해서 줌 */
+  ::v-deep .modal .body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    row-gap: 14px;
+  }
+
+  .head {
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+    /* margin-bottom: 12px; */
+  }
+
+  .head .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transform: none;
+    z-index: 2;
+  }
+
+  .head .coupon-detail {
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .coupon-detail .date { justify-content: center; }
+  .coupon-remaining { justify-content: center; }
 }
 </style>

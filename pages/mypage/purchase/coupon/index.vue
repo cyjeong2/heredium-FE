@@ -140,10 +140,11 @@
                 <tr>
                   <td colspan="5" style="padding: 0; border: none; background: transparent">
                     <CouponList
-                      :key="`page-${couponPageIndex}-${data && data.length}`"
+                      :key="`page-${couponList.number}-${(data && data.length) || 0}`"
                       class="coupon-list"
                       :data="data"
                       :right-button="true"
+                      @refresh-coupon-list="() => loadCouponList(couponList?.number || 0)"
                     />
                   </td>
                 </tr>
@@ -170,174 +171,126 @@ export default {
   name: 'MembershipAndCouponPage',
   components: { SideBarMyPage, ModalMembershipInfor, UDatepicker, CouponList, UPageable },
   mixins: [imageMixin],
+
   async asyncData({ $axios }) {
     const initialPageSize = 5;
 
+    // 기본 기간(최근 1개월)
+    const uiStart = dayjs().subtract(1, 'month').format('YYYY-MM-DD');
+    const uiEnd = dayjs().format('YYYY-MM-DD');
+
+    // 멤버십 정보/마일리지
     const dataMembership = await $axios.$get('/user/membership/info');
     const mileageRes = await $axios.$get(`/user/membershipMileage/${dataMembership.account_id}`, {
       params: { page: 0, size: initialPageSize }
     });
     const totalMileage = mileageRes.totalMileage;
 
-    const couponList = await $axios.$get('/user/coupons/usage');
+    // 쿠폰 (배열/페이지객체 모두 대응)
+    const couponRes = await $axios.$get('/user/coupons/usage', {
+      params: {
+        tab: 'total',
+        startDate: `${uiStart} 00:00:00`,
+        endDate: `${uiEnd} 23:59:59`,
+        page: 0,
+        size: initialPageSize
+      }
+    });
+    console.log(couponRes.totalCoupons);
+    let couponList;
+    let totalCoupons = 0;
+    let expiringCoupons = 0;
 
+    if (Array.isArray(couponRes)) {
+      couponList = {
+        content: couponRes,
+        totalElements: couponRes.length,
+        totalPages: 1,
+        number: 0,
+        size: initialPageSize,
+        first: true,
+        last: true
+      };
+    } else {
+      couponList = {
+        content: couponRes.content || [],
+        totalElements: couponRes.totalElements || 0,
+        totalPages: couponRes.totalPages || 0,
+        number: couponRes.number || 0,
+        size: couponRes.size || initialPageSize,
+        first: couponRes.first ?? true,
+        last: couponRes.last ?? true
+      };
+      // 합계는 백엔드 값 그대로 사용
+      totalCoupons = couponRes.totalCoupons ?? 0;
+      expiringCoupons = couponRes.expiringCoupons ?? 0;
+    }
+
+    // 멤버십 혜택
     const membershipBenefit = await $axios.$get('/user/membership/benefit');
-
-    const usedCouponsList = couponList.filter((item) => (item.used_coupons?.length || 0) > 0);
-
-    const availableCouponsList = couponList
-      .map((item) => ({
-        ...item,
-        unused_coupons: (item.unused_coupons || []).filter((c) => !c.is_expired)
-      }))
-      .filter((item) => item.unused_coupons.length > 0);
 
     return {
       dataMembership,
       totalMileage,
       membershipBenefit,
-      availableCouponsList,
-      usedCouponsList,
-      startDate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
-      endDate: dayjs().format('YYYY-MM-DD')
+
+      // 날짜 바인딩
+      startDate: uiStart,
+      endDate: uiEnd,
+      appliedStartDate: uiStart,
+      appliedEndDate: uiEnd,
+
+      // 페이지 데이터
+      couponList,
+      totalCoupons,
+      expiringCoupons
     };
   },
   data() {
     return {
+      pageSizeForLoad: 5,
+
       activeTab: 'total',
-      couponPageSize: 5,
-      couponPageIndex: 0,
       tabs: [
         { key: 'total', label: '전체' },
         { key: 'added', label: '보유 쿠폰' },
         { key: 'used', label: '사용 쿠폰' }
       ],
+
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
-      pageSizeForLoad: 5,
-      showModal: false,
 
-      appliedStartDate: null,
-      appliedEndDate: null
+      showModal: false,
+      hideTimer: null,
+      hoverPos: { x: 0, y: 0 }
     };
   },
   computed: {
-    totalCoupons() {
-      if (!this.availableCouponsList) return 0;
-      return this.availableCouponsList.reduce((sum, item) => {
-        return sum + (item.unused_coupons?.length || 0);
-      }, 0);
-    },
-    expiringCoupons() {
-      if (!this.availableCouponsList) return 0;
-      const today = dayjs();
-      return this.availableCouponsList.reduce((sum, item) => {
-        const expiring =
-          item.unused_coupons?.filter((coupon) => {
-            return coupon.expiration_date && dayjs(coupon.expiration_date).isBefore(today.add(30, 'day'));
-          }) || [];
-        return sum + expiring.length;
-      }, 0);
-    },
-    filteredCouponsAll() {
-      const start = this.appliedStartDate ? dayjs(this.appliedStartDate).startOf('day') : null;
-      const end = this.appliedEndDate ? dayjs(this.appliedEndDate).endOf('day') : null;
-
-      // 기간 교집합 체크: [aStart,aEnd] ↔ [bStart,bEnd]
-      const isOverlap = (aStart, aEnd, bStart, bEnd) => {
-        // aStart/aEnd가 null이면 무한대(-∞/∞)로 간주
-        const beginsBeforeBEnd = !aStart || !bEnd || aStart.isSame(bEnd) || aStart.isBefore(bEnd);
-        const endsAfterBStart = !aEnd || !bStart || aEnd.isSame(bStart) || aEnd.isAfter(bStart);
-        return beginsBeforeBEnd && endsAfterBStart;
-      };
-
-      // 사용 쿠폰은 사용일 기준
-      if (this.activeTab === 'used') {
-        const src = this.usedCouponsList || [];
-        return src
-          .map((item) => {
-            const pool = (item.used_coupons || []).filter((c) => {
-              if (!start || !end) return true;
-              const used = c.used_at || c.created_at; // 되도록 used_at
-              const t = used ? dayjs(used) : null;
-              return t && (t.isSame(start) || t.isAfter(start)) && (t.isSame(end) || t.isBefore(end));
-            });
-            return { ...item, used_coupons: pool };
-          })
-          .filter((item) => (item.used_coupons || []).length > 0);
-      }
-
-      // 보유(미사용) 쿠폰은 "유효기간 구간"과 조회기간이 겹치면 포함
-      const src = this.availableCouponsList || [];
-      return src
-        .map((item) => {
-          const pool = (item.unused_coupons || []).filter((c) => {
-            if (!start || !end) return true;
-
-            // 유효 시작/종료 (가능한 필드 우선순위로 선택)
-            const fromRaw = c.valid_from || c.delivered_date || c.created_at || null;
-            const toRaw = c.valid_to || c.expiration_date || null;
-
-            const from = fromRaw ? dayjs(fromRaw).startOf('day') : null; // null이면 -∞
-            const to = toRaw ? dayjs(toRaw).endOf('day') : null; // null이면  +∞
-
-            return isOverlap(from, to, start, end);
-          });
-          return { ...item, unused_coupons: pool };
-        })
-        .filter((item) => (item.unused_coupons || []).length > 0);
-    },
-    currentCouponSource() {
-      return Array.isArray(this.filteredCouponsAll) ? this.filteredCouponsAll : [];
-    },
-
     couponPageModel() {
-      const source = this.currentCouponSource;
-
-      const size = this.couponPageSize || 5;
-      const totalElements = source.length;
-      const totalPages = Math.max(1, Math.ceil(totalElements / size));
-      const safePage = Math.min(this.couponPageIndex || 0, totalPages - 1);
-
-      const start = safePage * size;
-      const end = start + size;
-      const content = source.slice(start, end);
-
-      return {
-        content,
-        totalElements,
-        totalPages,
-        number: safePage,
-        size,
-        first: safePage === 0,
-        last: safePage === totalPages - 1
-      };
+      return this.couponList;
     }
   },
   watch: {
     activeTab() {
-      this.couponPageIndex = 0;
+      this.loadCouponList(0);
     }
-  },
-
-  mounted() {
-    this.appliedStartDate = this.startDate;
-    this.appliedEndDate = this.endDate;
   },
   methods: {
     onCouponPageChange(index) {
-      this.couponPageIndex = index;
+      this.loadCouponList(index);
     },
 
-    formatDate(dateStr) {
-      if (!dateStr) return '';
-      return dayjs(dateStr).format('YYYY-MM-DD');
+    tabParam() {
+      if (this.activeTab === 'added') return 'available';
+      if (this.activeTab === 'used') return 'used';
+      return 'total';
     },
+
+    // 기간 퀵버튼
     selectFilter(option) {
       this.selectedFilter = option;
       const now = dayjs();
       let start;
-
       switch (option) {
         case '1개월':
           start = now.subtract(1, 'month');
@@ -354,31 +307,103 @@ export default {
         default:
           return;
       }
-
       this.startDate = start.format('YYYY-MM-DD');
       this.endDate = now.format('YYYY-MM-DD');
-
-      // 필터 바뀌면 첫 페이지로
       this.applyPeriodFilter();
-      this.couponPageIndex = 0;
     },
+
     applyPeriodFilter() {
       this.appliedStartDate = this.startDate;
       this.appliedEndDate = this.endDate;
-      this.couponPageIndex = 0;
+      this.loadCouponList(0);
     },
+
+    async loadCouponList(pageIndex = 0) {
+      try {
+        const res = await this.$axios.$get('/user/coupons/usage', {
+          params: {
+            tab: this.tabParam(),
+            startDate: `${this.appliedStartDate} 00:00:00`,
+            endDate: `${this.appliedEndDate} 23:59:59`,
+            page: pageIndex,
+            size: this.pageSizeForLoad
+          }
+        });
+
+        if (Array.isArray(res)) {
+          this.couponList = {
+            content: res,
+            totalElements: res.length,
+            totalPages: 1,
+            number: 0,
+            size: this.pageSizeForLoad,
+            first: true,
+            last: true
+          };
+        } else {
+          this.couponList = {
+            content: res.content || [],
+            totalElements: res.totalElements || 0,
+            totalPages: res.totalPages || 0,
+            number: res.number || 0,
+            size: res.size || this.pageSizeForLoad,
+            first: !!res.first,
+            last: !!res.last
+          };
+          this.totalCoupons = res.totalCoupons ?? 0;
+          this.expiringCoupons = res.expiringCoupons ?? 0;
+        }
+      } catch (e) {
+        console.error(e);
+        this.couponList = {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          number: 0,
+          size: this.pageSizeForLoad,
+          first: true,
+          last: true
+        };
+        this.totalCoupons = 0;
+        this.expiringCoupons = 0;
+      }
+    },
+
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      return dayjs(dateStr).format('YYYY-MM-DD');
+    },
+
     openModal() {
       this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
     },
+
+    onHoverIn() {
+      if (this.hideTimer) {
+        clearTimeout(this.hideTimer);
+        this.hideTimer = null;
+      }
+      this.showModal = true;
+    },
+    onHoverOut(e) {
+      const wrap = this.$refs.benefitWrap;
+      const to = e.relatedTarget;
+      if (wrap && to && wrap.contains(to)) return;
+      this.hideTimer = setTimeout(() => {
+        this.showModal = false;
+        this.hideTimer = null;
+      }, 120);
+    },
+
     imageSrcByCode(code) {
       const rows = (this.membershipBenefit && this.membershipBenefit.items) || [];
       const row = rows.find((r) => Number(r.code) === Number(code));
       if (row && row.image_url) return this.getImage(row.image_url);
       return null;
-    },
+    }
   }
 };
 </script>

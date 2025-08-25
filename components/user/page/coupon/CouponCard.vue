@@ -36,17 +36,12 @@
           :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
           @click.stop="handleOpenModal"
         >
-          쿠폰 사용
+          {{ buttonText }}
         </UButton>
       </div>
       <div class="coupon-remaining">
         <div v-if="!isSelection && !rightButton" class="button">
-          <UButton
-            class="reservation-btn"
-            w-size="100"
-            :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
-            @click="handleOpenModal"
-          >
+          <UButton class="reservation-btn" w-size="100" :disabled="buttonDisabled" @click="handleOpenModal">
             QR코드
           </UButton>
         </div>
@@ -115,7 +110,7 @@ export default {
     rightButton: {
       type: Boolean,
       default: false
-    },
+    }
   },
   data() {
     return {
@@ -153,12 +148,15 @@ export default {
       return this.modelValue === this.value;
     },
     isCouponAwaitingStart() {
-      const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
-      if (!deliveredDate) return true;
+      // const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
+      // if (!deliveredDate) return true;
+      const deliveredDate = this.detailCoupon?.unused_coupons?.[0]?.delivered_date;
+      if (!deliveredDate) return false;
       const today = this.$dayjs();
       const startDate = this.$dayjs(deliveredDate, 'YYYY-MM-DD HH:mm:ss', true);
       if (!startDate.isValid()) {
-        return true;
+        // return true;
+        return false;
       }
       return today.isBefore(startDate);
     },
@@ -170,6 +168,17 @@ export default {
         return false;
       }
       return true;
+    },
+    hasUnused() {
+      return (this.detailCoupon?.unused_coupons?.length ?? 0) > 0;
+    },
+    buttonDisabled() {
+      // 기존의 버튼 조건
+      return this.isExpired || this.isCouponAwaitingStart || !this.hasUnused;
+    },
+    buttonText() {
+      // 비활성일 땐 '사용 불가', 아니면 '쿠폰 사용'
+      return this.buttonDisabled ? '사용 불가' : '쿠폰 사용';
     }
   },
   created() {
@@ -195,7 +204,9 @@ export default {
       this.$emit('refresh-coupon-list');
     },
     checkExpiration() {
-      this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
+      // this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired); -- 기존 코드
+      const arr = this.detailCoupon?.unused_coupons || [];
+      this.isExpired = arr.length > 0 && arr.every((coupon) => coupon.is_expired === true);
     }
   }
 };
