@@ -8,14 +8,11 @@
       <div class="ticketing-body">
         <div class="membership_info">
           <div class="membership_icon">
-            <!-- <img
+            <img
               v-if="imageSrcByCode(dataMembership.code)"
               :src="imageSrcByCode(dataMembership.code)"
               alt="membership icon"
-            /> -->
-            <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" />
-            <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" />
-            <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" />
+            />
           </div>
           <div class="name_membership">
             <div>

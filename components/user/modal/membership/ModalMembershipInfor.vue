@@ -13,15 +13,12 @@
     <template #content>
       <div>
         <div class="title-modal">
-          <!-- <img
+          <img
             v-if="imageSrcByCode(dataMembership.code)"
             :src="imageSrcByCode(dataMembership.code)"
             style="width: 48px; height: 48px"
             alt="membership icon"
-          /> -->
-          <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
-          <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
-          <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
+          />
           <span class="name-membership">
             {{ dataMembership.name }} 님의 현재 등급은 <B>{{ dataMembership.membership_name }}</B> 입니다.
           </span>
@@ -31,8 +28,7 @@
             <div class="benefit-box">
               <div class="benefit-row">
                 <div class="left">
-                  <!-- <img :src="imageSrcByCode(1)" class="membership-icon2" /> -->
-                  <img src="~assets/img/Brown.png" class="membership-icon2" />
+                  <img :src="imageSrcByCode(1)" class="membership-icon2" />
                   <div class="name_target">
                     <p class="membership-name">{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</p>
                     <p class="membership-target">만 19세 이상 회원</p>
@@ -49,8 +45,7 @@
 
               <div class="benefit-row">
                 <div class="left">
-                  <!-- <img :src="imageSrcByCode(2)" class="membership-icon2" /> -->
-                  <img src="~assets/img/Terracotta.png" class="membership-icon2" />
+                  <img :src="imageSrcByCode(2)" class="membership-icon2" />
                   <div class="name_target">
                     <p class="membership-name">{{ (benefitRows.find((item) => item.code === 2) || {}).name }}</p>
                     <p class="membership-target">
@@ -70,8 +65,7 @@
 
               <div class="benefit-row">
                 <div class="left">
-                  <!-- <img :src="imageSrcByCode(3)" class="membership-icon2" /> -->
-                  <img src="~assets/img/Green.png" class="membership-icon2" />
+                  <img :src="imageSrcByCode(3)" class="membership-icon2" />
                   <div class="name_target">
                     <p class="membership-name">{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</p>
                     <p class="membership-target">만 19세 미만 회원</p>
@@ -103,15 +97,12 @@
   >
     <template #title>
       <div class="title-modal only-mobile">
-        <!-- <img
+        <img
           v-if="imageSrcByCode(dataMembership.code)"
           :src="imageSrcByCode(dataMembership.code)"
           style="width: 48px; height: 48px"
           alt="membership icon"
-        /> -->
-        <img v-if="dataMembership.code === 1" src="~assets/img/Brown.png" class="membership-icon" />
-        <img v-if="dataMembership.code === 2" src="~assets/img/Terracotta.png" class="membership-icon" />
-        <img v-if="dataMembership.code === 3" src="~assets/img/Green.png" class="membership-icon" />
+        />
         <span class="name-membership only-mobile">
           {{ dataMembership.name }} 님의 현재 등급은<br />
           <B>{{ dataMembership.short_name }}</B>
@@ -124,8 +115,7 @@
       <div class="benefit only-mobile" @click.stop>
         <div class="benefit-box only-mobile">
           <div class="benefit-row only-mobile">
-            <!-- <img :src="imageSrcByCode(1)" class="membership-icon2 only-mobile" /> -->
-            <img src="~assets/img/Brown.png" class="membership-icon2 only-mobile" />
+            <img :src="imageSrcByCode(1)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</B>
@@ -140,8 +130,7 @@
           </div>
 
           <div class="benefit-row only-mobile">
-            <!-- <img :src="imageSrcByCode(2)" class="membership-icon2 only-mobile" /> -->
-            <img src="~assets/img/Terracotta.png" class="membership-icon2 only-mobile" />
+            <img :src="imageSrcByCode(2)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 2) || {}).short_name }}</B>
@@ -159,8 +148,7 @@
           </div>
 
           <div class="benefit-row only-mobile">
-            <!-- <img :src="imageSrcByCode(3)" class="membership-icon2 only-mobile" /> -->
-            <img src="~assets/img/Green.png" class="membership-icon2 only-mobile" />
+            <img :src="imageSrcByCode(3)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
                 <B>{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</B>
