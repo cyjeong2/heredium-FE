@@ -632,7 +632,7 @@ export default {
 }
 .transparent-modal {
   z-index: 10;
-  pointer-events: none;
+  pointer-events: auto;
 }
 .modal_title {
   display: flex;

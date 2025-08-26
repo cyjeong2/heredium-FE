@@ -489,16 +489,8 @@ export default {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    :deep(.modal-wrap) {
-      pointer-events: auto !important;
-    }
-    :deep(.modal) {
-      pointer-events: auto !important;
-    }
   }
-.modal-custom :deep(.modal-wrap.background-white) {
-  pointer-events: auto !important;
-}
+
   .title-modal.only-mobile {
     display: flex;
     align-items: left;
