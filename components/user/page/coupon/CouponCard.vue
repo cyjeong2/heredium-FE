@@ -119,15 +119,28 @@ export default {
     };
   },
   computed: {
-    firstUnusedCoupon() {
-      return this.detailCoupon?.unused_coupons?.[0] || {};
+    primaryCoupon() {
+      const unused = this.detailCoupon?.unused_coupons || [];
+      if (unused.length > 0) return unused[0];
+
+      const used = this.detailCoupon?.used_coupons || [];
+      if (used.length > 0) {
+        // 필요하면 정렬 기준을 만료일/사용일 등으로 보강
+        // used.sort((a,b)=> dayjs(b.expiration_date) - dayjs(a.expiration_date));
+        return used[0];
+      }
+      return {};
     },
+    // firstUnusedCoupon() {
+    //   console.log(this.detailCoupon);
+    //   return this.detailCoupon?.unused_coupons?.[0] || {};
+    // },
     isForeverExpiry() {
-      const exp = this.firstUnusedCoupon?.expiration_date || '';
+      const exp = this.primaryCoupon?.expiration_date || '';
       return /^9999-12-31\b/.test(exp); // "9999-12-31" 또는 "9999-12-31 00:00:00" 등 대응
     },
     fullRangeText() {
-      return this.getFormattedDate(this.firstUnusedCoupon?.delivered_date, this.firstUnusedCoupon?.expiration_date);
+      return this.getFormattedDate(this.primaryCoupon?.delivered_date, this.primaryCoupon?.expiration_date);
     },
     startOnlyWithTilde() {
       const txt = String(this.fullRangeText || '');

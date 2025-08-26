@@ -200,7 +200,6 @@ export default {
         size: initialPageSize
       }
     });
-    console.log(couponRes.totalCoupons);
     let couponList;
     let totalCoupons = 0;
     let expiringCoupons = 0;
