@@ -6,12 +6,7 @@
           <p class="name">{{ detailCoupon.name }}</p>
           <p class="date">
             <img src="~assets/img/icon/icon_calender.svg" />
-            <span>{{
-              getFormattedDate(
-                detailCoupon.unused_coupons[0].delivered_date,
-                detailCoupon.unused_coupons[0].expiration_date
-              )
-            }}</span>
+            <span>{{ expiryDisplayText }}</span>
           </p>
           <div class="coupon-remaining">
             <div class="status active">
@@ -66,7 +61,29 @@ export default {
       }
       alert('쿠폰이 모두 사용되었습니다.');
       return '';
-    }
+    },
+    firstUnusedCoupon() {
+      return this.detailCoupon?.unused_coupons?.[0] || {};
+    },
+    isForeverExpiry() {
+      const exp = this.firstUnusedCoupon?.expiration_date || '';
+      return /^9999-12-31\b/.test(exp);
+    },
+    fullRangeText() {
+      const start = this.firstUnusedCoupon?.delivered_date;
+      const end = this.firstUnusedCoupon?.expiration_date;
+
+      if (!start && !end) return '-';
+      return this.getFormattedDate(start, end);
+    },
+    startOnlyWithTilde() {
+      const txt = String(this.fullRangeText || '');
+      const start = txt.split('~')[0]?.trim() || '';
+      return start ? `${start} ~` : '-';
+    },
+    expiryDisplayText() {
+      return this.isForeverExpiry ? this.startOnlyWithTilde : this.fullRangeText;
+    },
   },
   methods: {
     getFormattedDate(startDate, endDate) {
@@ -207,7 +224,11 @@ export default {
     margin: 0 auto;
   }
 
-  .coupon-detail .date { justify-content: center; }
-  .coupon-remaining { justify-content: center; }
+  .coupon-detail .date {
+    justify-content: center;
+  }
+  .coupon-remaining {
+    justify-content: center;
+  }
 }
 </style>

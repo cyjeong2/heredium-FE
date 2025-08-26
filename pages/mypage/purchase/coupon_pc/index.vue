@@ -200,7 +200,6 @@ export default {
         size: initialPageSize
       }
     });
-    console.log(couponRes.totalCoupons);
     let couponList;
     let totalCoupons = 0;
     let expiringCoupons = 0;
@@ -567,8 +566,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 48px;
-  height: 48px;
+  width: 30px;
+  height: 30px;
   margin-top: 20px;
   margin-left: 1.2rem;
 }
