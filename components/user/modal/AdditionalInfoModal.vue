@@ -73,9 +73,9 @@
 
         <!-- Footer -->
         <div class="foot">
-          <UButton button-type="secondary" class="secondary-btn" @click="skipMarketing">다음에 하기</UButton>
+          <UButton button-type="secondary" class="secondary-btn" :disabled="isSaving" @click="skipMarketing">다음에 하기</UButton>
           <!-- <UButton :disabled="!isFormValid" class="primary-btn" @click="submitForm">완료하고 혜택받기</UButton> -->
-          <UButton class="primary-btn" @click="submitForm">선택 내용 저장</UButton>
+          <UButton class="primary-btn" :disabled="isSaving" @click="submitForm">선택 내용 저장</UButton>
         </div>
       </div>
     </div>
@@ -104,6 +104,7 @@ export default {
       },
       regionData: REGION_DATA,
       jobOptions: JOB_OPTIONS,
+      isSaving: false,
     };
   },
   computed: {
@@ -126,40 +127,68 @@ export default {
       );
     },
   },
+  watch: {
+    'form.region.state'(newState) {
+      // 시/도가 비워지면 군/구도 비움
+      if (!newState) {
+        this.form.region.district = null;
+        return;
+      }
+      // 현재 시/도 기준 첫 번째 군/구로 세팅
+      const first = this.districtOptions?.[0]?.value || null;
+      this.form.region.district = first;
+    },
+  },
   methods: {
     async submitForm() {
-      // 직업, 지역, 동의 여부 등록 로직 수정
-      const isLocal = (this.form.region.state === '대전광역시');
+      if (this.isSaving) return;
+      this.isSaving = true;
 
-      const payload = {
-        job: this.form.job,
-        state: this.form.region.state,
-        district: this.form.region.district,
-        isLocalResident: isLocal,
-        isMarketingReceive: this.form.agreeMarketing,
-        marketingPending: false,
-        additionalInfoAgreed: this.form.additionalInfoAgreed,
-      };
+      try {
+        const isLocal = (this.form.region.state === '대전광역시');
+        const payload = {
+          job: this.form.job,
+          state: this.form.region.state,
+          district: this.form.region.district,
+          isLocalResident: isLocal,
+          isMarketingReceive: this.form.agreeMarketing,
+          marketingPending: false,
+          additionalInfoAgreed: this.form.additionalInfoAgreed,
+        };
 
-      const res = await this.$axios.$put('/user/account/marketing', payload);
-      this.$store.commit('service/auth/setUserInfo', res);
+        const res = await this.$axios.$put('/user/account/marketing', payload);
+        this.$store.commit('service/auth/setUserInfo', res);
 
-      this.$emit('issued', res.coupons || []);
-      this.$emit('close');
+        // ✅ 부모가 스냅샷 갱신하도록 알림
+        this.$emit('saved', res);
+        this.$emit('issued', res.coupons || []);
+        this.$emit('close');
+      } catch (err) {
+        console.warn('추가정보 저장 실패', err);
+      } finally {
+        this.isSaving = false;
+      }
     },
     async skipMarketing() {
+      if (this.isSaving) return;
+      this.isSaving = true;
+
       try {
         // 마케팅 동의 안 함(0)
-        await this.$axios.$put('/user/account/marketing', {
+        const res = await this.$axios.$put('/user/account/marketing', {
           marketingPending: false,
           isMarketingReceive: false,
           isLocalResident: false,
           additionalInfoAgreed: false,
         });
 
+         // ✅ 스토어 반영 + 부모에 통지(스냅샷)
+        this.$store.commit('service/auth/setUserInfo', res);
+        this.$emit('saved', res);
       } catch (err) {
         console.warn('마케팅 스킵 처리 실패', err);
       } finally {
+        this.isSaving = false;
         this.$emit('close');
       }
     },

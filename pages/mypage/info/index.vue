@@ -104,8 +104,8 @@
             <div class="form-field">
               <div class="inline-field">
                 <UInput :value="getPhone(account.phone)" readonly disabled class="h-xs" w-size="full" />
-                <UButton class="xs" button-type="chart" @click="onPhoneChange">
-                  {{ currentUser?.birthDate == null ? '휴대폰 인증' : '휴대폰 번호 변경' }}
+                <UButton class="xs" button-type="chart" @click="onPhoneClick">
+                  {{ !currentUser?.birthDate?.trim() ? '휴대폰 인증' : '휴대폰 번호 변경' }}
                 </UButton>
               </div>
             </div>
@@ -246,6 +246,63 @@
         :coupons="issuedCoupons"
         @close="couponModalVisible = false"
       /> -->
+      <AdditionalInfoModal
+        v-if="showAdditionalInfoModal && currentUser?.birthDate"
+        :is-show="showAdditionalInfoModal"
+        @saved="onAdditionalSaved"
+        @close="onAdditionalClosed"
+      />
+      <PhoneConsentModal
+        :is-show="phoneConsent.show"
+        confirm-text="인증하기"
+        cancel-text="취소"
+        confirm-type="primary"
+        cancel-type="secondary"
+        confirm-class="btn-fill"
+        cancel-class="btn-outline"
+        @close="closePhoneConsent"
+        @confirm="confirmPhoneConsent"
+      />
+      <!-- 미성년자 안내 -->
+      <UDialogModal
+        no-scroll-lock
+        :is-show="modal.phoneMinorNotice"
+        title="등급 안내"
+        title-align="center"
+        content-align="center"
+        @close="onMinorCancel"
+      >
+        <template #content>
+          <div class="minor-notice-content">
+            미성년자 등급으로 분류됩니다.<br/>
+            미성년자 등급 선택 시 마일리지가 초기화되며,<br/>
+            만 19세가 도래하는 시점까지<br/>
+            마일리지 적립 및 사용이 제한됩니다.<br/>
+            <span class="highlight">적립 마일리지: {{ mileageTotal }}</span>
+          </div>
+        </template>
+        <template #modal-btn1>
+          <UButton button-type="standard" @click="onMinorCancel">취소</UButton>
+        </template>
+        <template #modal-btn2>
+          <UButton button-type="primary" @click="onMinorProceed">전환하기</UButton>
+        </template>
+      </UDialogModal>
+
+      <!-- 성인 인증 완료 -->
+      <UDialogModal
+        no-scroll-lock
+        :is-show="modal.phoneSuccess"
+        title="인증 완료"
+        title-align="center"
+        content-align="center"
+        @close="onPhoneSuccessProceed"
+      >
+        <template #content>휴대폰 인증이 완료되었습니다.</template>
+        <template #modal-btn2>
+          <UButton button-type="primary" @click="onPhoneSuccessProceed">추가 정보 입력하고 혜택 받기</UButton>
+        </template>
+      </UDialogModal>
     </section>
   </main>
 </template>
@@ -260,11 +317,13 @@ import UCheckbox from '~/components/user/common/UCheckbox';
 import { createFormElement } from '~/assets/js/commons';
 import { REGION_DATA, JOB_OPTIONS, GENDER_TYPE } from '~/assets/js/types';
 // import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
+import AdditionalInfoModal from '~/components/user/modal/AdditionalInfoModal.vue';
+import PhoneConsentModal from '~/components/user/modal/PhoneConsentModal.vue';
 
 export default {
   name: 'MyPage',
   // MarketingCoupon
-  components: { UInput, UButton, UDialogModal, SideBarMyPage, USelect, UCheckbox },
+  components: { UInput, UButton, UDialogModal, SideBarMyPage, USelect, UCheckbox, AdditionalInfoModal, PhoneConsentModal },
   asyncData({ store, redirect }) {
     const isLogged = !!store.getters['service/auth/getAccessToken'];
 
@@ -289,6 +348,8 @@ export default {
         isSave: false,
         isError: false,
         noChange:  false,
+        phoneMinorNotice: false,
+        phoneSuccess: false,
       },
       feedback: {
         email: {
@@ -320,6 +381,7 @@ export default {
         additionalInfoAgreed: false,
         marketingAgreed: false,
       },
+      regionWatchReady: false,
       // 경고 모달 표시용
       showCancelWarning: false,
       pendingPayload: null,
@@ -328,6 +390,15 @@ export default {
       isTerms: { MARKETING: false },
       couponModalVisible: false,
       issuedCoupons: [],
+      phoneChange: false,
+      showAdditionalInfoModal: false,
+      phoneConsent: { show: false },
+      snapshotOnNextUserSync: false,
+      mileageTotal: 0,
+      pendingPhoneUserInfo: null,    // 미성년자일 때 PUT 보류용
+      prePhoneUserSnapshot: null,
+      openAdditionalAfterSuccess: false,
+      isSavingPhone: false,
     };
   },
   async fetch() {
@@ -337,6 +408,9 @@ export default {
           encodeData: this.$route.params.EncodeData
         }
       });
+
+      console.log('userInfo', userInfo)
+
       if (userInfo) {
         this.modify = true;
         this.account = {
@@ -348,6 +422,8 @@ export default {
           isLocalResident: this.$route.params.isLocalResident === 'true',
           isMarketingReceive: this.$route.params.isMarketingReceive === 'true'
         };
+
+        await this.upsertUserFromPhone(userInfo);
       }
     }
   },
@@ -367,17 +443,32 @@ export default {
     }
   },
   watch: {
-    'form.region.state'(newState) {
-      // 시 선택 시 첫 번째 군구 기본 설정
-      const opts = this.districtOptions;
-      if(!this.currentUser.district){
-        this.form.region.district = opts.length ? opts[0].value : null;
+    'form.region.state'(newState, oldState) {
+      // 초기 하이드레이션 중에는 동작하지 않음(기존값 유지)
+      if (!this.regionWatchReady) return;
+
+      // 선택 해제되면 군구도 비움
+      if (!newState) {
+        this.form.region.district = null;
+        return;
       }
-      // this.feedback.region = { isValid: true, text: '' };
+
+      // 사용자가 시/도를 바꿨으면 군구 첫 번째 값으로 초기화
+      const opts = this.districtOptions;         // 새 시/도의 군구 목록
+      this.form.region.district = opts.length ? opts[0].value : null;
+    },
+    currentUser: {
+      immediate: true,
+      deep: false,
+      handler(nv) {
+        if (!nv) return;
+        // ✅ UI만 갱신, 스냅샷 NO
+        this.applyUserToForm(nv, { snapshot: this.snapshotOnNextUserSync });
+        this.snapshotOnNextUserSync = false; // 한 번만 쓰고 바로 끔
+      }
     }
   },
   created() {
-
     if (this.currentUser) {
       // and seed your 추가 정보 form
       this.form.job                  = this.currentUser.job
@@ -388,15 +479,7 @@ export default {
       this.account.isLocalResident   = this.currentUser.isLocalResident
       this.form.marketingAgreedDate  = this.currentUser.marketingAgreedDate
 
-      // ② originalInfo 에도 똑같이 복사
-      Object.assign(this.originalInfo, {
-        email: this.currentUser.email,
-        job:    this.currentUser.job,
-        state:  this.currentUser.state,
-        district: this.currentUser.district,
-        additionalInfoAgreed: this.currentUser.additionalInfoAgreed,
-        marketingAgreed:       this.currentUser.isMarketingReceive,
-      });
+      this.syncOriginalInfoFrom(this.currentUser);
 
       // 인증 콜백으로 돌아왔으면 phoneChange 플래그 켜기
       if (this.$route.params.EncodeData) {
@@ -411,9 +494,252 @@ export default {
       if (this.isSNSLogin) {
         this.onPasswordConfirm();
       }
+
+      this.regionWatchReady = true;
     });
   },
   methods: {
+    // YYYYMMDD 혹은 YYYY-MM-DD 모두 허용
+    parseBirthToDate(birthStr) {
+      if (!birthStr) return null;
+
+      const s = String(birthStr).replace(/\D/g, ''); // 숫자만
+      if (s.length < 8) return null;
+
+      const y = Number(s.slice(0, 4));
+      const m = Number(s.slice(4, 6)) - 1; // JS 월은 0부터
+      const d = Number(s.slice(6, 8));
+
+      const dt = new Date(y, m, d);
+      return Number.isNaN(dt.getTime()) ? null : dt;
+    },
+    getAgeByDob(dob) {
+      if (!dob) return null;
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const mm = today.getMonth() - dob.getMonth();
+      if (mm < 0 || (mm === 0 && today.getDate() < dob.getDate())) age--;
+      return age;
+    },
+    onAdditionalSaved(updated) {
+      // ① 모달이 최신 유저 객체를 넘겨줄 수 있으면 즉시 스냅샷
+      if (updated) {
+        this.applyUserToForm(updated, { snapshot: true });
+      } else {
+        // ② 모달이 스토어만 커밋하고 객체는 안 넘길 때: 다음 currentUser 변경 1회에만 스냅샷
+        this.snapshotOnNextUserSync = true;
+      }
+      this.showAdditionalInfoModal = false;
+    },
+    onAdditionalClosed(payload) {
+      // 취소/그냥 닫기 → 스냅샷 예약 해제
+      this.showAdditionalInfoModal = false;
+    },
+    onPhoneClick() {
+      if (!this.currentUser?.birthDate?.trim()) {
+        this.phoneConsent.show = true;
+        // 체크박스는 모달 내부에서 관리
+      } else {
+        // 이미 인증됨 → 기존 로직
+        this.onPhoneChange();
+      }
+    },
+    closePhoneConsent() {
+      this.phoneConsent.show = false;
+    },
+    confirmPhoneConsent() {
+      this.phoneConsent.show = false;
+      // ✅ 기존 NICE 연동 로직 그대로
+      this.onPhoneChange();
+    },
+    applyUserToForm(obj, { snapshot = false } = {}) {
+      this.form.job                  = obj.job ?? null;
+      this.form.region.state         = obj.state ?? null;
+      this.form.region.district      = obj.district ?? null;
+      this.form.additionalInfoAgreed = !!obj.additionalInfoAgreed;
+      this.isTerms.MARKETING         = !!obj.isMarketingReceive;
+      this.form.marketingAgreedDate  = obj.marketingAgreedDate ?? null;
+      // ✅ 스냅샷은 조건부로만
+      if (snapshot) this.syncOriginalInfoFrom(obj);
+    },
+    async upsertUserFromPhone(userInfo) {
+      // 3단계: 전화·성별·생년월일만 저장 (멤버십 로직 없이)
+      try {
+        await this.apiUpdateIdentity(userInfo);
+      } catch (e) {
+        console.error('identity save failed', e);
+      }
+
+      // 나이 계산 후 모달 분기
+      // const dob  = this.parseBirthToDate(userInfo.birthDate);
+      // const age  = this.getAgeByDob(dob);
+      const age  = 17;
+
+      const isMinor = age !== null && age < 19;
+      if (age !== null) this.minorAge = age;
+
+      // 이후 버튼에서 진행할 때 쓸 원본 저장
+      this.pendingPhoneUserInfo = isMinor ? userInfo : null;  // ⬅️ 성인은 null (중복 호출 방지)
+
+      if (isMinor) {
+        this.modal.phoneMinorNotice = true;   // 미성년자 팝업
+      } else {
+        this.modal.phoneSuccess = true;       // 성인 인증 완료 팝업
+      }
+    },
+    // 새로 추가: Step3 저장용 (멤버십/쿠폰 로직 없음)
+    async apiUpdateIdentity(userInfo) {
+      try {
+        const payload = {
+          gender: userInfo.gender ?? null,
+          birthDate: userInfo.birthDate ?? null,
+          phone: userInfo.mobileNo ?? null,
+          isLocalResident: false,
+          marketingPending: true,
+          additionalInfoAgreed: false,
+          isMarketingReceive: false,
+        };
+        const updated = await this.$axios.$put('/user/account/identity', payload);
+
+        // ✅ 여기서 세팅
+        this.mileageTotal = Number(updated.totalMileage ?? 0);
+
+        // 스토어/폼 동기화(가벼운 저장)
+        this.$store.commit('service/auth/setUserInfo', { ...this.currentUser, ...updated });
+        this.applyUserToForm(updated);
+        this.syncOriginalInfoFrom({ ...this.currentUser, ...updated });
+
+        return updated;
+      } catch (e) {
+        const code = e?.response?.data?.code || e?.response?.data?.MESSAGE;
+        if (code === 'UNDER_FOURTEEN') {
+          this.modal.isError = true;
+          this.errorMsg = '만 14세 미만은 이용이 제한돼요.';
+          return; // 흐름 중단
+        }
+        throw e;
+      }
+    },
+    onPhoneSuccessProceed() {
+      this.modal.phoneSuccess = false;
+      this.afterPhoneSynced();
+    },
+    // 미성년자 '전환하기'에만 호출: 멤버십/쿠폰/만료/알림톡까지 백엔드에서 처리
+    async apiApplyMembershipByAge(userInfo) {
+      const payload = {
+        gender: userInfo.gender ?? null,
+        birthDate: userInfo.birthDate ?? null,
+        phone: userInfo.mobileNo ?? null,
+        isLocalResident: false,
+        isMarketingReceive: false,
+        marketingPending: true,
+        additionalInfoAgreed: false,
+      };
+      const updated = await this.$axios.$put('/user/account/info', payload);
+
+      // 응답 반영 (백엔드가 멤버십/쿠폰 반영한 최신값 반환)
+      this.$store.commit('service/auth/setUserInfo', updated);
+
+      const has = (k) => Object.prototype.hasOwnProperty.call(updated, k);
+      if (has('email')) this.account.email = updated.email;
+      if (has('name'))  this.account.name  = updated.name;
+      if (has('birthDate')) this.account.birthday = updated.birthDate;
+      if (has('gender'))    this.account.gender   = updated.gender;
+      if (has('phone'))     this.account.phone    = updated.phone;
+
+      if (has('job'))                 this.form.job = updated.job;
+      if (has('state'))               this.form.region.state = updated.state;
+      if (has('district'))            this.form.region.district = updated.district;
+      if (has('additionalInfoAgreed')) this.form.additionalInfoAgreed = !!updated.additionalInfoAgreed;
+      if (has('isMarketingReceive'))   this.isTerms.MARKETING = !!updated.isMarketingReceive;
+      if (has('marketingAgreedDate'))  this.form.marketingAgreedDate = updated.marketingAgreedDate;
+
+      this.syncOriginalInfoFrom(updated);
+      return updated;
+    },
+    // 공통 후처리: 추가정보 모달 노출 여부 계산
+    afterPhoneSynced({ deferForSuccess = false } = {}) {
+      const needExtra = !this.isAllSelected({
+        job: this.form.job,
+        state: this.form.region.state,
+        district: this.form.region.district,
+        additionalInfoAgreed: this.form.additionalInfoAgreed,
+        marketingAgreed: this.isTerms.MARKETING,
+      });
+      const hasBirth = !!(this.$store.getters['service/auth/getUserInfo']?.birthDate?.trim());
+
+      if (deferForSuccess) {
+        this.openAdditionalAfterSuccess = hasBirth && needExtra;
+      } else {
+        this.showAdditionalInfoModal = hasBirth && needExtra;
+      }
+    },
+    // 미성년자 모달 버튼
+    async onMinorProceed() {
+      this.modal.phoneMinorNotice = false;
+      if (this.isSavingPhone) return;
+      this.isSavingPhone = true;
+
+      try {
+        if (this.pendingPhoneUserInfo) {
+          await this.apiApplyMembershipByAge(this.pendingPhoneUserInfo);  // ← 멤버십3 전환 + 쿠폰 등 백엔드 처리
+          this.pendingPhoneUserInfo = null;
+        }
+      } catch (e) {
+        const code = e?.response?.data?.code || e?.response?.data?.MESSAGE;
+        this.modal.isError = true;
+        this.errorMsg = code === 'UNDER_FOURTEEN'
+          ? '만 14세 미만은 이용이 제한돼요.'
+          : '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        return;
+      } finally {
+        this.isSavingPhone = false;
+      }
+
+      // 추가 정보 모달 오픈 여부
+      this.afterPhoneSynced();
+    },
+    // ▼ 미성년자 팝업: 취소
+    onMinorCancel() {
+      this.modal.phoneMinorNotice = false;
+      // “기존 유지 + 추가 정보 입력 팝업(동일)” → 기존 규칙대로 열기
+      this.afterPhoneSynced();
+    },
+    // 성인 “인증 완료” 모달 닫기
+    onPhoneSuccessClose() {
+      this.modal.phoneSuccess = false;
+      if (this.openAdditionalAfterSuccess) {
+        this.showAdditionalInfoModal = true;
+        this.openAdditionalAfterSuccess = false;
+      }
+    },
+    syncOriginalInfoFrom(obj) {
+      const has = (k) => Object.prototype.hasOwnProperty.call(obj, k);
+      const toBool = (v) => (typeof v === 'string' ? v === 'true' : !!v);
+
+      // 기본은 기존 값으로 시작
+      const next = { ...this.originalInfo };
+
+      if (has('email'))               next.email = obj.email;
+      if (has('phone'))               next.phone = obj.phone;
+      if (has('job'))                 next.job = obj.job;
+      if (has('state'))               next.state = obj.state;
+      if (has('district'))            next.district = obj.district;
+      if (has('additionalInfoAgreed')) next.additionalInfoAgreed = toBool(obj.additionalInfoAgreed);
+      if (has('isMarketingReceive'))   next.marketingAgreed = toBool(obj.isMarketingReceive);
+
+      this.originalInfo = next;
+    },
+    isAllSelected({ job, state, district, additionalInfoAgreed, marketingAgreed }) {
+      const filled = (v) => (typeof v === 'string' ? v.trim().length > 0 : !!v);
+      return (
+        filled(job) &&
+        filled(state) &&
+        filled(district) &&
+        !!additionalInfoAgreed &&
+        !!marketingAgreed
+      );
+    },
     async onPasswordConfirm() {
       await this.$axios
         .$get('/user/account', {
@@ -529,36 +855,48 @@ export default {
           isMarketingReceive: this.isTerms.MARKETING,
           marketingAgreedDate: this.form.marketingAgreedDate,
           marketingPending: false,
+          phone: this.account.phone,
         }
 
-        // ─── 1) “아무 것도 바뀐 게 없으면” 체크 ──────────────────
-        const noChange =
-          !this.emailChange        &&                   // 이메일 변경 안 함
-          !this.passwordChange     &&                   // 비번 변경 안 함
-          payload.email            === this.originalInfo.email &&
-          payload.job              === this.originalInfo.job &&
-          payload.state            === this.originalInfo.state &&
-          payload.district         === this.originalInfo.district &&
-          payload.additionalInfoAgreed === this.originalInfo.additionalInfoAgreed &&
-          payload.isMarketingReceive   === this.originalInfo.marketingAgreed;
+        // ─── 1) noChange 체크 ───
+        const emailChanged = this.emailChange && (payload.email !== this.originalInfo.email);
+        const passwordChanged = this.passwordChange && !!this.newPassword1;
+
+        const profileChanged =
+          payload.job                  !== this.originalInfo.job ||
+          payload.state                !== this.originalInfo.state ||
+          payload.district             !== this.originalInfo.district ||
+          payload.additionalInfoAgreed !== this.originalInfo.additionalInfoAgreed ||
+          payload.isMarketingReceive   !== this.originalInfo.marketingAgreed;
+
+        const phoneChanged    = payload.phone !== this.originalInfo.phone;
+
+        // 값 기준으로 판단
+        const noChange = !emailChanged && !passwordChanged && !profileChanged && !phoneChanged;
 
         if (noChange) {
-          // show a simple “no changes” dialog
           this.modal.noChange = true;
           return;
         }
         // ────────────────────────────────────────────────────
 
-        const wasComplete = Object.values(this.originalInfo).every(v => !!v);
+        // 2) "원래 완전했는지" 정확히 계산
+        const wasComplete = this.isAllSelected({
+          job: this.originalInfo.job,
+          state: this.originalInfo.state,
+          district: this.originalInfo.district,
+          additionalInfoAgreed: this.originalInfo.additionalInfoAgreed,
+          marketingAgreed: this.originalInfo.marketingAgreed,
+        });
 
-        // 2) 지금도 모두 채워져 있는지
-        const isCompleteNow = [
-          this.form.job,
-          this.form.region.state,
-          this.form.region.district,
-          this.form.additionalInfoAgreed,
-          this.isTerms.MARKETING
-        ].every(v => !!v);
+        // 3) "지금도 완전한지" 계산
+        const isCompleteNow = this.isAllSelected({
+          job: this.form.job,
+          state: this.form.region.state,
+          district: this.form.region.district,
+          additionalInfoAgreed: this.form.additionalInfoAgreed,
+          marketingAgreed: this.isTerms.MARKETING,
+        });
 
         // 3) “원래 완전 → 지금 빠짐” 일 때만 경고 모달
         if (wasComplete && !isCompleteNow) {
@@ -584,18 +922,37 @@ export default {
         });
 
       if (res) {
-        this.account.email = res.email;
 
-        // 추가 정보
-        this.form.job                      = res.job;
-        this.form.region.state             = res.state;
-        this.form.region.district          = res.district;
-        this.form.additionalInfoAgreed     = res.additionalInfoAgreed;
-        this.isTerms.MARKETING             = res.isMarketingReceive;
+        const has = (k) => Object.prototype.hasOwnProperty.call(res, k);
 
+        // 이메일
+        if (has('email')) this.account.email = res.email;
+        if (has('phone')) this.account.phone = res.phone;
+
+        // 추가 정보 (null도 그대로 반영)
+        if (has('job'))                 this.form.job = res.job;
+        if (has('state'))               this.form.region.state = res.state;
+        if (has('district'))            this.form.region.district = res.district;
+        if (has('additionalInfoAgreed')) this.form.additionalInfoAgreed = !!res.additionalInfoAgreed;
+        if (has('isMarketingReceive'))   this.isTerms.MARKETING = !!res.isMarketingReceive;
+        if (has('marketingAgreedDate'))  this.form.marketingAgreedDate = res.marketingAgreedDate;
+
+        // 스토어도 최신값으로
+        this.$store.commit('service/auth/setUserInfo', res);
+
+        // ✅ 원본값을 “방금 저장된 값”으로 동기화
+        this.syncOriginalInfoFrom(res);
+
+        // ✅ 변경 플래그/임시 값 초기화
+        this.emailChange = false;
+        this.passwordChange = false;
+        this.newPassword1 = '';
+        this.newPassword2 = '';
+        this.pendingPayload = null;
+
+        // 쿠폰 모달 / 저장 완료 모달
         this.issuedCoupons = res.coupons || [];
         this.modal.isSave = true;
-        this.$store.commit('service/auth/setUserInfo', res);
       }
     },
     // 모달에서 “네” 눌렀을 때
@@ -1206,5 +1563,18 @@ h2 {
 
 .stack > * + * {
   margin-top: 8px;
+}
+
+.minor-notice-content {
+  font-size: 1.4rem;   /* 기존보다 작은 글자 크기 */
+  line-height: 2.2rem;
+  color: var(--color-grey-8);
+}
+
+.minor-notice-content .highlight {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-weight: 550;
+  font-size: 1.6rem; /* 강조 부분만 조금 크게 */
 }
 </style>
