@@ -249,7 +249,7 @@ export default {
       tabs: [
         { key: 'total', label: '전체' },
         { key: 'added', label: '적립 마일리지' },
-        { key: 'used', label: '사용 마일리지' }
+        { key: 'used', label: '차감 마일리지' }
       ],
       filterOptions: ['1개월', '3개월', '6개월', '1년'],
       selectedFilter: '1개월',
