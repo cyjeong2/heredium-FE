@@ -570,15 +570,12 @@ export default {
   border: 1px solid #e6e6e6;
   background-color: #fff;
 }
-.membership_icon img {
+.membership_icon {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 30px;
   height: 30px;
-  object-fit: contain;
-  max-width: 30px !important;
-  max-height: 30px !important;
   margin-top: 20px;
   margin-left: 1.2rem;
 }
