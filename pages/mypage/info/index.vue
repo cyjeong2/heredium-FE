@@ -249,11 +249,18 @@
       <AdditionalInfoModal
         v-if="showAdditionalInfoModal && currentUser?.birthDate"
         :is-show="showAdditionalInfoModal"
+        :initial-form="{
+          job: form.job,
+          region: { state: form.region.state, district: form.region.district },
+          additionalInfoAgreed: form.additionalInfoAgreed,
+          agreeMarketing: isTerms.MARKETING
+        }"
         @saved="onAdditionalSaved"
         @close="onAdditionalClosed"
       />
       <PhoneConsentModal
         :is-show="phoneConsent.show"
+        :message-html="phoneConsent.message"
         confirm-text="인증하기"
         cancel-text="취소"
         confirm-type="primary"
@@ -392,7 +399,7 @@ export default {
       issuedCoupons: [],
       phoneChange: false,
       showAdditionalInfoModal: false,
-      phoneConsent: { show: false },
+      phoneConsent: { show: false, message: '' },
       snapshotOnNextUserSync: false,
       mileageTotal: 0,
       pendingPhoneUserInfo: null,    // 미성년자일 때 PUT 보류용
@@ -440,7 +447,7 @@ export default {
       return region
         ? region.districts.map(d => ({ value: d, label: d }))
         : [];
-    }
+    },
   },
   watch: {
     'form.region.state'(newState, oldState) {
@@ -499,6 +506,31 @@ export default {
     });
   },
   methods: {
+    restorePendingPayload() {
+      try {
+        const raw = sessionStorage.getItem('mypage.pendingPayload');
+        if (!raw) return false;
+        const p = JSON.parse(raw);
+
+        // 폼/동의 상태 복구
+        this.form.job                  = p.job ?? null;
+        this.form.region.state         = p.state ?? null;
+        this.form.region.district      = p.district ?? null;
+        this.form.additionalInfoAgreed = !!p.additionalInfoAgreed;
+        this.isTerms.MARKETING         = !!p.isMarketingReceive;
+        this.form.marketingAgreedDate  = p.marketingAgreedDate ?? null;
+
+        // 재사용할 수 있게 보관(선택)
+        this.pendingPayload = p;
+
+        // 한 번 쓰고 지움
+        sessionStorage.removeItem('mypage.pendingPayload');
+        return true;
+      } catch (e) {
+        console.warn('restorePendingPayload failed', e);
+        return false;
+      }
+    },
     // YYYYMMDD 혹은 YYYY-MM-DD 모두 허용
     parseBirthToDate(birthStr) {
       if (!birthStr) return null;
@@ -530,6 +562,7 @@ export default {
         this.snapshotOnNextUserSync = true;
       }
       this.showAdditionalInfoModal = false;
+      this.afterPhoneSynced();
     },
     onAdditionalClosed(payload) {
       // 취소/그냥 닫기 → 스냅샷 예약 해제
@@ -538,6 +571,7 @@ export default {
     onPhoneClick() {
       if (!this.currentUser?.birthDate?.trim()) {
         this.phoneConsent.show = true;
+        this.phoneConsent.message = '멤버십 전환을 위해<br/>본인 인증이 필요합니다.';
         // 체크박스는 모달 내부에서 관리
       } else {
         // 이미 인증됨 → 기존 로직
@@ -573,7 +607,7 @@ export default {
       // 나이 계산 후 모달 분기
       // const dob  = this.parseBirthToDate(userInfo.birthDate);
       // const age  = this.getAgeByDob(dob);
-      const age  = 17;
+      const age = 17;
 
       const isMinor = age !== null && age < 19;
       if (age !== null) this.minorAge = age;
@@ -622,7 +656,12 @@ export default {
     },
     onPhoneSuccessProceed() {
       this.modal.phoneSuccess = false;
-      this.afterPhoneSynced();
+      const restored = this.restorePendingPayload();   // ✅ 복구
+      if (restored) {
+        this.showAdditionalInfoModal = true;          // ✅ 이전 입력값으로 모달 오픈
+      } else {
+        this.afterPhoneSynced();
+      }
     },
     // 미성년자 '전환하기'에만 호출: 멤버십/쿠폰/만료/알림톡까지 백엔드에서 처리
     async apiApplyMembershipByAge(userInfo) {
@@ -696,8 +735,12 @@ export default {
         this.isSavingPhone = false;
       }
 
-      // 추가 정보 모달 오픈 여부
-      this.afterPhoneSynced();
+      const restored = this.restorePendingPayload();   // ✅ 복구
+      if (restored) {
+        this.showAdditionalInfoModal = true;          // ✅ 이전 입력값으로 모달 오픈
+      } else {
+        this.afterPhoneSynced();
+      }
     },
     // ▼ 미성년자 팝업: 취소
     onMinorCancel() {
@@ -856,6 +899,26 @@ export default {
           marketingAgreedDate: this.form.marketingAgreedDate,
           marketingPending: false,
           phone: this.account.phone,
+        }
+
+        const complete = this.isAllSelected({
+          job: this.form.job,
+          state: this.form.region.state,
+          district: this.form.region.district,
+          additionalInfoAgreed: this.form.additionalInfoAgreed,
+          marketingAgreed: this.isTerms.MARKETING,
+        });
+        const hasBirth = !!(this.currentUser?.birthDate?.trim());
+
+        if (complete && !hasBirth) {
+          // 저장 값 보관 (리다이렉트 왕복 대비)
+          this.pendingPayload = payload;
+          sessionStorage.setItem('mypage.pendingPayload', JSON.stringify(payload));
+          this.phoneConsent.message =
+          '마케팅 수신활용동의 혜택 수령을 위해<br/>핸드폰 본인인증이 필요합니다.';
+          // 동의 모달(스크린샷) 오픈 → "인증하기"에서 onPhoneChange()
+          this.phoneConsent.show = true;
+          return;
         }
 
         // ─── 1) noChange 체크 ───
