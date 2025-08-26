@@ -479,16 +479,18 @@ export default {
   ::v-deep .modal-inner {
     width: 90vw !important;
     max-width: 360px !important;
-
-    height: 65vh !important;
+    max-height: 80vh !important;
+    height: auto !important;
     border-radius: 24px;
     position: absolute;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    display: flex;
+    display: inline-block;
     flex-direction: column;
     overflow: hidden;
+    padding-bottom: 20px;
+    box-sizing: border-box;
   }
 
   .title-modal.only-mobile {
@@ -514,6 +516,14 @@ export default {
     }
   }
 
+  /* 회색 영역이 꽉 차도록 */
+  .benefit.only-mobile {
+    flex: 1;
+    display: flex;
+  }
+  .benefit-box.only-mobile {
+    flex: 1;
+  }
   .benefit.only-mobile {
     margin-top: -2.2rem;
 
