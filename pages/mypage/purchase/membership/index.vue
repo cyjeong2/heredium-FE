@@ -565,7 +565,7 @@ export default {
 }
 .mileage_description {
   color: #666666;
-  font-size: 1.2rem;
+  font-size: 1.0rem;
 }
 
 .benefit-hover-wrapper {
@@ -705,7 +705,7 @@ export default {
       padding: 0 1.6rem;
       border: 1px solid #ccc;
       background-color: #fff;
-      font-size: 1.4rem;
+      font-size: 16px;
       max-height: 100%;
       box-sizing: border-box;
     }
