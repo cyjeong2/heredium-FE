@@ -79,6 +79,7 @@ export default {
     { src: '~/plugins/vue-awesome-swiper.js', ssr: false }
   ],
   router: {
+    base: '/',
     middleware: ['auth']
   },
   components: true,
@@ -106,6 +107,7 @@ export default {
   },
   buildModules: ['@nuxtjs/eslint-module', '@nuxtjs/stylelint-module', '@nuxt/postcss8'],
   build: {
+    publicPath: '/_nuxt/',
     splitChunks: {
       layouts: true,
       pages: true,
