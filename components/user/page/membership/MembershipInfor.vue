@@ -1,25 +1,26 @@
 <template>
   <KeepAlive>
     <div class="center box">
-      <div v-if="!dataMerbership">
+      <!-- <div v-if="!dataMembership">
         <no-membership />
-      </div>
-      <div v-else>
-        <has-membership :data-membership="dataMerbership" />
+      </div> -->
+      <div>
+        <has-membership :data-membership="dataMembership" />
       </div>
     </div>
   </KeepAlive>
 </template>
 
 <script>
-import NoMembership from './NoMembership.vue';
+// import NoMembership from './NoMembership.vue';
 import HasMembership from './HasMembership.vue';
 
 export default {
   name: 'MembershipInfor',
-  components: { NoMembership, HasMembership },
+  // NoMembership
+  components: { HasMembership },
   props: {
-    dataMerbership: {
+    dataMembership: {
       type: Object,
       required: false,
       default: () => {}

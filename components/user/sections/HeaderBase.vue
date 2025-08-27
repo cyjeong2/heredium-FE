@@ -99,11 +99,19 @@
           <NuxtLink to="/membership/registration" @click.native="menuOff">Membership</NuxtLink>
         </div>
         <div class="depth-nav">
-          <NuxtLink v-slot="{ isActive, href, navigate }" to="/coffee" custom @click.native="menuOff">
+          <a
+            href="https://m.smartstore.naver.com/mykonosblue"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="menuOff"
+          >
+          shop
+          </a>
+          <!-- <NuxtLink v-slot="{ isActive, href, navigate }" to="/coffee" custom @click.native="menuOff">
             <a :class="{ 'nuxt-link-active': isActive }" @click="clearAndGo(navigate, href)">
               <img src="~assets/img/coffee_calligraphy_m.svg" alt="" />
             </a>
-          </NuxtLink>
+          </NuxtLink> -->
         </div>
       </div>
       <NuxtLink to="/ticketing?selectedType=exhibitions" class="ticketing-area">
@@ -203,9 +211,18 @@
             <NuxtLink to="/membership/registration" @click.native="pcMenuTop">Membership</NuxtLink>
           </li>
           <li>
-            <NuxtLink to="/coffee" @click.native="pcMenuTop">
+            <!-- href="https://m.smartstore.naver.com/mykonosblue/category/689e41ba9329436c81ee55eb11b4da0f" -->
+            <a
+              href="https://smartstore.naver.com/mykonosblue"
+              target="_blank"
+              rel="noopener noreferrer"
+              @click="pcMenuTop"
+            >
+            shop
+            </a>
+            <!-- <NuxtLink to="/coffee" @click.native="pcMenuTop">
               <img src="~assets/img/coffee_calligraphy.svg" alt="" />
-            </NuxtLink>
+            </NuxtLink> -->
           </li>
         </ul>
       </nav>
@@ -775,9 +792,9 @@ header {
         display: flex !important;
       }
 
-      .logo {
-        margin-right: 6.925rem;
-      }
+      // .logo {
+      //   margin-right: 6.925rem;
+      // }
 
       &.is-active {
         .nav-wrap {

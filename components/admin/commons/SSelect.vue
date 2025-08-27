@@ -15,7 +15,8 @@
         @focusout="toggleOff"
         @change="onSelected"
       >
-        <option v-for="item in optionList" :key="item.value" :value="item.value">{{ item.label }}</option>
+      <option disabled :value="null">{{ defaultText }}</option>
+      <option v-for="item in optionList" :key="item.value" :value="item.value">{{ item.label }}</option>
       </select>
       <div class="dropdown-icon">
         <i class="ic-expand-more" />
@@ -92,6 +93,9 @@ export default {
       case 'x-large':
         width = 46;
         break;
+      case 's-large':
+        width = 30;
+        break;
       default:
         width = 15.2;
         break;
@@ -113,7 +117,16 @@ export default {
       this.isOpen = !this.isOpen;
     },
     onSelected() {
-      const value = this.selected;
+      let value = this.selected;
+
+      // placeholder가 null/'' 이면 null 유지
+      if (value === '' || value === null) {
+        value = null;
+      } else {
+        const n = Number(value);
+        // 숫자로 변환 가능하면 숫자, 아니면 원본
+        value = Number.isNaN(n) ? value : n;
+      }
 
       this.isOpen = false;
       this.$emit('input', value);

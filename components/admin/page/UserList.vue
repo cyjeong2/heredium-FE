@@ -11,6 +11,14 @@
         <SDropdown v-model="cloneQueryOptions.isMarketingReceive" :option-list="marketingOptionList"
           >마케팅 수신 동의:</SDropdown
         >
+        <!-- ✅ 직업 셀렉트 유지 -->
+        <SDropdown
+          v-model="cloneQueryOptions.job"
+          class="ml-16"
+          :option-list="jobOptionList"
+        >
+          직업:
+        </SDropdown>
       </div>
       <div :style="pageType === 'HANA' ? { border: 'none', padding: 0 } : ''">
         <SSearchBar v-model="cloneQueryOptions.text" @search="onSearch" />
@@ -50,13 +58,15 @@
               <th>연락처</th>
               <th>가입일시</th>
               <th>{{ pageType === 'COMMON' ? '최근 로그인 일시' : '휴면 전환 일시' }}</th>
-              <th>마케팅 수신 동의</th>
+              <th>마케팅<br/>수신 동의</th>
+              <th>직업</th>
+              <th>지역</th>
               <th>전시 관람 횟수</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
-              <td :colspan="pageType === 'HANA' ? '4' : '8'"><div>리스트가 없습니다.</div></td>
+              <td :colspan="pageType === 'HANA' ? '4' : '10'"><div>리스트가 없습니다.</div></td>
             </tr>
             <template v-if="pageType === 'HANA'">
               <tr v-for="(item, index) in data" :key="item.id" @click="onGoDetail(item.id)">
@@ -98,6 +108,12 @@
                   <div>{{ item.isMarketingReceive ? '동의' : '미동의' }}</div>
                 </td>
                 <td>
+                  <div>{{ jobLabel(item.job) }}</div>
+                </td>
+                <td>
+                  <div class="region-cell">{{ regionText(item.state, item.district) }}</div>
+                </td>
+                <td>
                   <div>{{ item.visitCount }}</div>
                 </td>
               </tr>
@@ -118,7 +134,7 @@ import SButton from '~/components/admin/commons/SButton';
 import SSearchBar from '~/components/admin/commons/SSearchBar';
 import SDatepicker from '~/components/admin/commons/SDatepicker';
 import SDivLine from '~/components/admin/commons/SDivLine';
-import { GENDER_TYPE, PAGE_SIZE_OPTIONS } from '~/assets/js/types';
+import { GENDER_TYPE, PAGE_SIZE_OPTIONS, JOB_OPTIONS } from '~/assets/js/types';
 
 export default {
   name: 'UserList',
@@ -161,6 +177,19 @@ export default {
     };
   },
   computed: {
+    // ✅ 직업 셀렉트용 옵션 (선택: 전체 + JOB_OPTIONS)
+    jobOptionList() {
+      // 값은 문자열로 통일 (백엔드가 String 비교)
+      const opts = JOB_OPTIONS.map(o => ({ value: String(o.value), label: o.label }));
+      return [{ value: null, label: '전체' }, ...opts];
+    },
+    // ✅ job 코드→라벨 빠른 조회용 맵
+    jobMap() {
+      return JOB_OPTIONS.reduce((acc, cur) => {
+        acc[cur.value] = cur.label;
+        return acc;
+      }, {});
+    },
     genderOptionList() {
       const genderList = Object.entries(GENDER_TYPE).map(([key, value]) => ({
         label: value,
@@ -210,6 +239,20 @@ export default {
     this.baseUrl = baseUrl;
   },
   methods: {
+    // ✅ 백엔드에서 number 또는 string이 올 수 있으니 문자열로 통일 후 매핑
+    jobLabel(jobValue) {
+      const key = jobValue === 0 ? '0' : String(jobValue ?? '');
+      return this.jobMap[key] ?? '-';
+    },
+    // ✅ 지역 텍스트: 개행(\n)으로 두 줄 표시
+    regionText(state, district) {
+      const s = (state || '').trim();
+      const d = (district || '').trim();
+      if (!s && !d) return '-';
+      if (s && !d) return s;
+      if (!s && d) return d;
+      return `${s}\n${d}`;   // ← 여기만 바뀜
+    },
     getGender(gender) {
       return GENDER_TYPE[gender];
     },
@@ -225,7 +268,8 @@ export default {
           startDate: '',
           endDate: '',
           gender: null,
-          isMarketingReceive: null
+          isMarketingReceive: null,
+          job: null,
         };
       }
       this.cloneQueryOptions.page = 0;
@@ -338,32 +382,35 @@ export default {
       width: 4%;
     }
     &:nth-of-type(2) {
-      width: 20%;
+      width: 12%;
     }
     &:nth-of-type(3) {
-      width: 15%;
+      width: 7%;
     }
     &:nth-of-type(4) {
-      width: 10%;
+      width: 7%;
     }
     &:nth-of-type(5) {
-      width: 10%;
+      width: 7%;
     }
     &:nth-of-type(6) {
-      width: 9%;
+      width: 7%;
     }
     &:nth-of-type(7) {
-      width: 9%;
-    }
-    &:nth-of-type(8) {
       width: 5%;
     }
+    &:nth-of-type(8) {
+      width: 15%;
+    }
     &:nth-of-type(9) {
-      width: 9%;
+      width: 7%;
     }
     &:last-of-type {
-      width: 9%;
+      width: 5%;
     }
   }
+}
+.region-cell {
+  white-space: pre-line; // \n을 실제 줄바꿈으로 렌더
 }
 </style>

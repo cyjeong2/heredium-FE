@@ -5,7 +5,7 @@
       type="radio"
       :checked="isChecked"
       :disabled="disabled"
-      @change="$emit('change', $event.target.value)"
+      @change="onChange"
     />
     <span class="toggle"></span>
     <span v-if="isHasSlotText" class="text"><slot name="default" /></span>
@@ -21,12 +21,12 @@ export default {
   },
   props: {
     value: {
-      type: [String, Boolean],
+      type: [String, Number, Boolean],
       required: false,
       default: ''
     },
     modelValue: {
-      type: String,
+      type: [String, Number, Boolean],
       required: false,
       default: ''
     },
@@ -42,6 +42,22 @@ export default {
     },
     isChecked() {
       return this.modelValue === this.value;
+    }
+  },
+  methods: {
+    onChange(e) {
+      let raw = e?.target?.value;
+
+      // value의 타입에 맞춰 캐스팅
+      if (typeof this.value === 'number') {
+        const n = Number(raw);
+        raw = Number.isNaN(n) ? raw : n;
+      } else if (typeof this.value === 'boolean') {
+        raw = (raw === 'true'); // 라디오 value가 'true'/'false'일 때
+      }
+      // 문자열인 경우는 그대로
+
+      this.$emit('change', raw); // Vue2 v-model 이벤트
     }
   }
 };

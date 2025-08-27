@@ -22,7 +22,7 @@
           />
         </div>
       </div>
-      <div class="field-group">
+      <div v-if="isCouponDate" class="field-group">
         <label>사용기간<b class="must">*</b></label>
         <s-flex-input-grid>
           <template #input>
@@ -54,7 +54,7 @@
       </div>
       <div class="field-group">
         <label>쿠폰종류<b class="must">*</b></label>
-        <div class="field-value">
+        <div class="field-value input-group">
           <SDropdown
             v-model="couponEditor.coupon_type"
             :disabled="disabled"
@@ -87,14 +87,15 @@
               <div>
                 <SCheckbox v-model="couponEditor.is_permanent" :disabled="disabled" />
                 <p>상시할인</p>
-              </div></template
-            >
+              </div>
+              </template>
           </s-flex-input-grid>
         </div>
       </div>
+
       <div class="field-group">
         <label>할인율<b class="must">*</b></label>
-        <div class="field-value">
+        <div class="field-value input-group">
           <s-flex-input-grid>
             <template #input>
               <SDiscountInput
@@ -109,11 +110,11 @@
           </s-flex-input-grid>
         </div>
       </div>
-      <div v-if="!disabled" class="right">
+      <div v-if="!disabled" class="right" :style="{ marginTop: isCouponDate ? '0px' : '60px' }">
         <SButton v-if="showDeleteButton" button-type="standard" w-size="medium" @click="handleDeleteCoupon"
-          >삭제</SButton
+          >쿠폰삭제</SButton
         >
-        <SButton v-if="showAddButton" button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 추가 </SButton>
+        <SButton v-if="showAddButton" button-type="primary" w-size="medium" @click="handleAddNewCoupon"> 쿠폰추가 </SButton>
       </div>
     </div>
   </div>
@@ -184,7 +185,12 @@ export default {
       type: Number,
       required: false,
       default: 0
-    }
+    },
+    isCouponDate: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -251,6 +257,7 @@ export default {
 <style scoped lang="scss">
 .benefit-container {
   display: flex;
+  align-items: flex-start;
   padding: 12px 20px;
   gap: 60px;
   background-color: #eff6ff !important;
@@ -260,7 +267,7 @@ export default {
   .benefit-information {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 16px;
     flex: 1;
     .field-group {
       display: grid;

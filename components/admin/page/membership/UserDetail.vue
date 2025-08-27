@@ -1,0 +1,514 @@
+<template>
+  <div class="edit">
+    <h1 class="mb-17">{{ titleText }}</h1>
+    <div class="info-table">
+      <div class="row">
+        <label>이메일</label>
+        <div>{{ cloneDetailData.email }}</div>
+      </div>
+      <div class="row">
+        <label>이름</label>
+        <div>{{ cloneDetailData.name }}</div>
+      </div>
+      <div class="row">
+        <label>연락처</label>
+        <div>{{ cloneDetailData.phone }}</div>
+      </div>
+      <div class="row">
+        <label>생년월일</label>
+        <div>{{ cloneDetailData.birthDate }}</div>
+        <label>성별</label>
+        <div>{{
+                cloneDetailData.gender === 'M' ? '남'
+                : cloneDetailData.gender === 'W' ? '여'
+                : ''
+            }}
+      </div>
+      </div>
+      <div class="row">
+        <label>가입일시</label>
+        <div>{{ cloneDetailData.createdDate }}</div>
+        <label>최근 로그인 일시</label>
+        <div>{{ cloneDetailData.lastLoginDate }}</div>
+      </div>
+      <div class="row">
+        <label>마케팅 수신 동의 여부</label>
+        <div>{{ cloneDetailData.isMarketingReceive ? '동의' : '미동의' }}</div>
+      </div>
+    </div>
+    <div class="bottom-menus mb-36">
+      <SLink :to="baseUrl">리스트</SLink>
+    </div>
+    <div class="history-header mb-24">
+      <SProgressTab :label="['마일리지 내역']" class="single-tab"/>
+      <SButton v-if="cloneDetailData.code !== 3" button-type="primary" @click="onPointRegister">마일리지 등록</SButton>
+    </div>
+    <SPageable
+      :table-data="tableData"
+      @getTableData="
+        (page) => {
+          $emit('changePage', page);
+        }
+      "
+    >
+      <template #data="{ data }">
+        <table class="admin-table">
+          <thead :class="{ 'data-none': !data || !data[0] }">
+            <tr>
+              <th>NO</th>
+              <th>구분</th>
+              <th>카테고리</th>
+              <th>제목</th>
+              <th>적립일시</th>
+              <th>일련번호</th>
+              <th>결제금액</th>
+              <th>적립<br/>마일리지</th>
+              <th>결제방법</th>
+              <th>작성자</th>
+              <th>비고</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="!data || !data[0]">
+              <td colspan="100%"><div>리스트가 없습니다.</div></td>
+            </tr>
+            <tr
+              v-for="(item, index) in data"
+              :key="item.id"
+              :class="{
+                'child-row': item.relatedMileageId !== null,
+                'has-child': data.some(d => d.relatedMileageId === item.id)
+              }"
+            >
+              <!-- NO -->
+              <td>
+                <div :style="{ paddingLeft: item.relatedMileageId ? '1.5rem' : '0' }">
+                  <span v-if="item.relatedMileageId">└</span>
+                  {{ tableData.startCount - index }}
+                </div>
+              </td>
+              <!-- 구분 -->
+              <td>
+                <div class="text-center">{{ getTypeText(item.type) }}</div>
+              </td>
+              <!-- 카테고리 -->
+              <td>
+                <div class="text-center">{{ getCategoryText(item.category) }}</div>
+              </td>
+              <!-- 제목 -->
+              <td>
+                <div
+                  class="text-left"
+                  :style="{ paddingLeft: item.relatedMileageId ? '2rem' : '0' }"
+                >
+                  {{ item.title }}
+                </div>
+              </td>
+              <!-- 적립일시 -->
+              <td>
+                <div>{{ $dayjs(item.createdDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+              </td>
+              <!-- 일련번호 -->
+              <td>
+                <div class="text-center">{{ item.serialNumber }}</div>
+              </td>
+              <!-- 결제금액 -->
+              <td>
+                <div class="text-right">{{ item.paymentAmount.toLocaleString() }}</div>
+              </td>
+              <!-- 적립마일리지 -->
+              <td>
+                <div class="text-right">{{ item.mileageAmount.toLocaleString() }}</div>
+              </td>
+              <!-- 결제방법 -->
+              <td>
+                <div>{{ getPaymentMethodText(item.paymentMethod) }}</div>
+              </td>
+              <!-- 작성자 -->
+              <td>
+                <div>{{ item.lastModifiedName }}</div>
+                <!-- <div>{{ item.createdName }}</div> -->
+              </td>
+              <td>
+                <div>{{ item.remark }}</div>
+              </td>
+              <td>
+                <div class="flex justify-center">
+                  <SButton
+                    v-if="canShowCancel(item, data)"
+                    button-type="standard"
+                    size="small"
+                    @click="onClickCancel(item, data)"
+                  >
+                    취소
+                  </SButton>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+    </SPageable>
+    <!-- <SDialogModal :is-show="modal.isSave" @close="$router.push(baseUrl)">
+      <template #content>회원정보가 수정되었습니다.</template>
+      <template #modal-btn2>
+        <SLink button-type="primary" :to="baseUrl">확인</SLink>
+      </template>
+    </SDialogModal> -->
+     <!-- <SDialogModal :is-show="modal.isConfirmSave" @close="modal.isConfirmSave = false">
+      <template #content>취소 하시겠습니까?</template>
+      <template #modal-btn1>
+        <SButton button-type="primary" @click="handleRefund">확인</SButton>
+      </template>
+    </SDialogModal> -->
+    <MileageForm
+      :account-id="id"
+      :is-show="modal.isMileageModal"
+      @close="modal.isMileageModal = false"
+      @save="handleSaveMileage"
+    />
+    <CancelReasonForm
+      :is-show="modal.isReasonModal"
+      @close="modal.isReasonModal = false"
+      @confirm="handleRefund"
+    />
+    <SDialogModal :is-show="modal.isUpgradeCancelModal" @close="modal.isUpgradeCancelModal = false">
+      <template #content>현재 마일리지를 취소하시면 멤버십 승급이 취소됩니다. 계속 진행하시겠습니까?</template>
+      <template #modal-btn1>
+        <SButton button-type="standard" @click="modal.isUpgradeCancelModal = false">아니요</SButton>
+      </template>
+      <template #modal-btn2>
+        <SButton button-type="primary" @click="confirmUpgradeCancel">예</SButton>
+      </template>
+    </SDialogModal>
+  </div>
+</template>
+
+<script>
+import cloneDeep from 'lodash/cloneDeep';
+// import SInput from '~/components/admin/commons/SInput';
+// import SCheckbox from '~/components/admin/commons/SCheckbox';
+import SLink from '~/components/admin/commons/SLink';
+import SButton from '~/components/admin/commons/SButton';
+import SPageable from '~/components/admin/commons/SPageable';
+import SProgressTab from '~/components/admin/commons/SProgressTab';
+import { PAYMENT_METHOD_TYPE, MILEAGE_EVENT_TYPE, CATEGORY_STR_TYPE } from '~/assets/js/types';
+import SDialogModal from '~/components/admin/modal/SDialogModal';
+import MileageForm from '~/components/admin/page/membership/MileageForm.vue';
+import CancelReasonForm from '~/components/admin/page/membership/CancelReasonForm.vue';
+
+export default {
+  name: 'UserDetail',
+  // SDialogModal
+  components: { SProgressTab, SPageable, SLink, SButton, MileageForm, CancelReasonForm, SDialogModal },
+  props: {
+    detailData: {
+      type: Object,
+      required: false,
+      default: () => null
+    },
+    tableData: {
+      type: Object,
+      required: false,
+      default: () => null
+    }
+  },
+  data() {
+    return {
+      id: this.$route.params.id,
+      titleText: '계정 정보',
+      baseUrl: '/admin/user/membership',
+      cloneDetailData: cloneDeep(this.detailData),
+      modal: {
+        isSave: false,
+        isMileageModal: false,
+        // isConfirmSave: false
+        isReasonModal: false,
+        isUpgradeCancelModal: false,
+      },
+      isConfirmPending: false,
+      pendingRefundItem: null,
+      isUpgradeCancelFlow: false,
+    };
+  },
+  methods: {
+    onPointRegister(){
+      if (this.cloneDetailData.code === 3) {
+        return;
+      }
+
+      this.modal.isMileageModal = true;
+    },
+    async handleSaveMileage(payload) {
+      try {
+        await this.$axios.$post('/admin/membershipMileage', payload);
+        this.modal.isMileageModal = false;
+
+        const currentPage = this.tableData.pageable.pageNumber;
+        this.$emit('changePage', currentPage);
+
+      } catch (err) {
+        console.error(err);
+        alert('저장에 실패했습니다.');
+      }
+    },
+    getCategoryText(code) {
+      return CATEGORY_STR_TYPE[code] || '-';
+    },
+    getPaymentMethodText(code) {
+      // PAYMENT_METHOD_TYPE 이 undefined 면 빈 객체로 대체
+      const map = PAYMENT_METHOD_TYPE || {};
+      return map[code] ?? '-';
+    },
+    getTypeText(code) {
+      return MILEAGE_EVENT_TYPE[code] ?? '-';
+    },
+    handleBeforeRefund(item) {
+      this.isUpgradeCancelFlow = false;
+      this.pendingRefundItem = item;
+      this.modal.isReasonModal = true;
+    },
+    handleBeforeUpgradeCancel(item) {
+
+      this.isUpgradeCancelFlow = false;
+      this.pendingUpgradeItem = { ...item };
+
+      const payload = {
+        accountId: item.accountId,
+        relatedMileageId: item.relatedMileageId,
+        mileageAmount: item.mileageAmount
+      };
+
+      this.$axios
+        .post('/admin/membershipMileage/cancel/check', payload)
+        .then(({ data }) => {
+          if (data.canCancel) {
+            this.modal.isUpgradeCancelModal = true;
+            this.isUpgradeCancelFlow = true;
+          } else {
+            this.confirmUpgradeCancel();
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          this.$q.notify({
+            type: 'negative',
+            message: '서버 오류가 발생했습니다. 다시 시도해주세요.'
+          });
+        });
+    },
+    /**
+     * 2차: 확인 모달에서 '예' 클릭 → 취소사유 모달로 이어감
+     */
+    confirmUpgradeCancel() {
+      this.modal.isUpgradeCancelModal = false;
+      // 그대로 취소사유 모달로 넘어가기
+      this.pendingRefundItem = this.pendingUpgradeItem;
+      this.modal.isReasonModal = true;
+    },
+    async handleRefund(reason) {
+      try {
+        const recordId = this.pendingRefundItem.id;
+        this.modal.isReasonModal = false;
+        // 백엔드에 취소 API 엔드포인트가 있다면 호출
+
+        if (this.isUpgradeCancelFlow) {
+          // └ 승급 취소 전용 엔드포인트 혹은 플래그 전달
+          await this.$axios.$post(
+            `/admin/membershipMileage/${recordId}/refund?upgradeCancel=true`,
+            { reason }
+          );
+        }else{
+          // └ 일반 환불
+          await this.$axios.$post(
+            `/admin/membershipMileage/${recordId}/refund`,
+            { reason }
+          );
+        }
+
+        // 플래그 초기화
+        this.isUpgradeCancelFlow = false;
+        // 성공 후 테이블 새로고침
+        const currentPage = this.tableData.pageable.pageNumber;
+        this.$emit('changePage', currentPage);
+
+      } catch (err) {
+        console.error(err);
+        alert('취소 처리에 실패했습니다.');
+      }
+    },
+     // 가장 최근 승급 부모 id 구하기
+    getLatestUpgradeParentId(rows) {
+      const upgradeParents = rows.filter(r => this.getTypeText(r.type) === '승급');
+      if (upgradeParents.length === 0) return null;
+
+      return upgradeParents.reduce((latest, cur) => {
+        const a = new Date(latest.createdDate).getTime();
+        const b = new Date(cur.createdDate).getTime();
+        return b > a ? cur : latest;
+      }).id;
+    },
+
+    // 취소 버튼 노출 여부
+    canShowCancel(item, rows) {
+      // 0) 티켓 연동된 내역은 취소 불가
+      if (item.ticketId != null) return false; // null/undefined 둘 다 차단
+
+      // 1) 일반 적립(부모)은 취소 가능
+      if (item.type === 0 && item.relatedMileageId == null) return true;
+
+      // 2) 승급-연결 적립(자식)은 "가장 최근 승급"의 자식만 가능
+      if (item.type === 0 && item.relatedMileageId != null) {
+        const latestId = this.getLatestUpgradeParentId(rows);
+        return latestId != null && item.relatedMileageId === latestId;
+      }
+
+      return false;
+    },
+
+    // 클릭 시 핸들러: 일반/승급취소 분기
+    onClickCancel(item, rows) {
+      if (item.type === 0 && item.relatedMileageId == null) {
+        this.handleBeforeRefund(item);
+        return;
+      }
+      // 승급-연결 적립인 경우: 오직 최신 승급의 자식만
+      const latestId = this.getLatestUpgradeParentId(rows);
+      if (latestId != null && item.relatedMileageId === latestId) {
+        this.handleBeforeUpgradeCancel(item);
+      }
+    },
+
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.edit {
+  > h1 {
+    b {
+      color: var(--color-blue);
+      margin-right: 2rem;
+    }
+  }
+  > h4 {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.9rem;
+    border-bottom: 1px solid var(--color-grey-2);
+  }
+
+  .contents-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    b {
+      color: var(--color-blue);
+      margin-right: 2rem;
+    }
+  }
+
+  .contents {
+    background-color: var(--color-white);
+    border-radius: 0.3rem;
+    overflow: hidden;
+  }
+
+  .bottom-menus {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2.4rem;
+    padding-top: 2.4rem;
+    border-top: 1px solid var(--color-grey-2);
+  }
+
+  .has-feedback > div {
+    display: flex;
+  }
+
+  .admin-table {
+    th {
+      &:first-of-type {
+        width: 5rem;
+      }
+      &:nth-of-type(2) {
+        width: 10rem;
+      }
+      &:nth-of-type(3) {
+        width: 10rem;
+      }
+      &:nth-of-type(4) {
+        width: 30rem;
+      }
+      &:nth-of-type(5) {
+        width: 10rem;
+      }
+      &:nth-of-type(6) {
+        width: 10rem;
+      }
+      &:nth-of-type(7) {
+        width: 10rem;
+      }
+      &:nth-of-type(8) {
+        width: 8rem;
+      }
+      &:nth-of-type(9) {
+        width: 10rem;
+      }
+      &:nth-of-type(10) {
+        width: 10rem;
+      }
+      &:nth-of-type(11) {
+        width: 17rem;
+      }
+      &:last-of-type {
+        width: 10rem;
+      }
+    }
+  }
+  .history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.single-tab ::v-deep .tab:nth-child(2) {
+  display: none !important;
+}
+
+.child-row {
+  /* 전체 줄 색을 살짝 다르게 */
+  background-color: #fafafa;
+
+  /* 만약 첫 번째 셀만 들여쓰기 하고 싶다면
+  td:first-of-type {
+    padding-left: 1.5rem !important;
+  }
+  */
+}
+
+/* 기본 테이블 행은 흰색 */
+.edit .admin-table tbody tr {
+  background-color: #fff !important;
+}
+
+/* .edit 를 루트로 해서 specificity ↑ */
+.edit .admin-table tbody > tr.child-row,
+.edit .admin-table tbody > tr.has-child {
+  background-color: #eeeeee !important;
+}
+
+.edit .admin-table tbody > tr.child-row div,
+.edit .admin-table tbody > tr.has-child div {
+  color: #555 !important;
+}
+/* 마일리지 내역 테이블 로우 기본 커서 유지 */
+.edit .admin-table tbody tr {
+  cursor: default !important;
+}
+
+</style>

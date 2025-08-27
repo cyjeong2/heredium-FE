@@ -8,6 +8,7 @@
           :key="`coupon-${item.id}-${item.unused_coupons?.length}`"
           :detail-coupon="item"
           :is-selection="isSelection"
+          :right-button="rightButton"
           :value="item.id"
           :model-value="selectedCouponId"
           :change="updateSelection"
@@ -40,7 +41,11 @@ export default {
       type: Number,
       required: false,
       default: null
-    }
+    },
+    rightButton: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {};

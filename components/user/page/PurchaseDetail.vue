@@ -6,8 +6,8 @@
         <div class="pc-tabs">
           <h2>구매내역</h2>
           <NuxtLink to="/mypage/purchase/all" class="tab">전시·프로그램</NuxtLink>
-          <NuxtLink to="/mypage/purchase/coffee" class="tab">커피</NuxtLink>
-          <NuxtLink to="/mypage/purchase/membership" class="tab">멤버십·쿠폰함</NuxtLink>
+          <NuxtLink to="/mypage/purchase/membership_pc" class="tab">멤버십</NuxtLink>
+          <NuxtLink to="/mypage/purchase/coupon_pc" class="tab">쿠폰함</NuxtLink>
           <NuxtLink to="/mypage/info" class="big-tab">내 정보 수정</NuxtLink>
         </div>
       </section>

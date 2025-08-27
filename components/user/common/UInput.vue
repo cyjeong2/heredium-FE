@@ -14,11 +14,20 @@
         textAlign: textAlign
       }"
       :type="type"
-      :maxlength="maxlength ? maxlength : '524288'"
+      :maxlength="maxlength || null"
       :disabled="disabled"
-      @input="updateInput"
+      :autocomplete="type === 'email' ? 'email' : (type === 'password' ? 'current-password' : 'on')"
+      :autocapitalize="type === 'email' ? 'none' : null"
+      :autocorrect="type === 'email' ? 'off' : null"
+      :inputmode="isNumberOnly ? 'numeric' : (type === 'email' ? 'email' : null)"
+      spellcheck="false"
+
+      @input="onInput"
       @keyup="keyup"
       @keyup.enter="enter"
+
+      @compositionstart="composing = true"
+      @compositionend="onCompositionEnd"
     />
     <p v-if="!!errorMsg" class="error-msg">{{ errorMsg }}</p>
     <div v-if="subIcon" class="sub-icon">명</div>
@@ -100,7 +109,8 @@ export default {
   },
   data() {
     return {
-      width: ''
+      width: '',
+      composing: false, // ← IME 조합 상태
     };
   },
   created() {
@@ -134,7 +144,17 @@ export default {
     }
   },
   methods: {
-    updateInput(e) {
+    onInput(e) {
+      if (this.composing) {
+        // 한글 조합 중엔 있는 그대로만 반영(가공 X)
+        this.$emit('input', e.target.value);
+        return;
+      }
+      this.$emit('input', this.getComputedValue(e));
+    },
+    onCompositionEnd(e) {
+      this.composing = false;
+      // 조합 종료 시점에만 정규화/가공
       this.$emit('input', this.getComputedValue(e));
     },
     keyup(e) {
@@ -190,6 +210,7 @@ input {
   border: 1px solid var(--color-u-grey-2);
   text-align: left;
   background-color: var(--color-white);
+  border-radius: 2px;
 
   &::placeholder {
     color: var(--color-u-grey-2);
@@ -235,7 +256,7 @@ input {
 .h-xs {
   input {
     width: 100% !important;
-    height: 3.6rem;
+    height: 4rem;
     padding: 0 1.2rem;
     font-size: 1.2rem;
   }
@@ -271,7 +292,7 @@ input {
   .h-xs {
     input {
       width: 32rem !important;
-      height: 4rem;
+      height: 4.5rem;
       padding: 0 1.6rem;
       font-size: 1.4rem;
     }
@@ -294,6 +315,27 @@ input {
   .error-msg {
     font-size: 1.2rem !important;
     margin-top: 0.5rem !important;
+  }
+}
+
+input {
+  color: var(--color-black);
+  caret-color: var(--color-black);
+  -webkit-appearance: none;                     /* iOS 기본 스타일 제거 */
+  appearance: none;
+  background-clip: padding-box;
+
+  /* 영문이 안 보이는 경우 대개 웹폰트 글리프 이슈 → 안전한 폰트 스택 명시 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+               'Noto Sans KR', 'Segoe UI', Roboto, 'Helvetica Neue',
+               Arial, sans-serif;
+}
+
+/* 모바일에서 16px 미만이면 포커스 시 줌 → 버벅임 유발 */
+@media (max-width: 768px) {
+  input {
+    font-size: 16px;  /* 최소 16px 유지 */
+    height: 44px;     /* 줄였던 높이는 44px 이상으로 */
   }
 }
 </style>

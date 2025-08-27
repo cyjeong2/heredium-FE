@@ -19,12 +19,12 @@
       </div>
     </div>
     <div class="top-menus mb-16">
-      <SButton w-size="large" class="mr-16" @click="downloadExcel">엑셀 다운로드</SButton>
+      <SButton w-size="large" class="mr-16" @click="downloadExcel">다운로드</SButton>
+      <!-- <SButton w-size="large" class="mr-16" @click="downloadMileage">마일리지 내역<br>다운로드</SButton> -->
       <SDropdown v-model="queryOptions.size" :option-list="pageSizeList" @change="onSelectSizeChange"
         >리스트 수:</SDropdown
       >
     </div>
-
     <SPageable :table-data="tableData" @getTableData="onChangePage">
       <template #data="{ data }">
         <table class="admin-table">
@@ -35,52 +35,63 @@
               <th>계정</th>
               <th>이름</th>
               <th>연락처</th>
-              <th>결제일시</th>
-              <th>멤버십횟수</th>
-              <th>전시사용횟수</th>
-              <th>프로그램사용횟수</th>
-              <th>음료사용횟수</th>
-              <th>마케팅수신동의</th>
+              <!-- <th>멤버십<br>횟수</th> -->
+              <th>전시<br>사용횟수</th>
+              <th>프로그램<br>사용횟수</th>
+              <th>커피<br>사용횟수</th>
+              <th>마일리지<br>내역</th>
+              <!-- <th>마케팅<br>수신동의</th> -->
             </tr>
           </thead>
           <tbody>
             <tr v-if="!data || !data[0]">
               <td colspan="11"><div>리스트가 없습니다.</div></td>
             </tr>
-            <tr v-for="(item, index) in data" :key="item.id">
+            <tr v-for="(item, index) in data" :key="item.account_id" @click="onGoDetail(item.account_id)">
+              <!-- No -->
               <td>
                 <div>{{ tableData.startCount + index + 1 }}</div>
               </td>
+              <!-- 멤버십 구분 -->
               <td>
                 <div>{{ item.membership_name }}</div>
               </td>
+              <!-- 계정 -->
               <td>
                 <div>{{ item.email }}</div>
               </td>
+              <!-- 이름 -->
               <td>
                 <div>{{ item.name }}</div>
               </td>
+              <!-- 연락처 -->
               <td>
-                <div>{{ item.phone }}</div>
+                <div>{{ formatPhone(item.phone) }}</div>
               </td>
-              <td>
-                <div>{{ item.payment_date }}</div>
-              </td>
-              <td>
+              <!-- 멤버십횟수 -->
+              <!-- <td>
                 <div>{{ item.number_of_memberships }}</div>
-              </td>
+              </td> -->
+              <!-- 전시 사용횟수 -->
               <td>
                 <div>{{ item.number_of_exhibitions_used }}</div>
               </td>
+              <!-- 프로그램 사용횟수 -->
               <td>
                 <div>{{ item.number_of_programs_used }}</div>
               </td>
+              <!-- 커피 사용횟수 -->
               <td>
                 <div>{{ item.number_of_coffee_used }}</div>
               </td>
+              <!-- 마일리지 내역 -->
               <td>
-                <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
+                <div>{{ item.mileage_sum }}</div>
               </td>
+              <!-- 마케팅 수신동의 -->
+              <!-- <td>
+                <div>{{ item.is_agree_to_receive_marketing ? '동의' : '미동의' }}</div>
+              </td> -->
             </tr>
           </tbody>
         </table>
@@ -160,10 +171,13 @@ export default {
       this.tableData.startCount = this.tableData.number * this.tableData.size;
       this.queryOptionsSaved = cloneDeep(this.queryOptions);
     } catch (error) {
-      alert(API_ERROR);
+      console.error(API_ERROR, error)
     }
   },
   methods: {
+    onGoDetail(id) {
+      this.$router.push(`/admin/user/membership/detail/${id}`);
+    },
     onChangePage(page) {
       if (!this.$fetchState.pending) {
         this.queryOptions.page = page;
@@ -215,7 +229,20 @@ export default {
           document.body.removeChild(link);
           URL.revokeObjectURL(href);
         });
-    }
+    },
+    // downloadMileage(){
+    //   alert('마일리지 내역 다운로드')
+    // },
+    formatPhone(phone) {
+      if (!phone) return '';
+      // 1) 숫자만 추출
+      const digits = phone.replace(/\D+/g, '');
+      // 2) 2~3 / 3~4 / 4 자리 그룹으로 나눠 하이픈 삽입
+      return digits.replace(
+        /^(\d{2,3})(\d{3,4})(\d{4})$/,
+        '$1-$2-$3'
+      );
+    },
   }
 };
 </script>
@@ -256,8 +283,8 @@ export default {
   th {
     /* NO */
     &:first-of-type {
-      width: 100px;
-      min-width: 100px;
+      width: 60px;
+      min-width: 60px;
     }
     /* Membership */
     &:nth-of-type(2) {
@@ -276,38 +303,33 @@ export default {
     }
     /* Phone */
     &:nth-of-type(5) {
-      width: 120px;
-      min-width: 120px;
-    }
-    /* Payment date */
-    &:nth-of-type(6) {
-      width: 173px;
-      min-width: 173px;
-    }
-    /* Number of membership */
-    &:nth-of-type(7) {
-      width: 110px;
-      min-width: 110px;
+      width: 130px;
+      min-width: 130px;
     }
     /* Number of display uses */
-    &:nth-of-type(8) {
-      width: 110px;
-      min-width: 110px;
+    &:nth-of-type(6) {
+      width: 80px;
+      min-width: 80px;
     }
     /* Number of program uses */
-    &:nth-of-type(9) {
-      width: 110px;
-      min-width: 110px;
+    &:nth-of-type(7) {
+      width: 80px;
+      min-width: 80px;
     }
     /* Number of drink uses */
-    &:nth-of-type(10) {
-      width: 110px;
-      min-width: 110px;
+    &:nth-of-type(8) {
+      width: 80px;
+      min-width: 80px;
     }
+     /* 마일리지 내역 */
+    // &:nth-of-type(10) {
+    //   width: 80px;
+    //   min-width: 80px;
+    // }
     /* Agree to receive marketing */
     &:last-of-type {
-      width: 100px;
-      min-width: 100px;
+      width: 80px;
+      min-width: 80px;
     }
   }
 }

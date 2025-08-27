@@ -16,7 +16,13 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'preconnect', href: 'https://js.tosspayments.com', crossorigin: '' },
+      { rel: 'dns-prefetch', href: '//js.tosspayments.com' },
+      { rel: 'preconnect', href: 'https://pay.toss.im', crossorigin: '' },
+      { rel: 'dns-prefetch', href: '//pay.toss.im' },
+    ],
     script: [
       {
         integrity: 'sha384-eKjgHJ9+vwU/FCSUG3nV1RKFolUXLsc6nLQ2R1tD0t4YFPCvRmkcF8saIfOZNWf/',
@@ -34,7 +40,8 @@ export default {
       {
         type: 'text/javascript',
         innerHTML: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag("js", new Date());gtag("config", "G-GZHCBRCHVV");`
-      }
+      },
+      { src: 'https://js.tosspayments.com/v1/payment', defer: true },
     ],
     __dangerouslyDisableSanitizers: ['script', 'innerHTML']
   },

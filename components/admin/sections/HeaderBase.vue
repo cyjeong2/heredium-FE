@@ -135,6 +135,9 @@
             <NuxtLink to="/admin/terms/video">
               <span class="bt-1r">영상정보처리기기 운영 관리방침</span>
             </NuxtLink>
+            <NuxtLink to="/admin/terms/marketing">
+              <span class="bt-1r">마케팅 활용 동의 및 광고 수신</span>
+            </NuxtLink>
           </div>
         </div>
         <div v-if="isShowByAuthLevel(['ADMIN', 'SUPERVISOR'])" class="depth-nav">
@@ -192,7 +195,7 @@
       </nav>
     </div>
     <div class="header-bottom">
-      <NuxtLink v-slot="{ isActive, href, navigate }" to="/admin/myinfo">
+      <NuxtLink v-slot="{ isActive, href, navigate }" to="/admin/myinfo" custom>
         <a :class="{ 'nuxt-link-active': isActive }" @click="clearAndGo(navigate, href)">
           <i class="ic-settings" />
           <p class="nt-5">Setting</p>

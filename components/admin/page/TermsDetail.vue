@@ -142,6 +142,11 @@ export default {
         baseUrl = '/admin/site/notice';
         state = '공지';
         break;
+      case 'MARKETING':
+        titleText = '마케팅 활용 동의 및 광고 수신';
+        baseUrl = '/admin/terms/marketing';
+        state = '진행';
+        break;
       default:
         titleText = '올바르지 않은 페이지 타입';
         break;

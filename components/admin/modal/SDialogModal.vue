@@ -47,7 +47,7 @@ export default {
     isShow(newValue) {
       if (!this.noScrollLock) {
         if (newValue) {
-          disableBodyScroll(document);
+          disableBodyScroll(document, { reserveScrollBarGap: true });
         } else {
           clearAllBodyScrollLocks();
         }

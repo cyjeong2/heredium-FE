@@ -73,62 +73,33 @@
 
             <div class="edit-area">
               <div>
-                <section class="membership-coupon has-title-side-btn">
+                <!-- <section class="membership-coupon has-title-side-btn">
                   <h3 class="mb-24">멤버십 정보<b class="must">*</b></h3>
                   <div>
                     <div class="grid-table">
-                      <!-- HEADER -->
+
                       <div class="grid-table-header">노출</div>
                       <div class="grid-table-header">멤버십 이름</div>
-                      <div class="grid-table-header">가격</div>
-                      <div class="grid-table-header">결제버튼 활성화</div>
                       <div class="grid-table-header">세부내용</div>
-                      <!-- BODY -->
+
                       <template v-for="(membership, membershipIndex) in historyItem.memberships">
                         <div
                           v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_checkbox`"
+                          :key="`${membership.id}_checkbox`"
                           class="grid-table-body checkbox-cell"
                         >
                           <SCheckbox v-model="membership.is_enabled" disabled />
                         </div>
                         <div
                           v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_name_edit`"
+                          :key="`${membership.id}_name_edit`"
                           class="grid-table-body membership-name"
                         >
                           <SInput v-model="membership.name" w-size="full" readonly />
                         </div>
                         <div
                           v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_price_edit`"
-                          class="grid-table-body"
-                        >
-                          <SFlexInputGrid>
-                            <template #input>
-                              <SInput
-                                v-model="membership.price"
-                                is-comma-num
-                                w-size="full"
-                                text-align="right"
-                                readonly
-                              />
-                            </template>
-                            <template #content>
-                              <div class="currency">원</div>
-                            </template>
-                          </SFlexInputGrid>
-                        </div>
-                        <div
-                          v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_active-register`"
-                          class="grid-table-body checkbox-cell"
-                        >
-                          <SCheckbox v-model="membership.is_register_membership_button_shown" disabled />
-                        </div>
-                        <div
-                          v-show="!membership.is_deleted"
-                          :key="`${membership.tempId}_action`"
+                          :key="`${membership.id}_action`"
                           class="grid-table-body membership-action"
                         >
                           <div
@@ -141,11 +112,11 @@
                             <i class="ic-arrow-next"></i>
                           </div>
                         </div>
-                        <!-- BENEFIT -->
+
                         <CouponEditor
                           v-for="coupon in membership.coupons"
                           v-show="membershipIndexExpanded === membershipIndex"
-                          :key="`${membership.tempId}_coupon_${coupon.tempId}`"
+                          :key="`${membership.id}_coupon_${coupon.id}`"
                           :coupon="coupon"
                           :validate-before-add-new-coupon="true"
                           disabled
@@ -153,19 +124,23 @@
                       </template>
                     </div>
                   </div>
-                </section>
+                </section> -->
                 <section class="editor mb-16">
-                  <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
+                  <h3 class="mb-16">멤버십 콘텐츠(PC)<b class="must">*</b></h3>
                   <SummernoteEditor v-model.trim="historyItem.content_detail" disabled />
                 </section>
-                <section class="mb-16">
+                <section class="editor mb-16">
+                  <h3 class="mb-16">멤버십 콘텐츠(Mobile)</h3>
+                  <SummernoteEditor v-model.trim="historyItem.content_detail_mobile" disabled />
+                </section>
+                <!-- <section class="mb-16">
                   <h3 class="mb-16">Note</h3>
                   <SImageUploadRepresentative
                     :image-src="historyItem?.note_image?.note_image_url"
                     type="PROJECT_DETAIL_IMAGE"
                     disabled
                   />
-                </section>
+                </section> -->
               </div>
             </div>
           </div>
@@ -176,13 +151,13 @@
 </template>
 
 <script>
-import SCheckbox from '../../commons/SCheckbox.vue';
+// import SCheckbox from '../../commons/SCheckbox.vue';
 import SDatepicker from '../../commons/SDatepicker.vue';
-import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
+// import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SImageUploadRepresentative from '../../commons/SImageUploadRepresentative.vue';
 import SInput from '../../commons/SInput.vue';
 import SToggle from '../../commons/SToggle.vue';
-import CouponEditor from './CouponEditor.vue';
+// import CouponEditor from './CouponEditor.vue';
 import SummernoteEditor from '~/components/admin/commons/Summernote';
 
 export default {
@@ -191,10 +166,10 @@ export default {
     SDatepicker,
     SImageUploadRepresentative,
     SInput,
-    CouponEditor,
+    // CouponEditor,
     SToggle,
-    SFlexInputGrid,
-    SCheckbox,
+    // SFlexInputGrid,
+    // SCheckbox,
     SummernoteEditor
   },
   props: {
@@ -359,7 +334,7 @@ export default {
 
 .grid-table {
   display: grid;
-  grid-template-columns: 7rem 1fr 1fr 20rem 15rem;
+  grid-template-columns: 7rem 1fr 15rem;
   box-shadow: 0 0 0 1px var(--color-grey-2);
   overflow: hidden;
   margin-bottom: 2.75rem;
@@ -375,7 +350,7 @@ export default {
   .create-membership,
   .benefit-container,
   .delete-membership {
-    grid-column: span 5;
+    grid-column: span 3;
   }
   .checkbox-cell {
     display: flex;

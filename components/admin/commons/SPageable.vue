@@ -80,7 +80,6 @@ export default {
       if (this.tableData.totalPages - count < pageCount) {
         count = this.tableData.totalPages - pageCount;
       }
-
       return count;
     },
     pageCount() {
@@ -92,7 +91,6 @@ export default {
       if (count > this.tableData.totalPages) {
         count = this.tableData.totalPages;
       }
-
       return count;
     }
   },

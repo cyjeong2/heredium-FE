@@ -1,16 +1,9 @@
 <template>
   <KeepAlive>
-    <div class="center no-coupon">
-      <div>
-        <picture>
-          <source srcset="~/assets/img/mobile/noresult.png" media="(max-width: 768px)" />
-          <source srcset="~/assets/img/pc/noresult.png" media="(min-width: 769px)" />
-          <img src="~/assets/img/mobile/noresult.png" alt="" />
-        </picture>
-      </div>
+    <div class="center no-mileage">
       <div class="content">
         <div class="center">
-          <p>보유하고 있는 쿠폰이 없습니다.</p>
+          <p>조회된 쿠폰이 없습니다.</p>
         </div>
       </div>
     </div>
@@ -24,12 +17,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.no-coupon {
+.no-mileage {
   padding: 1.5rem 0;
-
+  min-height: 211px;
   .content {
     font-size: 1.6rem;
     font-weight: 500;
+    color: #666666;
   }
 }
 </style>

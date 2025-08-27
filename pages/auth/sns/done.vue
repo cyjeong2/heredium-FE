@@ -1,36 +1,60 @@
 <template>
   <main class="container">
-    <h1>가입되었어요!</h1>
-    <div>
-      <img class="m" src="~assets/img/mobile/register_img.png" alt="" width="120" height="120" />
-      <img class="pc" src="~assets/img/pc/register_img.png" alt="" width="144" height="144" />
+    <div style="margin-top: 4rem;">
+      <img class="m" src="~assets/img/pc/logo.svg" alt="" width="120" height="120" />
+      <img class="pc" src="~assets/img/pc/logo.svg" alt="" width="144" height="144" />
     </div>
-    <div class="check-warp">
-      <UCheckbox @change="updateMoreInfo"><strong>저는 대전에 살아요.</strong></UCheckbox>
-      <p>대전 지역 주민의 전시·프로그램 참여 추이를 확인하기 위해 지역 주민 여부를 파악하고 있어요.</p>
-    </div>
-    <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">메인으로 이동</ULink>
+    <h1>헤레디움<br/> 회원가입을 축하합니다!</h1>
+    <p>헤레디움의 다양한 전시 프로그램을 만나보세요.</p>
+    <ULink :to="$store.state.deviceInfo.isApp ? '/app' : '/'">시작</ULink>
+    <!-- 쿠폰 모달 -->
+    <MarketingCoupon
+      :is-show="showCouponModal"
+      @close="closeCouponModal"
+    />
   </main>
 </template>
 
 <script>
 import ULink from '~/components/user/common/ULink.vue';
-import UCheckbox from '~/components/user/common/UCheckbox.vue';
+import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
 
 export default {
   name: 'SNSRegisterDone',
-  components: { UCheckbox, ULink },
-  async asyncData({ params, query, $axios, redirect }) {
+  components: { ULink, MarketingCoupon },
+  async asyncData({ params, query, $axios, redirect, $dayjs }) {
     const provider = query.provider;
     const snsToken = query.snsToken;
     const encodeData = query.EncodeData;
-    const isMarketingReceive =
-      provider === 'kakao' ? null : query.marketing === 'true' || params.isMarketingReceive === 'true';
+
+     const userInfo = await $axios
+      .$get('/nice/decrypt', {
+        params: {
+          encodeData: query.EncodeData
+        }
+      })
+      .catch(() => {
+        redirect('/auth/register/register1');
+      });
+
+    const qMarketing = query.marketing === 'true'
+    const qState = query.state;
+    const qDistrict = query.district;
+    const isLocal = (qState === '대전광역시');
+
     const loginInfo = await $axios
       .$post(`/oauth2/${provider}/sign-up`, {
         token: snsToken,
         encodeData,
-        isMarketingReceive
+        isMarketingReceive: qMarketing,
+        state: qState,
+        district: qDistrict,
+        isLocalResident: isLocal,
+        gender: qMarketing
+          ? (userInfo.gender === 'MAN' ? 'M' : 'W') : null,
+        birthDate: qMarketing
+          ? $dayjs(userInfo.birthDate).format('YYYY-MM-DD') : null,
+        marketingPending: false,
       })
       .catch((err) => {
         const errMsg = err.response.data.MESSAGE;
@@ -50,14 +74,19 @@ export default {
       redirect('/auth/login');
     }
 
-    return { token: loginInfo.token };
+    return { token: loginInfo.token, marketing : qMarketing };
   },
   data() {
     return {
-      token: null
+      token: null,
+      showCouponModal: false,
     };
   },
   async mounted() {
+    if (this.marketing === 'true') {
+      this.showCouponModal = true;
+    }
+
     if (this.token) {
       this.$store.commit('service/auth/setAccessToken', this.token);
       const userInfo = await this.$axios.$get('/user/account/info').catch(() => {});
@@ -65,8 +94,8 @@ export default {
     }
   },
   methods: {
-    updateMoreInfo(checked) {
-      this.$axios.$put(`/user/account/local-resident?enabled=${checked}`);
+    closeCouponModal() {
+      this.showCouponModal = false;
     }
   }
 };
@@ -154,5 +183,12 @@ a {
     min-width: 21rem !important;
     margin: 3.2rem auto 0;
   }
+}
+
+p {
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 2.24rem;
 }
 </style>

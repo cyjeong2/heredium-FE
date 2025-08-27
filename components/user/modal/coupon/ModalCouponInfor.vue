@@ -2,16 +2,11 @@
   <UModal :is-show="open" class="modal-custom" hide-edge-close-btn hide-head @close="handleClose">
     <template #content>
       <div class="head">
-        <div class="coupon-detail center">
+        <div class="coupon-detail">
           <p class="name">{{ detailCoupon.name }}</p>
           <p class="date">
             <img src="~assets/img/icon/icon_calender.svg" />
-            <span>{{
-              getFormattedDate(
-                detailCoupon.unused_coupons[0].delivered_date,
-                detailCoupon.unused_coupons[0].expiration_date
-              )
-            }}</span>
+            <span>{{ expiryDisplayText }}</span>
           </p>
           <div class="coupon-remaining">
             <div class="status active">
@@ -66,7 +61,29 @@ export default {
       }
       alert('쿠폰이 모두 사용되었습니다.');
       return '';
-    }
+    },
+    firstUnusedCoupon() {
+      return this.detailCoupon?.unused_coupons?.[0] || {};
+    },
+    isForeverExpiry() {
+      const exp = this.firstUnusedCoupon?.expiration_date || '';
+      return /^9999-12-31\b/.test(exp);
+    },
+    fullRangeText() {
+      const start = this.firstUnusedCoupon?.delivered_date;
+      const end = this.firstUnusedCoupon?.expiration_date;
+
+      if (!start && !end) return '-';
+      return this.getFormattedDate(start, end);
+    },
+    startOnlyWithTilde() {
+      const txt = String(this.fullRangeText || '');
+      const start = txt.split('~')[0]?.trim() || '';
+      return start ? `${start} ~` : '-';
+    },
+    expiryDisplayText() {
+      return this.isForeverExpiry ? this.startOnlyWithTilde : this.fullRangeText;
+    },
   },
   methods: {
     getFormattedDate(startDate, endDate) {
@@ -101,7 +118,6 @@ export default {
       border-bottom: 1px solid #d1d5db;
       padding-bottom: 2rem;
       margin-bottom: 2rem;
-
       .name {
         margin-top: 3.2rem;
         font-weight: 700;
@@ -175,6 +191,44 @@ export default {
     button {
       width: 100% !important;
     }
+  }
+}
+.modal-custom {
+  /* body 안에서 head와 qr-box 사이 간격을 통일해서 줌 */
+  ::v-deep .modal .body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    row-gap: 14px;
+  }
+
+  .head {
+    position: relative;
+    align-self: stretch;
+    width: 100%;
+    /* margin-bottom: 12px; */
+  }
+
+  .head .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transform: none;
+    z-index: 2;
+  }
+
+  .head .coupon-detail {
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .coupon-detail .date {
+    justify-content: center;
+  }
+  .coupon-remaining {
+    justify-content: center;
   }
 }
 </style>

@@ -9,37 +9,39 @@
       <img :src="couponImageSrc" />
     </div>
     <div class="coupon-detail">
-      <p class="name">{{ detailCoupon.name }}</p>
-      <div class="discount">
-        <!-- <div v-if="!isSelection" class="date">
-          <img src="~assets/img/icon/icon_discount_tag.svg" />
-          <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
-        </div> -->
-        <div class="date">
-          사용기간:
-          <span>{{
-            getFormattedDate(
-              detailCoupon.unused_coupons[0].delivered_date,
-              detailCoupon.unused_coupons[0].expiration_date
-            )
-          }}</span>
+      <div>
+        <p class="name">{{ detailCoupon.name }}</p>
+        <div class="type-discount">
+          <span class="type">헤레디움 {{ couponTypeLabel }}</span>
+          <span class="discount-text">
+            {{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }} 할인 쿠폰
+          </span>
+        </div>
+        <div class="discount">
+          <!-- <div v-if="!isSelection" class="date">
+            <img src="~assets/img/icon/icon_discount_tag.svg" />
+            <span>{{ detailCoupon.discount_percent === 100 ? '무료' : `${detailCoupon.discount_percent}%` }}</span>
+          </div> -->
+          <div class="date">
+            유효기간:
+            <span>{{ expiryDisplayText }}</span>
+          </div>
         </div>
       </div>
-      <div>
-        <div class="date">
-          사용여부:
-          <span v-if="detailCoupon.unused_coupons.length > 0">사용가능</span>
-          <span v-else>사용완료</span>
-        </div>
+      <div v-if="rightButton && !isSelection" class="right-action">
+        <UButton
+          class="use-btn"
+          w-size="100"
+          button-type="chart"
+          :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
+          @click.stop="handleOpenModal"
+        >
+          {{ buttonText }}
+        </UButton>
       </div>
       <div class="coupon-remaining">
-        <div v-if="!isSelection" class="button">
-          <UButton
-            class="reservation-btn"
-            w-size="100"
-            :disabled="isExpired || isCouponAwaitingStart || detailCoupon.unused_coupons.length === 0"
-            @click="handleOpenModal"
-          >
+        <div v-if="!isSelection && !rightButton" class="button">
+          <UButton class="reservation-btn" w-size="100" :disabled="buttonDisabled" @click="handleOpenModal">
             QR코드
           </UButton>
         </div>
@@ -73,6 +75,7 @@ import UButton from '../../common/UButton.vue';
 import ModalCouponInfor from '../../modal/coupon/ModalCouponInfor.vue';
 import { imageMixin } from '~/mixins/imageMixin';
 import { getDateCommonDateOutput } from '~/assets/js/commons';
+import { COUPON_TYPE_OPTION_LIST } from '~/assets/js/types';
 
 export default {
   name: 'CouponCard',
@@ -103,6 +106,10 @@ export default {
       validator(value) {
         return value === null || ['number', 'string'].includes(typeof value);
       }
+    },
+    rightButton: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -112,6 +119,41 @@ export default {
     };
   },
   computed: {
+    primaryCoupon() {
+      const unused = this.detailCoupon?.unused_coupons || [];
+      if (unused.length > 0) return unused[0];
+
+      const used = this.detailCoupon?.used_coupons || [];
+      if (used.length > 0) {
+        // 필요하면 정렬 기준을 만료일/사용일 등으로 보강
+        // used.sort((a,b)=> dayjs(b.expiration_date) - dayjs(a.expiration_date));
+        return used[0];
+      }
+      return {};
+    },
+    // firstUnusedCoupon() {
+    //   console.log(this.detailCoupon);
+    //   return this.detailCoupon?.unused_coupons?.[0] || {};
+    // },
+    isForeverExpiry() {
+      const exp = this.primaryCoupon?.expiration_date || '';
+      return /^9999-12-31\b/.test(exp); // "9999-12-31" 또는 "9999-12-31 00:00:00" 등 대응
+    },
+    fullRangeText() {
+      return this.getFormattedDate(this.primaryCoupon?.delivered_date, this.primaryCoupon?.expiration_date);
+    },
+    startOnlyWithTilde() {
+      const txt = String(this.fullRangeText || '');
+      const start = txt.split('~')[0]?.trim() || '';
+      return start ? `${start} ~` : '';
+    },
+    expiryDisplayText() {
+      return this.isForeverExpiry ? this.startOnlyWithTilde : this.fullRangeText;
+    },
+    couponTypeLabel() {
+      const opt = COUPON_TYPE_OPTION_LIST.find((o) => o.value === this.detailCoupon.coupon_type);
+      return opt ? opt.label : this.detailCoupon.coupon_type;
+    },
     couponImageSrc() {
       return this.getImage(this.detailCoupon.image_url);
     },
@@ -119,12 +161,15 @@ export default {
       return this.modelValue === this.value;
     },
     isCouponAwaitingStart() {
-      const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
-      if (!deliveredDate) return true;
+      // const deliveredDate = this.detailCoupon?.unused_coupons?.[0].delivered_date;
+      // if (!deliveredDate) return true;
+      const deliveredDate = this.detailCoupon?.unused_coupons?.[0]?.delivered_date;
+      if (!deliveredDate) return false;
       const today = this.$dayjs();
       const startDate = this.$dayjs(deliveredDate, 'YYYY-MM-DD HH:mm:ss', true);
       if (!startDate.isValid()) {
-        return true;
+        // return true;
+        return false;
       }
       return today.isBefore(startDate);
     },
@@ -136,6 +181,17 @@ export default {
         return false;
       }
       return true;
+    },
+    hasUnused() {
+      return (this.detailCoupon?.unused_coupons?.length ?? 0) > 0;
+    },
+    buttonDisabled() {
+      // 기존의 버튼 조건
+      return this.isExpired || this.isCouponAwaitingStart || !this.hasUnused;
+    },
+    buttonText() {
+      // 비활성일 땐 '사용 불가', 아니면 '쿠폰 사용'
+      return this.buttonDisabled ? '사용 불가' : '쿠폰 사용';
     }
   },
   created() {
@@ -161,7 +217,9 @@ export default {
       this.$emit('refresh-coupon-list');
     },
     checkExpiration() {
-      this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired);
+      // this.isExpired = this.detailCoupon?.unused_coupons?.every((coupon) => coupon.is_expired); -- 기존 코드
+      const arr = this.detailCoupon?.unused_coupons || [];
+      this.isExpired = arr.length > 0 && arr.every((coupon) => coupon.is_expired === true);
     }
   }
 };
@@ -173,7 +231,7 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 1.2rem;
-    column-gap: 0.8rem;
+    column-gap: 1.8rem;
     overflow: hidden;
     border: 1px solid transparent;
 
@@ -184,6 +242,7 @@ export default {
     .img-wrap {
       height: 10rem;
       width: 10rem;
+      padding: 2.5rem;
 
       > img {
         width: 100%;
@@ -209,6 +268,7 @@ export default {
       align-items: center;
       column-gap: 4px;
       min-width: 5.2rem;
+      margin-top: 0.6rem;
     }
 
     &.checked {
@@ -220,7 +280,6 @@ export default {
   &-detail {
     display: flex;
     flex: 1;
-    flex-direction: column;
     row-gap: 8px;
     color: var(--color-u-placeholder);
   }
@@ -336,7 +395,78 @@ export default {
 
 @media screen and (min-width: 769px) {
   .coupon-card {
-    max-width: 400px;
+    max-width: 100%;
+  }
+}
+
+.coupon-card {
+  .coupon-detail {
+    /* 제목: 굵게, 크게 */
+    .name {
+      font-size: 1.8rem; /* ≈ 18px */
+      font-weight: 700;
+      line-height: 1.4;
+      color: #111; /* 진한 검정 */
+      margin: 0 0 0.4rem 0; /* 아래 살짝 간격 */
+    }
+
+    /* 본문(설명) */
+    .type-discount {
+      display: block; /* 줄바꿈 */
+      font-size: 1.5rem; /* ≈ 15px */
+      font-weight: 400;
+      line-height: 1.6;
+      color: #111;
+      margin: 0 0 0.4rem 0;
+
+      .type,
+      .discount-text {
+        font-weight: 400; /* 굵기 통일 */
+      }
+    }
+
+    /* 유효기간: 더 작고 회색 */
+    .discount {
+      margin-top: -1rem;
+
+      .date {
+        font-size: 1.3rem; /* ≈ 13px */
+        line-height: 1.6;
+        color: #9e9e9e; /* 회색 */
+        display: inline-block;
+        min-width: unset; /* 기존 최소폭 해제 */
+      }
+    }
+  }
+}
+
+/* 오른쪽 액션 버튼 영역 */
+.right-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto; /* 오른쪽으로 밀기 */
+  padding-right: 3.8rem; /* 살짝 여백 */
+}
+
+.right-action .use-btn {
+  min-width: 92px !important;
+  height: 32px;
+  font-size: 1.4rem;
+  font-weight: 500;
+  padding: 2rem;
+  border: 1px solid black;
+}
+
+/* 작은 화면에서도 버튼이 카드 안에서 잘 맞도록 */
+@media (max-width: 768px) {
+  .right-action {
+    padding-right: 0.4rem;
+  }
+  .right-action .use-btn {
+    min-width: 80px !important;
+    height: 32px;
+    font-size: 1.3rem;
   }
 }
 </style>

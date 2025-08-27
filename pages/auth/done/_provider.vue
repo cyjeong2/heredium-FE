@@ -44,10 +44,12 @@ export default {
         const snsToken = err.response?.data?.BODY || '';
 
         if (errorMessage === 'USER_NOT_FOUND') {
+
+          localStorage.setItem('snsInfo', JSON.stringify({ snsToken, provider }));
           this.$router.push({
-            name: 'auth-sns-terms-agree',
-            params: { snsToken, provider: this.provider }
+            name: 'auth-register-register1',
           });
+          // this.$router.push('/auth/register/register1');
         } else {
           this.$router.push('/auth/login');
         }

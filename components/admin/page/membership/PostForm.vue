@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="row">
-          <label>게시물 등록 기간 / 오픈일</label>
+          <label>게시물 등록 기간 / 오픈일 <b class="must">*</b></label>
           <div>
             <SDatepicker
               v-model="detailData.start_date"
@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="row">
-          <label>오픈일 지정</label>
+          <label>오픈일 지정 <b class="must">*</b></label>
           <div>
             <SDatepicker
               v-model="detailData.open_date"
@@ -70,18 +70,16 @@
     </div>
     <div class="edit-area">
       <div>
-        <section class="membership-coupon has-title-side-btn">
+        <!-- <section class="membership-coupon has-title-side-btn">
           <h3 class="mb-24">멤버십 정보<b class="must">*</b></h3>
           <div>
             <div class="grid-table" :class="{ 'is-error': feedback?.emptyMemberships }">
               <AddMembershipOption @add-membership-option="handlePushMembershipOption" />
-              <!-- HEADER -->
+
               <div class="grid-table-header">노출</div>
               <div class="grid-table-header">멤버십 이름</div>
-              <div class="grid-table-header">가격</div>
-              <div class="grid-table-header">결제버튼 활성화</div>
               <div class="grid-table-header">세부내용</div>
-              <!-- BODY -->
+
               <template v-for="(membership, membershipIndex) in detailData.memberships">
                 <div
                   v-show="!membership.is_deleted"
@@ -96,29 +94,6 @@
                   class="grid-table-body membership-name"
                 >
                   <SInput v-model="membership.name" w-size="full" :class="{ 'is-error': !membership.name }" />
-                </div>
-                <div v-show="!membership.is_deleted" :key="`${membership.tempId}_price_edit`" class="grid-table-body">
-                  <SFlexInputGrid>
-                    <template #input>
-                      <SInput
-                        v-model="membership.price"
-                        is-comma-num
-                        w-size="full"
-                        text-align="right"
-                        :class="{ 'is-error': !membership.price }"
-                      />
-                    </template>
-                    <template #content>
-                      <div class="currency">원</div>
-                    </template>
-                  </SFlexInputGrid>
-                </div>
-                <div
-                  v-show="!membership.is_deleted"
-                  :key="`${membership.tempId}_active-register`"
-                  class="grid-table-body checkbox-cell"
-                >
-                  <SCheckbox v-model="membership.is_register_membership_button_shown" />
                 </div>
                 <div
                   v-show="!membership.is_deleted"
@@ -135,7 +110,7 @@
                     <i class="ic-arrow-next"></i>
                   </div>
                 </div>
-                <!-- BENEFIT -->
+
                 <CouponEditor
                   v-for="(coupon, couponIndex) in membership.coupons"
                   v-show="membershipIndexExpanded === membershipIndex"
@@ -163,14 +138,20 @@
               </template>
             </div>
           </div>
-        </section>
+        </section> -->
         <section class="editor mb-16">
-          <h3 class="mb-16">멤버십 콘텐츠<b class="must">*</b></h3>
+          <h3 class="mb-16">멤버십 콘텐츠(PC)<b class="must">*</b></h3>
           <div class="editor-wrap" :class="{ 'is-error': feedback?.contentDetail }">
             <SummernoteEditor v-model.trim="detailData.content_detail" />
           </div>
         </section>
-        <section class="mb-16">
+        <section class="editor mb-16">
+          <h3 class="mb-16">멤버십 콘텐츠(Mobile)</h3>
+          <div class="editor-wrap">
+            <SummernoteEditor v-model.trim="detailData.content_detail_mobile" />
+          </div>
+        </section>
+        <!-- <section class="mb-16">
           <h3 class="mb-16">Note</h3>
           <SImageUploadRepresentative
             :image-src="detailData.note_image.note_image_url"
@@ -178,7 +159,7 @@
             @image-uploaded="updateNoteImage"
             @image-removed="removeNoteImage"
           />
-        </section>
+        </section> -->
       </div>
       <div class="bottom">
         <SButton @click="modal.isCancel = true">취소</SButton>
@@ -251,7 +232,7 @@
         <SButton button-type="primary" @click="$router.go(0)">확인</SButton>
       </template>
     </SDialogModal>
-    <HistoryModal :is-show="modal.isShowHistory" :history-item="historyItem" @close="modal.isShowHistory = false" />
+    <HistoryModal v-if="historyItem" :is-show="modal.isShowHistory" :history-item="historyItem" @close="modal.isShowHistory = false" />
   </div>
 </template>
 
@@ -260,7 +241,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import SDatepicker from '../../commons/SDatepicker.vue';
-import SFlexInputGrid from '../../commons/SFlexInputGrid.vue';
 import SPageable from '../../commons/SPageable.vue';
 import HistoryModal from './HistoryModal.vue';
 import STitle from '~/components/admin/commons/STitle';
@@ -270,11 +250,11 @@ import SToggle from '~/components/admin/commons/SToggle';
 import SummernoteEditor from '~/components/admin/commons/Summernote';
 import SDialogModal from '~/components/admin/modal/SDialogModal';
 import { COUPON_DEFAULT, MEMBERSHIP_DEFAULT, POST_DETAIL } from '~/assets/js/types';
-import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
+// import SCheckbox from '~/components/admin/commons/SCheckbox.vue';
 import SImageUploadRepresentative from '~/components/admin/commons/SImageUploadRepresentative.vue';
 import { imageMixin } from '~/mixins/imageMixin';
-import AddMembershipOption from '~/components/admin/page/membership/AddMembershipOption.vue';
-import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
+// import AddMembershipOption from '~/components/admin/page/membership/AddMembershipOption.vue';
+// import CouponEditor from '~/components/admin/page/membership/CouponEditor.vue';
 import { toKoreaCurrency } from '~/assets/js/converter';
 import { API_ERROR } from '~/utils/message';
 
@@ -288,12 +268,11 @@ export default {
     SInput,
     SButton,
     STitle,
-    SCheckbox,
+    // SCheckbox,
     SImageUploadRepresentative,
-    AddMembershipOption,
-    CouponEditor,
+    // AddMembershipOption,
+    // CouponEditor,
     SDatepicker,
-    SFlexInputGrid,
     HistoryModal
   },
   mixins: [imageMixin],
@@ -489,13 +468,17 @@ export default {
     },
     isValidate() {
       const feedbackError = {};
+
+      // 제목입력
       if (!this.detailData.name) {
         feedbackError.name = true;
       }
+      // 썸네일입력
       const thumbnail = this.detailData.thumbnail_urls;
       if (!thumbnail || !thumbnail.large || !thumbnail.medium || !thumbnail.small) {
         feedbackError.thumbnailUrl = true;
       }
+
       const startDate = this.detailData.start_date && this.$dayjs(this.detailData.start_date, 'YYYY-MM-DD', true);
       if (!startDate || !startDate.isValid()) {
         feedbackError.start_date = true;
@@ -504,6 +487,7 @@ export default {
       if (!endDate || !endDate.isValid()) {
         feedbackError.end_date = true;
       }
+
       const openDate = this.detailData.open_date && this.$dayjs(this.detailData.open_date, 'YYYY-MM-DD', true);
       if (!openDate || !openDate.isValid()) {
         feedbackError.open_date = true;
@@ -511,35 +495,36 @@ export default {
         feedbackError.open_date = true;
       }
 
+      // 멤버십 콘텐츠
       if (!this.detailData.content_detail) {
         feedbackError.contentDetail = true;
       }
 
-      const memberships = this.detailData?.memberships || [];
-      if (!memberships.length) {
-        feedbackError.emptyMemberships = true;
-      }
+      // const memberships = this.detailData?.memberships || [];
+      // if (!memberships.length) {
+      //   feedbackError.emptyMemberships = true;
+      // }
 
-      feedbackError.memberships = [];
-      for (let membershipIndex = 0; membershipIndex < memberships.length; membershipIndex++) {
-        const membershipItem = memberships[membershipIndex];
-        if (memberships.is_deleted) continue;
-        const membershipFeedback = this.validateMembershipItem(membershipItem);
-        feedbackError.memberships[membershipIndex] = membershipFeedback;
-      }
-      if (feedbackError.memberships.every((item) => !item)) {
-        delete feedbackError.memberships;
-      } else {
-        // expose coupon if error
-        const firstIndexMembershipCouponError = feedbackError.memberships?.findIndex((item) => !!item?.coupons);
-        let currentIndexMembershipCouponError = false;
-        if (typeof this.membershipIndexExpanded === 'number') {
-          currentIndexMembershipCouponError = !!feedbackError.memberships?.[this.membershipIndexExpanded]?.coupons;
-        }
-        if (firstIndexMembershipCouponError !== -1 && !currentIndexMembershipCouponError) {
-          this.membershipIndexExpanded = firstIndexMembershipCouponError;
-        }
-      }
+      // feedbackError.memberships = [];
+      // for (let membershipIndex = 0; membershipIndex < memberships.length; membershipIndex++) {
+      //   const membershipItem = memberships[membershipIndex];
+      //   if (memberships.is_deleted) continue;
+      //   const membershipFeedback = this.validateMembershipItem(membershipItem);
+      //   feedbackError.memberships[membershipIndex] = membershipFeedback;
+      // }
+      // if (feedbackError.memberships.every((item) => !item)) {
+      //   delete feedbackError.memberships;
+      // } else {
+      //   // expose coupon if error
+      //   const firstIndexMembershipCouponError = feedbackError.memberships?.findIndex((item) => !!item?.coupons);
+      //   let currentIndexMembershipCouponError = false;
+      //   if (typeof this.membershipIndexExpanded === 'number') {
+      //     currentIndexMembershipCouponError = !!feedbackError.memberships?.[this.membershipIndexExpanded]?.coupons;
+      //   }
+      //   if (firstIndexMembershipCouponError !== -1 && !currentIndexMembershipCouponError) {
+      //     this.membershipIndexExpanded = firstIndexMembershipCouponError;
+      //   }
+      // }
 
       return feedbackError;
     },
@@ -561,19 +546,20 @@ export default {
       detailData.events = null;
 
       // Delete tempId in membershipOption
-      for (const membershipOption of detailData.memberships) {
-        if (membershipOption.tempId) {
-          delete membershipOption.tempId;
-        }
-        // Delete tempId in coupon
-        for (const coupon of membershipOption.coupons) {
-          if (coupon.tempId) {
-            delete coupon.tempId;
-          }
-        }
-      }
+      // for (const membershipOption of detailData.memberships) {
+      //   if (membershipOption.tempId) {
+      //     delete membershipOption.tempId;
+      //   }
+      //   // Delete tempId in coupon
+      //   for (const coupon of membershipOption.coupons) {
+      //     if (coupon.tempId) {
+      //       delete coupon.tempId;
+      //     }
+      //   }
+      // }
 
       try {
+        console.log('detailData', detailData)
         if (this.mode === 'create') {
           await this.$axios.post('/admin/posts', detailData);
         } else {
@@ -646,7 +632,7 @@ export default {
           };
         });
         transformData.memberships = memberships;
-        transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
+        // transformData.note_image.note_image_url = transformData.note_image.note_image_url || '';
 
         this.historyItem = transformData;
         this.modal.isShowHistory = true;
@@ -747,7 +733,7 @@ export default {
 
 .grid-table {
   display: grid;
-  grid-template-columns: 7rem 1fr 1fr 20rem 15rem;
+  grid-template-columns: 7rem 1fr 15rem;
   box-shadow: 0 0 0 1px var(--color-grey-2);
   overflow: hidden;
   margin-bottom: 2.75rem;
@@ -763,7 +749,7 @@ export default {
   .create-membership,
   .benefit-container,
   .delete-membership {
-    grid-column: span 5;
+    grid-column: span 3;
   }
   .checkbox-cell {
     display: flex;

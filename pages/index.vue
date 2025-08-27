@@ -1,5 +1,34 @@
 <template>
   <div>
+    <!-- 1. 기존회원 초기 휴대폰 인증 모달 -->
+    <MarketingPop
+      v-if="isShowMarketingPop && userInfo?.marketingPending && !userInfo?.birthDate"
+      :is-show="isShowMarketingPop"
+      @close="handleMarketingSkipped"
+    />
+    <!-- 2. 멤버십1이나 멤버십3 등급 모달 -->
+    <NotificationModal
+      v-if="showNotificationModal && userInfo?.marketingPending && notificationCode !== null"
+      :is-show="showNotificationModal"
+      :code="notificationCode"
+      :can-next="notificationCanNext"
+      @next="openAdditionalInfo"
+      @close="showNotificationModal = false"
+    />
+    <!-- @next="openAdditionalInfo" -->
+    <!-- 3. 마케팅 정보 수집 모달 -->
+    <AdditionalInfoModal
+      v-if="showAdditionalInfoModal && userInfo?.marketingPending && userInfo?.birthDate"
+      :is-show="showAdditionalInfoModal"
+      @close="showAdditionalInfoModal = false"
+      @issued="onCouponIssued"
+    />
+    <!-- 4. 동의 회원 > 마케팅 동의 쿠폰 모달 -->
+    <!-- <MarketingCoupon
+      :is-show="showCouponModal"
+      :coupons="issuedCoupons"
+      @close="showCouponModal = false"
+    /> -->
     <client-only>
       <section>
         <Swiper ref="mainSwiper" :options="mainSwiperOption" class="main-slider" @slideChange="onMainSlideChange">
@@ -133,11 +162,16 @@
 import UTag from '~/components/user/common/UTag';
 import { getDateCommonDateOutput, numberPad } from '~/assets/js/commons';
 import UPopupModal from '~/components/user/modal/UPopupModal.vue';
+import MarketingPop from '~/components/user/modal/UMarketingModal.vue';
+// import MarketingCoupon from '~/components/user/modal/coupon/MarketingCoupon.vue';
+import NotificationModal from '~/components/user/modal/NotificationModal.vue';
+import AdditionalInfoModal from '~/components/user/modal/AdditionalInfoModal.vue';
 
 export default {
   name: 'IndexPage',
-  components: { UPopupModal, UTag },
-  async asyncData({ $axios, req }) {
+  // MarketingCoupon
+  components: { UPopupModal, UTag, MarketingPop, NotificationModal, AdditionalInfoModal },
+  async asyncData({ $axios, query, redirect, req, store }) {
     const mainData = await $axios.$get('/user/common/home');
 
     if (req?.body?.previewData) {
@@ -147,7 +181,50 @@ export default {
       mainData.popups = [];
     }
 
-    return { mainData };
+    let userPhoneInfo = null;
+
+    // 이미 birthDate 가 채워진 유저라면(=> 한 번 처리된 유저) EncodeData 분기 스킵
+    const currentUser = store.getters['service/auth/getUserInfo'];
+    const needsAuth = query.EncodeData && !currentUser?.birthDate;
+
+    // 2) EncodeData 쿼리 감지
+    if (needsAuth) {
+      try {
+        // 복호화해서 userPhoneInfo 획득
+        userPhoneInfo = await $axios
+          .$get('/nice/decrypt', {
+            params: {
+              encodeData: query.EncodeData
+            }
+          })
+          .catch(() => {
+            redirect('/');
+          });
+
+          // 2‑2) 유저 정보 업데이트 (PUT)
+          const payload = {
+            gender: userPhoneInfo.gender,
+            birthDate: userPhoneInfo?.birthDate,
+            // …필요한 다른 필드
+            phone: userPhoneInfo.mobileNo,            // 새로 받은 번호
+            isLocalResident: false,
+            isMarketingReceive: false,
+            marketingPending: true,
+            additionalInfoAgreed: false,
+          };
+          const updated = await $axios.$put('/user/account/info', payload);
+
+          // 2‑3) 스토어 커밋
+          store.commit('service/auth/setUserInfo', updated);
+
+          // return redirect({ path: '/', query: {} });
+      } catch {
+        // 복호화 실패 시 홈으로 리다이렉트(혹은 에러 처리)
+        redirect('/')
+      }
+    }
+
+    return { mainData, userPhoneInfo };
   },
   data() {
     return {
@@ -193,7 +270,14 @@ export default {
       currentExSlide: 1,
       isSubTitle: false,
       mainData: null,
-      isShowPopup: false
+      isShowPopup: false,
+      isShowMarketingPop: false,
+      showCouponModal: false,
+      showNotificationModal: false,
+      showAdditionalInfoModal: false,
+      notificationCode: null,
+      notificationCanNext: true,
+      issuedCoupons: [],
     };
   },
   computed: {
@@ -202,6 +286,19 @@ export default {
     },
     exSwiper() {
       return this.$refs.exSwiper.$swiper;
+    },
+    userInfo() {
+      return this.$store.getters['service/auth/getUserInfo'];
+    }
+  },
+  watch: {
+    userPhoneInfo: {
+      handler(newVal) {
+        if (!newVal) return;
+
+        this.handlePhoneInfo();
+      },
+      immediate: true
     }
   },
   created() {
@@ -223,6 +320,7 @@ export default {
       this.isShowPopup = true;
     }
     this.isSubTitle = !!this.mainData?.projects[0]?.subtitle;
+    this.isShowMarketingPop = true;
   },
   methods: {
     getFormattedDate(startDate, endDate) {
@@ -245,8 +343,52 @@ export default {
     },
     goExDetail(item) {
       this.$router.push(`/${item.kind.toLowerCase()}/${item.id}`);
-    }
-  }
+    },
+    onCouponIssued(coupons) {
+      // 3번 팝업에서 넘어온 쿠폰 리스트 저장
+      this.issuedCoupons = coupons;
+      // 3번 팝업 닫고
+      this.showAdditionalInfoModal = false;
+      // 4번 쿠폰 모달 열기
+      this.showCouponModal = true;
+    },
+    onMarketingPopClose(code) {
+      this.isShowMarketingPop = false;
+      this.showNotificationModal = true;    // 2단계 열기
+    },
+    // 3단계에서 완료되면 쿠폰 모달
+    onAdditionalInfoIssued() {
+      this.showAdditionalInfoModal = false;
+      this.showCouponModal = true;          // 4단계 쿠폰 모달
+    },
+    // NotificationModal 'next' 눌렀을 때
+    openAdditionalInfo() {
+      this.showNotificationModal = false;
+      this.showAdditionalInfoModal = true;  // 3단계 열기
+    },
+    openCoupon() {
+      this.showNotificationModal = false;
+      this.showCouponModal = true;
+    },
+    handlePhoneInfo() {
+      // ② 생년월일로 나이 계산
+      const birth = this.$dayjs(this.userInfo?.birthDate, 'YYYY-MM-DD');
+      const today = this.$dayjs();
+      let age = today.year() - birth.year();
+      if (today.isBefore(birth.add(age, 'year'))) age--;
+      // ③ 알림 코드 결정
+      this.notificationCode = age < 19 ? 3 : 1;
+      // ④ 알림 모달 열기
+      this.showNotificationModal = true;
+    },
+    // 1‑1. 팝업에서 "취소/닫기" 눌렀을 때
+    handleMarketingSkipped() {
+      this.isShowMarketingPop = false;
+      this.notificationCanNext  = false;           // 다음 버튼 숨김
+      this.notificationCode       = 1;
+      this.showNotificationModal = true;           // NotificationModal 열기
+    },
+  },
 };
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="isShow" class="modal-wrap">
+    <div v-if="isShow" class="modal-wrap" :class="{ 'background-white': backgroundWhite }">
       <div class="modal-inner">
         <div class="modal">
           <div v-if="!hideHead" class="head">
@@ -43,6 +43,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    backgroundWhite: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -75,7 +80,12 @@ export default {
   z-index: 500;
   background-color: rgba(17, 17, 17, 0.8);
 }
-
+.modal-wrap.background-white {
+  position: fixed;
+  top: 0;
+  z-index: 500;
+  background-color: transparent;
+}
 .modal-inner {
   position: absolute;
   width: calc(100% - 4rem);

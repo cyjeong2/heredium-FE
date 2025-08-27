@@ -66,7 +66,11 @@ export default ({ redirect, store, route }) => {
     const userToken = store.getters['service/auth/getAccessToken'];
 
     if (depthLevel1 === 'mypage' && !userToken) {
-      redirect('/auth/login');
+      // 로그인 페이지로 보낼 때 query에 원본 URL(fullPath)을 담아서 보냄
+      return redirect({
+        path: '/auth/login',
+        // query: { redirectPage: route.fullPath }
+      });
     }
   }
 };
