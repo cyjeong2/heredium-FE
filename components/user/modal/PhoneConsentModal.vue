@@ -8,9 +8,7 @@
         </div>
 
         <div class="body" body-scroll-lock-ignore>
-          <h3 style="text-align:center; margin:3rem 0;">
-            멤버십 전환을 위해<br/>본인 인증이 필요합니다.
-          </h3>
+          <h3 class="title" style="text-align:center; margin:3rem 0;" v-html="messageHtml"></h3>
 
           <div class="term-select" style="text-align:center;">
             <UCheckbox v-model="isTerms.AGREE">
@@ -67,6 +65,10 @@ export default {
     cancelType:  { type: String, default: 'secondary' },
     confirmClass:{ type: String, default: '' },           // 추가 CSS 클래스
     cancelClass: { type: String, default: '' },
+    messageHtml: {
+      type: String,
+      default: '멤버십 전환을 위해<br/>본인 인증이 필요합니다.'
+    },
   },
   data() {
     return {

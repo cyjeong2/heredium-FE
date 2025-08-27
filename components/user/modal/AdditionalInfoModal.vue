@@ -92,7 +92,16 @@ export default {
   name: 'AdditionalInfoModal',
   components: { USelect, UCheckbox, UButton },
   props: {
-    isShow: { type: Boolean, required: true }
+    isShow: { type: Boolean, required: true },
+    initialForm: {
+      type: Object,
+      default: () => ({
+        job: null,
+        region: { state: null, district: null },
+        additionalInfoAgreed: false,
+        agreeMarketing: false,     // 또는 isMarketingReceive와 호환
+      })
+    },
   },
   data() {
     return {
@@ -105,6 +114,7 @@ export default {
       regionData: REGION_DATA,
       jobOptions: JOB_OPTIONS,
       isSaving: false,
+      hydrating: false,
     };
   },
   computed: {
@@ -128,18 +138,54 @@ export default {
     },
   },
   watch: {
+    // 모달이 열릴 때 초기값 주입
+    isShow(newVal) {
+      if (newVal) this.$nextTick(() => this.hydrateFromInitial());
+    },
+    // 부모 프롭 값이 바뀌면(복구/재오픈) 다시 주입
+    initialForm: {
+      deep: true,
+      handler() {
+        if (this.isShow) this.hydrateFromInitial();
+      }
+    },
     'form.region.state'(newState) {
+      if (this.hydrating) return;
       // 시/도가 비워지면 군/구도 비움
       if (!newState) {
         this.form.region.district = null;
         return;
       }
       // 현재 시/도 기준 첫 번째 군/구로 세팅
-      const first = this.districtOptions?.[0]?.value || null;
-      this.form.region.district = first;
+      const hasCurrent = this.districtOptions.some(o => o.value === this.form.region.district);
+      if (!hasCurrent) {
+        this.form.region.district = this.districtOptions?.[0]?.value || null;
+      }
     },
   },
+  mounted() {
+   // 컴포넌트 마운트 시점에 이미 열려 있으면 한 번 주입
+   if (this.isShow) this.hydrateFromInitial();
+  },
   methods: {
+    hydrateFromInitial() {
+      this.hydrating = true;
+      const src = this.initialForm || {};
+      this.form.additionalInfoAgreed = !!src.additionalInfoAgreed;
+      this.form.agreeMarketing      = !!(src.agreeMarketing ?? src.isMarketingReceive);
+      this.form.job                 = src.job ?? null;
+
+      // 지역
+      const state = src.region?.state ?? src.state ?? null;
+      const districtCandidate = src.region?.district ?? src.district ?? null;
+      this.form.region.state = state;
+
+      const dists = this.regionData.find(r => r.state === state)?.districts ?? [];
+      this.form.region.district = dists.includes(districtCandidate)
+        ? districtCandidate
+        : (dists[0] || null);
+      this.$nextTick(() => { this._hydrating = false; });
+    },
     async submitForm() {
       if (this.isSaving) return;
       this.isSaving = true;
