@@ -30,7 +30,7 @@
                 <div class="left">
                   <img :src="imageSrcByCode(1)" class="membership-icon2" />
                   <div class="name_target">
-                    <p class="membership-name">{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</p>
+                    <p class="membership-name only-pc">{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</p>
                     <p class="membership-target">만 19세 이상 회원</p>
                   </div>
                 </div>
@@ -47,7 +47,7 @@
                 <div class="left">
                   <img :src="imageSrcByCode(2)" class="membership-icon2" />
                   <div class="name_target">
-                    <p class="membership-name">{{ (benefitRows.find((item) => item.code === 2) || {}).name }}</p>
+                    <p class="membership-name only-pc">{{ (benefitRows.find((item) => item.code === 2) || {}).name }}</p>
                     <p class="membership-target">
                       마일리지 {{ benefitRows.find((item) => item.code === 2)?.usage_threshold }}점 달성
                       {{ benefitRows.find((item) => item.code === 1)?.name }} 회원
@@ -67,7 +67,7 @@
                 <div class="left">
                   <img :src="imageSrcByCode(3)" class="membership-icon2" />
                   <div class="name_target">
-                    <p class="membership-name">{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</p>
+                    <p class="membership-name only-pc">{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</p>
                     <p class="membership-target">만 19세 미만 회원</p>
                   </div>
                 </div>
@@ -118,7 +118,7 @@
             <img :src="imageSrcByCode(1)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
-                <B>{{ (benefitRows.find((item) => item.code === 1) || {}).name }}</B>
+                <B>{{ (benefitRows.find((item) => item.code === 1) || {}).short_name }}</B>
               </p>
               <p class="membership-target only-mobile">만 19세 이상 회원</p>
               <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(1).length <= 2 }">
@@ -151,7 +151,7 @@
             <img :src="imageSrcByCode(3)" class="membership-icon2 only-mobile" />
             <div class="name_target only-mobile">
               <p class="membership-name only-mobile">
-                <B>{{ (benefitRows.find((item) => item.code === 3) || {}).name }}</B>
+                <B>{{ (benefitRows.find((item) => item.code === 3) || {}).short_name }}</B>
               </p>
               <p class="membership-target only-mobile">만 19세 미만 회원</p>
               <div class="benefit-grid only-mobile" :class="{ 'one-row': getOrderedCouponsByCode(3).length <= 2 }">
@@ -202,6 +202,7 @@ export default {
   },
   computed: {
     coupons1() {
+      console.log(this.benefitRows)
       return this.getOrderedCouponsByCode(1);
     },
     coupons2() {
