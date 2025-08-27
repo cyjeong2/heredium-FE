@@ -124,9 +124,9 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="uiStartDate" :max="uiEndDate" style="width: 227.5px" />
+            <UDatepicker v-model="uiStartDate" :max="uiEndDate" style="width: 175px" />
             <span>~</span>
-            <UDatepicker v-model="uiEndDate" :min="uiStartDate" style="width: 227.5px" />
+            <UDatepicker v-model="uiEndDate" :min="uiStartDate" style="width: 175px" />
           </div>
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
         </div>
@@ -146,7 +146,7 @@
                   <th>적립내역</th>
                   <th>유효기간</th>
                   <th>적립</th>
-                  <th>차감</th>
+                  <th>사용</th>
                 </tr>
               </thead>
               <tbody>
@@ -445,7 +445,7 @@ export default {
 }
 
 .ticketing-body {
-  width: 2300px;
+  width: 100%;
   height: 200px !important;
 
   .ticketing-info {
@@ -561,8 +561,7 @@ export default {
   flex-direction: row;
   align-items: flex-start;
 
-  width: 80%;
-  max-width: 1000px;
+  width: 90%;
   height: 100%;
   max-height: 300px;
   padding: 2rem;
@@ -657,16 +656,15 @@ export default {
   gap: 5rem;
   padding-left: 30px;
   margin-top: 20px;
-  margin-left: 60px;
+  margin-left: 40px;
   font-weight: bold;
   font-size: 16px;
   text-align: right;
 }
 .mileage-section {
-  width: 80%;
-  max-width: 1000px;
-  padding-left: 24px;
-  padding-right: 24px;
+  width: 90%;
+  padding-left: 12px;
+  padding-right: 12px;
   box-sizing: border-box;
 }
 .tabs {
@@ -739,7 +737,7 @@ export default {
   cursor: pointer;
 }
 .mileage-table {
-  width: 100%;
+  width: 90%;
   border-collapse: collapse;
   table-layout: fixed;
 
@@ -766,7 +764,7 @@ export default {
 
   th:nth-child(2),
   td:nth-child(2) {
-    width: 400px;
+    width: 350px;
   }
   td:nth-child(2) {
     text-align: left;

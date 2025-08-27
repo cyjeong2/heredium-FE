@@ -123,9 +123,9 @@
           </div>
           <!-- 사용자 지정 기간 설정 -->
           <div class="date-range">
-            <UDatepicker v-model="startDate" :max="endDate" style="width: 227.5px" />
+            <UDatepicker v-model="startDate" :max="endDate" style="width: 175px" />
             <span>~</span>
-            <UDatepicker v-model="endDate" :min="startDate" style="width: 227.5px" />
+            <UDatepicker v-model="endDate" :min="startDate" style="width: 175px" />
           </div>
 
           <button class="filter-submit" @click="applyPeriodFilter">조회</button>
@@ -437,7 +437,7 @@ export default {
 }
 
 .ticketing-body {
-  width: 2300px;
+  width: 100%;
   height: 200px !important;
 
   .ticketing-info {
@@ -553,8 +553,7 @@ export default {
   flex-direction: row;
   align-items: flex-start;
 
-  width: 80%;
-  max-width: 1000px;
+  width: 90%;
   height: 100%;
   max-height: 300px;
   padding: 2rem;
@@ -654,10 +653,9 @@ export default {
   font-size: 16px;
 }
 .mileage-section {
-  width: 80%;
-  max-width: 1000px;
-  padding-left: 24px;
-  padding-right: 24px;
+  width: 90%;
+  padding-left: 12px;
+  padding-right: 12px;
   box-sizing: border-box;
 }
 .tabs {
