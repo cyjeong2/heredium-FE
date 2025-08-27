@@ -202,7 +202,6 @@ export default {
   },
   computed: {
     coupons1() {
-      console.log(this.benefitRows)
       return this.getOrderedCouponsByCode(1);
     },
     coupons2() {
