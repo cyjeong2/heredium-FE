@@ -605,9 +605,8 @@ export default {
       }
 
       // 나이 계산 후 모달 분기
-      // const dob  = this.parseBirthToDate(userInfo.birthDate);
-      // const age  = this.getAgeByDob(dob);
-      const age = 17;
+      const dob  = this.parseBirthToDate(userInfo.birthDate);
+      const age  = this.getAgeByDob(dob);
 
       const isMinor = age !== null && age < 19;
       if (age !== null) this.minorAge = age;
