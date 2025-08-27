@@ -141,7 +141,7 @@
               <thead>
                 <tr>
                   <th>적립내역</th>
-                  <th>적립/사용</th>
+                  <th>적립/차감</th>
                 </tr>
               </thead>
               <tbody>

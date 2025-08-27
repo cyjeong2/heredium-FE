@@ -146,7 +146,7 @@
                   <th>적립내역</th>
                   <th>유효기간</th>
                   <th>적립</th>
-                  <th>사용</th>
+                  <th>차감</th>
                 </tr>
               </thead>
               <tbody>
